@@ -6,7 +6,10 @@ const routes = [
 		name: 'index',
 		component:  loadView(loaded => {
 			require(['../modules/index/index.vue'], loaded)
-		})
+		}),
+		meta: {
+			title: '大脑银行'
+		}
 	}
 ]
 

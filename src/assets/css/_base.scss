@@ -1,0 +1,33 @@
+@import '~lib/sandal/core';
+@import '~assets/css/core/functions', '~assets/css/core/mixins', '~assets/css/core/vars';
+
+*, *:before, *:after {
+	box-sizing: border-box;
+}
+
+html, body {
+	width: 100%;
+	height: 100%;
+	margin: 0 auto;
+	background-color: #eee;
+}
+
+body {
+	max-width: $maxW;
+	min-width: $minW;
+	margin: 0 auto;
+	background-color: #fff;
+	font-size: $fontSize;
+
+	a {
+
+	}
+}
+
+p {
+	margin: 0 auto;
+}
+
+a {
+	text-decoration: none;
+}

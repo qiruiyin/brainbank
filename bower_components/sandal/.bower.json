@@ -1,0 +1,14 @@
+{
+  "name": "sandal",
+  "homepage": "https://github.com/marvin1023/sandal",
+  "_release": "859d423eae",
+  "_resolution": {
+    "type": "branch",
+    "branch": "master",
+    "commit": "859d423eaec53e8f38cbdf3daec8e36b6cdf4a11"
+  },
+  "_source": "https://github.com/marvin1023/sandal.git",
+  "_target": "*",
+  "_originalSource": "https://github.com/marvin1023/sandal.git",
+  "_direct": true
+}

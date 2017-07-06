@@ -1,12 +1,16 @@
+<!-- 
+ 底部导航菜单
+ -->
+
 <template>
-	<div class="nav">
+	<nav>
 		<tabbar icon-class="vux-center" slot="bottom">
       <tabbar-item v-for="item in navDatas" :link="{name: item.link}" :selected="item.value == navSelected" :key="item.value">
       	<img :class="{'icon-big': item.value == 'mall'}" slot="icon" :src="item.img">
         <span slot="label" class="icon">{{ item.name }}</span>
       </tabbar-item>
     </tabbar>
-	</div>
+	</nav>
 </template>
 
 <script type="text/babel">
@@ -46,10 +50,10 @@
     				img: imgMsg,
     				link: 'msg'
     			},{
-    				value: "my",
+    				value: "userCenter",
     				name: "我的",
     				img: imgMy,
-    				link: 'my'
+    				link: 'userCenter'
     			}
     		],
     		navSelected: 'index'
@@ -61,7 +65,7 @@
 <style lang="scss" scoped>
 	@import '~lib/sandal/core';
 	@import '~assets/css/core/functions', '~assets/css/core/mixins', '~assets/css/core/vars';
-	
+
 	// 这里的大小取自vux组件的
 	.icon-big {
 		width: 68px;

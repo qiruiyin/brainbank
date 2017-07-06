@@ -1,0 +1,64 @@
+$entry: 'video', 'audio', 'quotation', 'download';
+	$entryIconW: 56px;
+
+	$entryVideos: '1';
+	$entryVideosIconW: 89px;
+	$entryVideosIconH: 97px;
+	
+	.entry {
+		@include halfpxline(0, $borderColor, 0 , 0, 1px, 0);
+		width: 100%;
+		padding: 20px 0;
+		text-align: center;
+		display: flex;
+
+		&.entry-videos {
+			& > div {
+				padding-top: $entryVideosIconH;
+		
+				&:before {
+					width: $entryVideosIconW;
+					height: $entryVideosIconH;
+					background-image: url("~assets/img/index/videos.png");
+				}
+
+				p {
+					width: $entryVideosIconW;
+					// text-align: justify;
+				}
+			}
+		}
+
+		& > div {
+			position: relative;
+			flex: 1;
+			padding-top: $entryIconW;
+			text-align: center;
+
+			&:before {
+				content: "";
+				position: absolute;
+				top: 0;
+				left: 0;
+				right: 0;
+				width: $entryIconW;
+				height: $entryIconW;
+				margin: 0 auto;
+				background: url("~assets/img/index/entry-video.png") no-repeat;
+				background-size: 100% auto;
+				background-position: center auto;	
+			}
+
+			p {
+				margin: 0 auto;
+			}
+		}
+
+		@each $iconName in $entry {
+			.entry-#{$iconName} {
+				&:before {
+					background-image: url("~assets/img/index/entry-#{$iconName}.png");
+				}
+			}
+		}
+	}

@@ -13,15 +13,12 @@ html, body {
 }
 
 body {
-	max-width: $maxW;
+	// max-width: $maxW;
 	min-width: $minW;
 	margin: 0 auto;
 	background-color: #fff;
 	font-size: $fontSize;
-
-	a {
-
-	}
+	color: $fontColor;
 }
 
 p {
@@ -30,4 +27,27 @@ p {
 
 a {
 	text-decoration: none;
+	color: inherit;
+}
+
+ul, li {
+	list-style: none;
+	margin: 0 auto;
+}
+
+img {
+	display: block;
+}
+
+.img {
+  max-width: 100%;
+}
+
+h1, h2, h3, h4, h5 {
+	margin: 0 auto;
+	font-weight: normal;
+}
+
+.hide {
+	display: none !important;
 }

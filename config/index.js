@@ -29,8 +29,7 @@ module.exports = {
     assetsPublicPath: '/',
     proxyTable: {
         '/wechat': {
-            // target: 'http://192.168.1.151:8080/csm/wechat',
-            target: 'http://192.168.1.150:81/wechat',
+            target: 'http://192.168.1.164:81/wechat/',
             changeOrigin: true,
             secure: false, // 接受 运行在 https 上的服务
             pathRewrite: {

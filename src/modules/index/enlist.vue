@@ -55,7 +55,8 @@
 			}
 		},
 		mounted: function() {
-			this.$http.post('/discover/userinfo/get',{"userCode":"201705300052529835144771844797952"}).then(function(argument) {
+			this.$http.post('/wechat/discover/userinfo/get',{"userCode":"201705300052529835144771844797952"}).then(function(e) {
+				// console.log(e)
 			})
 		},
 		methods: {

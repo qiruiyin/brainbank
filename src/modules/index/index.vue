@@ -8,7 +8,7 @@
 		
 		<div class="container">
 			<div class="banner">
-	    	<swiper auto :list="bannerDatas" :aspect-ratio="768/1366"></swiper>
+	    	<swiper auto dots-position="center" :list="bannerDatas" :aspect-ratio="768/1366"></swiper>
 			</div>
 			
 			<div class="entry">
@@ -76,7 +76,7 @@
 		components: { Group, Cell, Swiper, Card, Panel, elHeaderIndex, elTuijian, elImgText },
 	  data () {
 	    return {
-	      bannerDatas: [],
+	      bannerDatas: getterIndex.bannerDatas,
 	      adDatas: getterIndex.adDatas,
 	      entryDatas: getterIndex.entryDatas,
 	      entryVideosDatas: getterIndex.entryVideosDatas,
@@ -88,21 +88,21 @@
 	    }
 	  },
 	  mounted: function () {
-	  // 	let _this = this;
-	  // 	this.$http.post('/discover/index',{"userCode":"201705300052529835144771844797952"}).then(function(e) {
-	  // 		let banner = [],
-	  // 				bannerTop = e.data.bannerTop,
-	  // 				url = 'http://192.168.1.150:81/';
-	  // 		for(let i = 0; i < bannerTop.length; i++) {
-	  // 			banner[i] = {
-	  // 				img: url + bannerTop[i].adCode.replace(/\\/g, '/'),
-	  // 				url: 'banner/1'
-	  // 			}
-	  // 		}
+	  	let _this = this;
+	  	this.$http.post('/wechat/discover/index',{"userCode":"201705300052529835144771844797952"}).then(function(e) {
+	  	// 	let banner = [],
+	  	// 			bannerTop = e.data.data.bannerTop,
+	  	// 			url = 'http://192.168.1.150:81/';
+	  	// 	for(let i = 0; i < bannerTop.length; i++) {
+	  	// 		banner[i] = {
+	  	// 			img: url + bannerTop[i].adCode.replace(/\\/g, '/'),
+	  	// 			url: 'banner/1'
+	  	// 		}
+	  	// 	}
 
-	  // 		bannerTop.map()
-			// 	_this.bannerDatas = banner;
-			// })	
+	  	// 	// bannerTop.map()
+				// _this.bannerDatas = banner;
+			})	
 	  },
 	  methods: {
 	  	entry (url, type) {

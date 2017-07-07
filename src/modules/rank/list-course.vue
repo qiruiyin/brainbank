@@ -1,12 +1,12 @@
 <!-- 
-	音视频排行榜
+	课程下载
  -->
 
 <template>
 	<div class="rank-list">
 		<el-headerIndex></el-headerIndex>
-
-		<div class="container">		
+		
+		<div class="container">
 			<div class="tab">
 	      <tab v-model="tabSelected">
 	        <tab-item :selected="tabSelected == index" v-for="(item, index) in tabDatas" @click="tabSelected = index" :key="index">{{ item.title }}</tab-item>
@@ -27,21 +27,18 @@
 	import elImgTextRank from 'components/img-text/img-text-rank'
 
 	export default {
-		name: 'rankList',
+		name: 'listCourse',
 		components: { Tab, TabItem, Swiper, SwiperItem, elHeaderIndex, elImgTextRank },
 		data () {
 			return {
 				index: 0,
 				tabDatas: [
 					{
-						value: 'pay',
-						title: '付费',
+						value: 'new',
+						title: '最新上传',
 					},{
-						value: 'free',
-						title: '免费',
-					},{
-						value: 'all',
-						title: '排行榜',
+						value: 'most',
+						title: '下载最多',
 					}
 				],
 				tabSelected: 0,
@@ -51,8 +48,8 @@
 						list: [
 							{
 								id: '',
-								title: '总裁商业思维',
-								type: '游戏',
+								title: '纪念谷2',
+								type: '文字说明',
 								pay: '1340.0',
 								like: {
 									num: 2234,
@@ -64,7 +61,7 @@
 								}
 							},{
 								id: '',
-								title: '总裁商业思维',
+								title: '纪念谷2',
 								type: '游戏',
 								pay: '1340.0',
 								like: {
@@ -77,7 +74,7 @@
 								}
 							},{
 								id: '',
-								title: '总裁商业思维',
+								title: '纪念谷2',
 								type: '游戏',
 								pay: '1340.0',
 								like: {
@@ -95,56 +92,12 @@
 						list: [
 							{
 								id: '',
-								title: '总裁商业思维',
+								title: '纪念谷2',
 								type: '游戏',
 								pay: '0',
 								like: {
 									num: 2234,
 									percent: 3.4
-								},
-								url: 'videoDetail',
-								params: {
-									id: 1
-								}
-							}
-						]
-					},{
-						value: 'all',
-						list: [
-							{
-								id: '',
-								title: '总裁商业思维',
-								type: '游戏',
-								pay: '0',
-								like: {
-									num: 2234,
-									percent: 1
-								},
-								url: 'audioDetail',
-								params: {
-									id: 1
-								}
-							},{
-								id: '',
-								title: '总裁商业思维',
-								type: '游戏',
-								pay: '1888888',
-								like: {
-									num: 2,
-									percent: 3.4
-								},
-								url: 'audioDetail',
-								params: {
-									id: 1
-								}
-							},{
-								id: '',
-								title: '总裁商业思维',
-								type: '游戏',
-								pay: '0',
-								like: {
-									num: 2234,
-									percent: 5
 								},
 								url: 'audioDetail',
 								params: {

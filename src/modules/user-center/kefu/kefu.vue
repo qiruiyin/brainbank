@@ -10,7 +10,14 @@
 			<card :header="{title:'我的服务人员'}">
 				<div slot="content" class="service">
 					<div class="service-card">
-						<img src="" alt="">
+						<img :src="service.img" alt="">
+						<div class="service-card-text">
+							<div class="title">{{ service.name }}</div>
+							<p>工号：{{ service.num }}</p>
+							<p>电话：{{ service.tel }}</p>
+
+							<div class="btn" @click="goPage('kefuDetail')">查看TA的名片</div>
+						</div>
 					</div>
 				</div>
 			</card>
@@ -24,7 +31,7 @@
 		          </tr>
 		        </thead>
 		        <tbody>
-		          <tr v-for="(item, index) in courseList" :key="index">
+		          <tr v-for="(item, index) in courseList" :key="index" @click="goPage()">
 		            <td>{{ item.startDate }}</td>
 		            <td>{{ item.name }}</td>
 		            <td>{{ item.lecturer }}</td>
@@ -81,6 +88,11 @@
 					}
 				],
 			}
+		},
+		methods: {
+			goPage (url) {
+	  		this.$router.push({ name: url })
+			}
 		}
 	}
 </script>
@@ -89,5 +101,36 @@
 	@import '~lib/sandal/core';
 	@import '~assets/css/core/functions', '~assets/css/core/mixins', '~assets/css/core/vars';
 	
+	$serviceCardW: 66px;
 
+	.service-card {
+		position: relative;
+		padding: $padding;
+		display: flex;
+
+		img {
+			width: $serviceCardW;
+			height: $serviceCardW;
+			border-radius: $serviceCardW;
+		}
+
+		.service-card-text {
+			flex: 1;
+			padding-left: $padding;
+		}
+
+		.title {
+			font-size: 18px;
+			color: $fontColorBlack;
+		}
+
+		.btn {
+			@include halfpxline($borderRadius, $borderColor, 1px, 1px, 1px, 1px);
+			position: absolute;
+			top: 26px;
+			right: $padding;
+			padding: 0 10px;
+			line-height: 36px;
+		}
+	}
 </style>

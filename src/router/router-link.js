@@ -59,6 +59,15 @@ const routes = [
 			title: '资料下载'
 		}
 	},{
+		path: '/list-course',
+		name: 'courseList',
+		component:  loadView(loaded => {
+			require(['../modules/rank/list-course.vue'], loaded)
+		}),
+		meta: {
+			title: '资料下载'
+		}
+	},{
 		path: '/quotation',
 		name: 'quotation',
 		component:  loadView(loaded => {
@@ -118,13 +127,22 @@ const routes = [
 			title: '大脑银行'
 		}
 	},{
-		path: '/kefu',
+		path: '/user-center/kefu',
 		name: 'kefu',
 		component:  loadView(loaded => {
 			require(['../modules/user-center/kefu/kefu.vue'], loaded)
 		}),
 		meta: {
 			title: '我的客服'
+		}
+	},{
+		path: '/user-center/kefu-detail',
+		name: 'kefuDetail',
+		component:  loadView(loaded => {
+			require(['../modules/user-center/kefu/kefu-detail.vue'], loaded)
+		}),
+		meta: {
+			title: '我的客服详情'
 		}
 	},{
 		path: '/share',
@@ -136,7 +154,7 @@ const routes = [
 			title: '分享有奖'
 		}
 	},{
-		path: '/personal-edit',
+		path: '/user-center/personal-edit',
 		name: 'personalEdit',
 		component:  loadView(loaded => {
 			require(['../modules/user-center/personal/edit.vue'], loaded)
@@ -145,7 +163,7 @@ const routes = [
 			title: '修改资料'
 		}
 	},{
-		path: '/integral',
+		path: '/user-center/integral',
 		name: 'integral',
 		component:  loadView(loaded => {
 			require(['../modules/user-center/integral/integral.vue'], loaded)
@@ -154,13 +172,23 @@ const routes = [
 			title: '我的推广积分'
 		}
 	},{
-		path: '/feedback',
+		path: '/user-center/feedback',
 		name: 'feedback',
 		component:  loadView(loaded => {
 			require(['../modules/user-center/feedback/feedback.vue'], loaded)
 		}),
 		meta: {
 			title: '问题反馈'
+		}
+	},{
+		// 商城
+		path: '/mall',
+		name: 'mall',
+		component:  loadView(loaded => {
+			require(['../modules/mall/mall.vue'], loaded)
+		}),
+		meta: {
+			title: '商城首页'
 		}
 	}
 ]

@@ -4,6 +4,32 @@
 
 <template>
 	<div class="msg">
+		<swipeout class="vux-1px-tb">
+      <swipeout-item transition-mode="follow" v-for="(item, index) in msgDatas" :key="item.date">
+      	<div slot="left-menu">
+          <swipeout-button type="primary">标记为已读</swipeout-button>
+          <swipeout-button type="warn">删除</swipeout-button>
+        </div>
+        <div slot="right-menu">
+          <swipeout-button type="primary">标记为已读</swipeout-button>
+          <swipeout-button type="warn">删除</swipeout-button>
+        </div>
+        <div slot="content" class="msg-simple vux-1px-t">
+      		<header>{{ item.date }}</header>
+					<main>
+						<div class="title">{{ item.title }}</div>
+						<div class="desc">{{ item.content }}</div>
+						<div class="time">时间：{{ item.time }}</div>
+					</main>
+					<footer>
+						<router-link :to="{ name: item.url }">
+							{{ item.urlMsg }}
+						</router-link>
+					</footer>  	
+        </div>
+      </swipeout-item>
+    </swipeout>
+<!-- 
 		<div class="msg-simple" v-for="item in msgDatas" :key="item.date">
 			<header>{{ item.date }}</header>
 			<main>
@@ -16,13 +42,18 @@
 					{{ item.urlMsg }}
 				</router-link>
 			</footer>
-		</div>
+		</div> -->
 	</div>
 </template>
 
 <script type="text/babel">
+	import { GroupTitle, Swipeout, SwipeoutItem, SwipeoutButton, XButton } from 'vux'
+
 	export default {
 		name: 'msg',
+		components: {
+			GroupTitle, Swipeout, SwipeoutItem, SwipeoutButton, XButton
+		},
 		data () {
 			return {
 				title: '消息',

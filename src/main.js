@@ -11,8 +11,7 @@ Vue.use(AjaxPlugin)
 
 Vue.http.defaults.timeout = 5000;                        //响应时间
 Vue.http.defaults.headers.post['Content-Type'] = 'application/json';           //配置请求头
-// Vue.http.defaults.baseURL = 'http://192.168.1.151:8080/csm/wechat/';
-Vue.http.defaults.baseURL = 'http://192.168.1.150:81/wechat/';
+// Vue.http.defaults.baseURL = 'http://192.168.1.164:81/wechat/';
 
 // console.log(Vue.http.defaults)
 // 点击延迟

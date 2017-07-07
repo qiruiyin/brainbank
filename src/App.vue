@@ -2,7 +2,10 @@
   <div id="app">
     <loading v-model="isLoading"></loading>
     <div class="container">
-      <router-view></router-view>    
+      <transition :name="'vux-pop-' + (direction.direction === 'forward' ? 'in' : 'out')">
+          <router-view class="router-view"></router-view>
+        </transition>
+      <!-- <router-view></router-view>     -->
     </div>
     <el-nav></el-nav>
   </div>
@@ -21,8 +24,12 @@ export default {
   },
   computed: {
     ...mapState({
-      isLoading: state => state.isLoading
+      isLoading: state => state.isLoading,
+      direction: state => state.direction
     })
+  },
+  mounted: () => {
+
   }
 }
 </script>
@@ -45,4 +52,33 @@ export default {
     overflow: auto;
     -webkit-overflow-scrolling: touch;
   }
+
+.vux-pop-out-enter-active,
+.vux-pop-out-leave-active,
+.vux-pop-in-enter-active,
+.vux-pop-in-leave-active {
+  will-change: transform;
+  transition: all 500ms;
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  backface-visibility: hidden;
+  perspective: 1000;
+}
+.vux-pop-out-enter {
+  opacity: 0;
+  transform: translate3d(-100%, 0, 0);
+}
+.vux-pop-out-leave-active {
+  opacity: 0;
+  transform: translate3d(100%, 0, 0);
+}
+.vux-pop-in-enter {
+  opacity: 0;
+  transform: translate3d(100%, 0, 0);
+}
+.vux-pop-in-leave-active {
+  opacity: 0;
+  transform: translate3d(-100%, 0, 0);
+}
 </style>

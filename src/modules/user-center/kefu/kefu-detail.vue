@@ -24,16 +24,16 @@
 			
 			<card :header="{title:'我的服务人员'}">
 				<div slot="content" class="kefu-course-read">
-					<div class="kefu-course-read-block" v-for="item in courseAll" :key="item.value">
-						<div :class="['kefu-icon', 'kefu-icon-' + item.color]">{{ item.name }}</div>
+					<div class="kefu-course-read-block" v-for="item in courseAll" :key="item.code">
+						<div :class="['kefu-icon', { 'disabled': item.owner }]">{{ item.name }}</div>
 					</div>
 				</div>
 			</card>
 
 			<card :header="{title: '联系方式'}">
 				<div slot="content" class="kefu-link">
-					<a class="link-icon-tel" :href="'tel:' + link.tel">{{ link.tel }}<span>（点击拨打）</span></a>
-					<a class="link-icon-weixin">{{ link.weixin }}<span>（复制微信号添加服务老师）</span></a>
+					<a class="link-icon-tel" :href="'tel:' + header.tel">{{ header.tel }}<span>（点击拨打）</span></a>
+					<a class="link-icon-weixin">{{ header.weixin }}<span>（复制微信号添加服务老师）</span></a>
 				</div>
 			</card>
 			
@@ -74,71 +74,79 @@
 			return {
 				title: '客服详情',
 				header: {
-					img: imgUser,
-					name: '谢学军',
-					position: '资深客服经理',
-					time: '1.5年',
-					customerNum: '30',
-					likeRate: '99%',
-					customerWitness: '25',
-					serviceLevel: '75'			
+					img: '',
+					name: '',
+					position: '',
+					time: '',
+					customerNum: '',
+					tel: '',
+					weixin: '',
+					likeRate: '',
+					customerWitness: '',
+					serviceLevel: ''			
 				},
-				courseAll: [
-					{
-						value: 'all',
-						name: '总',
-						color: 'green',
-					},{
-						value: 'xi',
-						name: '系',
-						color: 'red',
-					},{
-						value: 'fu',
-						name: '服',
-						color: 'gray',
-					},{
-						value: 'ling',
-						name: '领',
-						color: 'blue',
-					},{
-						value: 'hong',
-						name: '红',
-						color: 'lightblue',
-					},{
-						value: 'he',
-						name: '合',
-						color: 'yellow',
-					}
-				],
-				link: {
-					tel: '18896904426',
-					weixin: '18896904426'
-				},
+				courseAll: [],
 				courseTitle: [ '日期', '课程', '讲师', '时间', '地点' ],
-				courseList: [
-					{
-						startDate: '2012-10-01',
-						name: '商业思维',
-						lecturer: '待定',
-						time: 5,
-						address: '广州'
-					},{
-						startDate: '2012-10-01',
-						name: '商业思维',
-						lecturer: '待定',
-						time: 5,
-						address: '广州'
-					},{
-						startDate: '2012-10-01',
-						name: '商业思维',
-						lecturer: '待定',
-						time: 5,
-						address: '广州'
-					}
-				],
+				courseList: [],
 			}
 		},
+		mounted () {
+			this.fetchData();
+		},
 		methods: {
+			fetchData() {
+				let _this = this;
+				this.$http.post('/wechat/usercenter/customerService/info',
+						{
+							"customerCode": _this.$store.state.user.userCode,
+							"userCode": _this.$route.params.serviceCode
+						}
+					).then(function(e) {
+						let responseData = e.data.data,
+								header = responseData.customerServiceInfoList[0];
+
+						_this.header = {
+							img: _this.resolveImg(header.headPhoto),
+							name: header.NAME,
+							position: header.roleName,
+							time: header.workTime + '年',
+							customerNum: header.customerCount,
+							tel: header.mobile,
+							weixin: '',
+							likeRate: '99%',
+							customerWitness: '25',
+							serviceLevel: '75'	
+						};
+
+						_this.transData(responseData.lessonList, 'courseList');
+
+						let courseAll = [];
+						responseData.medalBeanList.map(function(item, index) {
+							courseAll[index] = {
+								name: item.name.substr(0, 1),
+								nameAll: item.name,
+								code: item.code,
+								owner: item.owner
+							}
+						});
+						_this.courseAll = courseAll;
+					}
+				);
+			},
+			transData (data, name) {
+				let arr = [];
+				data.map(function(item, index) {
+					arr[index] = {
+						startDate: item.startDate,
+						name: item.name,
+						lecturer: item.author,
+						time: item.continueTime,
+						address: item.address
+					}
+				})
+
+				this[name] = arr;
+			},
 			goPage () {
 	  		this.$router.push({ name: 'index' })
 			}
@@ -217,13 +225,18 @@
 		border-radius: $borderRadius;
 		color: #fff;
 		font-size: 20px;
+		background: #1ABC9C;
+
+		&.disabled {
+			background: #BDC3C7;
+		}
 	}
 
-	@each $color in $colors { 
-		.kefu-icon-#{$color} { 
-			background: $color;
-		} 
-	}
+	// @each $color in $colors { 
+	// 	.kefu-icon-#{$color} { 
+	// 		background: $color;
+	// 	} 
+	// }
 	
 	.kefu-link {
 		padding: $padding;

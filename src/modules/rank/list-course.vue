@@ -12,8 +12,13 @@
 	        <tab-item :selected="tabSelected == index" v-for="(item, index) in tabDatas" @click="tabSelected = index" :key="index">{{ item.title }}</tab-item>
 	      </tab>
 	      <swiper class="list" height="100%" v-model="tabSelected" :show-dots="false">
-	        <swiper-item v-for="(tabContentDatasList, index) in tabContentDatas" :key="index">
-	          <el-img-text-rank v-for="(item, ind) in tabContentDatasList.list" :img-text-data="item" :key="ind"></el-img-text-rank>
+	        <swiper-item v-for="(tabContentDatasList, index) in tabDatas" :key="index">
+	          <template v-if="tabContentDatasList.value == 'new'">
+	          	<el-img-text-rank @onBtnClick="downloadScource" v-for="(item, ind) in newData" :img-text-data="item" img-text-btn="1" :key="ind"></el-img-text-rank>
+	          </template>
+	          <template v-if="tabContentDatasList.value == 'most'">
+	          	<el-img-text-rank @onBtnClick="downloadScource" v-for="(item, ind) in mostData" :img-text-data="item" img-text-btn="1" :key="ind"></el-img-text-rank>
+	          </template>
 	        </swiper-item>
 	      </swiper>
 	    </div>
@@ -22,13 +27,13 @@
 </template>
 
 <script type="text/babel">
-	import { Tab, TabItem, Swiper, SwiperItem } from 'vux'
+	import { Tab, TabItem, Swiper, SwiperItem, Alert } from 'vux'
 	import elHeaderIndex from 'components/header/header-index'
 	import elImgTextRank from 'components/img-text/img-text-rank'
 
 	export default {
 		name: 'listCourse',
-		components: { Tab, TabItem, Swiper, SwiperItem, elHeaderIndex, elImgTextRank },
+		components: { Tab, TabItem, Swiper, SwiperItem, Alert, elHeaderIndex, elImgTextRank },
 		data () {
 			return {
 				index: 0,
@@ -42,71 +47,93 @@
 					}
 				],
 				tabSelected: 0,
-				tabContentDatas: [
-					{
-						value: 'pay',
-						list: [
-							{
-								id: '',
-								title: '纪念谷2',
-								type: '文字说明',
-								pay: '1340.0',
-								like: {
-									num: 2234,
-									percent: 3
-								},
-								url: 'audioDetail',
-								params: {
-									id: 1
-								}
-							},{
-								id: '',
-								title: '纪念谷2',
-								type: '游戏',
-								pay: '1340.0',
-								like: {
-									num: 11,
-									percent: 3.4
-								},
-								url: 'audioDetail',
-								params: {
-									id: 1
-								}
-							},{
-								id: '',
-								title: '纪念谷2',
-								type: '游戏',
-								pay: '1340.0',
-								like: {
-									num: 2234,
-									percent: 4
-								},
-								url: 'audioDetail',
-								params: {
-									id: 1
-								}
-							}
-						]
-					},{
-						value: 'free',
-						list: [
-							{
-								id: '',
-								title: '纪念谷2',
-								type: '游戏',
-								pay: '0',
-								like: {
-									num: 2234,
-									percent: 3.4
-								},
-								url: 'audioDetail',
-								params: {
-									id: 1
-								}
-							}
-						]
+				newData: [],
+				mostData: []
+			}
+		},
+		mounted () {
+			this.fetchData();
+		},
+		methods: {
+			fetchData() {
+				let _this = this;
+				// 最新上传
+	  		_this.$http.post('/wechat/coursewaremobile/queryTypeRankByCode',{
+	  			"customerCode": _this.$store.state.user.userCode, // userCode
+	  			"pageSize": 1, 
+	  			"pageCount": 10,
+	  			"typeCode": _this.$route.params.typeCode
+	  		}).then(function(e) {
+					let responseData = e.data.data;
+					_this.transData(responseData, 'newData');
+	  		});
+
+	  		// 下载最多
+	  		_this.$http.post('/wechat/coursewaremobile/queryTypeByCode',{
+	  			"customerCode": _this.$store.state.user.userCode, // userCode
+	  			"pageSize": 1, 
+	  			"pageCount": 10,
+	  			"typeCode": _this.$route.params.typeCode
+	  		}).then(function(e) {
+					let responseData = e.data.data;
+					_this.transData(responseData, 'mostData');
+	  		});
+			},
+			transData (data, obj) {
+	  		let _this = this,
+	  				arr = [];
+				data.list.map(function(item, index){
+					arr[index] = {
+						id: item.id,
+						code: item.code,
+						title: item.name,
+						type: '文字说明',
+						pay: item.isBuy,
+						download: item.downloads,
+						downloadUrl: _this.resolveImg(item.file_url),
+						peice: item.requiredpoints,
+						url: 'audioDetail',
+						img: _this.resolveImg(item.thumbnail),
+						params: {
+							id: item.code
+						}
 					}
-				]
+				});
+
+				_this[obj] = arr;
+			},
+			downloadScource (args) {
+				console.log(args)
+				let _this = this;
+				if(_this.$store.state.user.userCode == '') {
+					_this.$vux.alert.show({
+		        title: '',
+		        content: '请先登录',
+		        onShow () {
+		          console.log('Plugin: I\'m showing')
+		        },
+		        onHide () {
+		          console.log('Plugin: I\'m hiding now')
+		        }
+		      })
+				} else {
+					_this.$http.post('/wechat/coursewaremobile/buy',{
+		  			"customerCode": _this.$store.state.user.userCode, // userCode
+		  			"productCode": args.code
+		  		}).then(function(e) {
+		  			if(e.data.data.result.tag == 0) {
+			      	_this.$vux.alert.show({
+				        title: '',
+				        content: e.data.data.result.msg,
+				        onHide () {
+				        	
+				        }
+				      })  		
+			      } else {
+			      	window.location.href(_this.resolveImg(args.url))
+			      }
+					});
+				}
 			}
 		}
 	}

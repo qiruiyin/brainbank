@@ -3,6 +3,9 @@ import Vuex from 'vuex'
 import * as actions from './actions'
 import * as getters from './getters'
 import loadbar from './modules/loadbar'
+import common from './modules/common'
+import direction from './modules/direction'
+import user from './modules/user'
 
 Vue.use(Vuex)
 
@@ -12,7 +15,10 @@ export default new Vuex.Store({
   actions,
   getters,
   modules: {
-  	loadbar
+  	loadbar,
+  	common,
+    direction,
+    user
     // cart,
     // products
   },

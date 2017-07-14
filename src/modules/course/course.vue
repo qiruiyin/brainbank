@@ -18,7 +18,7 @@
 	          <tr v-for="(item, index) in courseList" :key="index">
 	            <td>{{ item.startDate }}</td>
 	            <td>{{ item.name }}</td>
-	            <td>{{ item.lecturer }}</td>
+	            <td>{{ item.author }}</td>
 	            <td>{{ item.time }}</td>
 	            <td>{{ item.address }}</td>
 	          </tr>
@@ -27,8 +27,8 @@
 			</div>
 			
 			<div class="banner">
-				<router-link :to="{ name: banner.url }">
-					<img class="img" :src="banner.img" alt="">
+				<router-link v-for="(item, index) in banner" :key="index" :to="{ name: item.link }">
+					<img class="img" :src="item.img" alt="">
 				</router-link>
 			</div>
 
@@ -54,31 +54,8 @@
 			return {
 				title: '课程列表',
 				courseTitle: [ '日期', '课程', '讲师', '时间', '地点' ],
-				courseList: [
-					{
-						startDate: '2012-10-01',
-						name: '商业思维',
-						lecturer: '待定',
-						time: 5,
-						address: '广州'
-					},{
-						startDate: '2012-10-01',
-						name: '商业思维',
-						lecturer: '待定',
-						time: 5,
-						address: '广州'
-					},{
-						startDate: '2012-10-01',
-						name: '商业思维',
-						lecturer: '待定',
-						time: 5,
-						address: '广州'
-					}
-				],
-				banner: {
-					url: '',
-					img: imgBanner
-				},
+				courseList: [],
+				banner: [],
 				courseTuijian: [
 					{
 						header: {
@@ -125,6 +102,22 @@
 					}
 				]
 			}
+		},
+		mounted () {
+			this.fetchData();
+		},
+		methods: {
+			fetchData	() {
+	  		// 获取所有数据
+	  		let _this = this;
+	  		_this.$http.post('/wechat/course/index',{}).then(function(e) {
+					let responseData = e.data.data;
+	  			_this.courseList = responseData.lessonList;
+	  			// _this.banner
+		  		_this.resolveField(_this, 'banner', responseData.adLessonList, 'ad_code');
+		  		console.log(_this.banner)
+	  		});
+	  	}
 		}
 	}
 </script>
@@ -134,7 +127,14 @@
   @import '~assets/css/core/functions', '~assets/css/core/mixins', '~assets/css/core/vars';
   
   .table {
+  	width: 100%;
   	margin-bottom: $padding;
+    white-space: nowrap;
+    overflow: auto;
+
+    td, th {
+    	padding: 0 1em;
+    }
   }
 
 	.banner {

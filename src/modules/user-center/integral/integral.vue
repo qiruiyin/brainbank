@@ -9,7 +9,7 @@
 		<div class="container">
 			<div class="integral-header">
 				<img src="~assets/img/user-center/integral.png" alt="">
-				<p>{{ integral.now }}分</p>
+				<p>{{ integral }}分</p>
 			</div>
 
 			<div class="tab">
@@ -17,8 +17,8 @@
 	        <tab-item :selected="tabSelected == index" v-for="(item, index) in tabDatas" @click="tabSelected = index" :key="index">{{ item.title }}</tab-item>
 	      </tab>
 	      <swiper class="list" height="500px" v-model="tabSelected" :show-dots="false">
-	        <swiper-item v-for="(tabContentDatasData, index) in tabContentDatas" :key="index">
-	          <div class="integral-man" v-for="(item, ind) in tabContentDatasData.data" :key="ind">
+	        <swiper-item v-for="(tabContentDatasData, index) in tabDatas" :key="index">
+	          <div class="integral-man" v-for="(item, ind) in tabContentDatas[tabContentDatasData.value]" :key="ind">
 							<img :src="item.img">
 							<div class="title">
 								<p>{{ item.name }}</p>
@@ -44,53 +44,58 @@
 		data () {
 			return {
 				title: '我的积分',
-				integral: {
-					now: 20,
-					all: 20
-				},
+				integral: 0,
 				tabDatas: [
 					{
-						value: '',
-						title: '已邀请普通学员2位',
+						value: 'type1',
+						title: '',
 					},{
-						value: 'free',
-						title: '1位报名总裁商业思维',
+						value: 'type2',
+						title: '',
 					}
 				],
 				tabSelected: 0,
-				tabContentDatas: [
-					{
-						value: 'yiyaoqing',
-						data: [
-							{
-								value: '',
-								name: '苏引华',
-								date: '2017.08.02',
-								img: imgHeader
-							}
-						]
-					},{
-						value: 'yiyaoqing',
-						data: [
-							{
-								value: '',
-								name: '苏引华',
-								date: '2017.08.02',
-								img: imgHeader
-							},{
-								value: '',
-								name: '苏引华',
-								date: '2017.08.02',
-								img: imgHeader
-							},{
-								value: '',
-								name: '苏引华',
-								date: '2017.08.02',
-								img: imgHeader
-							}
-						]
+				tabContentDatas: {
+					type1: [],
+					type2: []
+				}
+			}
+		},
+		mounted () {
+			this.fetchData();
+		},
+		methods: {
+			fetchData() {
+				let _this = this;
+				this.$http.post('/wechat/usercenter/getIntegralInfo',
+						{
+							"userCode": _this.$store.state.user.userCode,
+						}
+					).then(function(e) {
+						let responseData = e.data.data.result;
+
+						_this.interval = responseData.integralInfo;
+						_this.tabDatas[0].title = "已邀请普通学员" + responseData.type1 + "位";
+						_this.tabDatas[1].title = responseData.type2 + "位报名总裁商业思维";
+
+						_this.transData(responseData.list1, 'type1');
+						_this.transData(responseData.list2, 'type2');
 					}
-				],
+				);
+			},
+			transData (data, name) {
+				let _this =this,
+						arr = [];
+
+				data.map(function(item, index){
+					arr[index] = {
+						id: item.id,
+						name: item.name,
+						img: _this.resolveImg(item.header),
+						date: item.create_time
+					}
+				});
+				_this.tabContentDatas[name] = arr;
 			}
 		}
 	}
@@ -114,16 +119,6 @@
 			margin: 0 auto;
 			margin-bottom: $padding;
 		}
-
-		// .btn {
-		// 	width: 4em;
-		// 	margin: 0 auto;
-		// 	margin-top: $padding;
-		// 	margin-bottom: $padding;
-		// 	border-radius: $borderRadius;
-		// 	background: $colorRed;
-		// 	color: #fff;
-		// }
 	}
 
 	.integral-man {

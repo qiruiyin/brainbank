@@ -6,7 +6,8 @@
 	<nav>
 		<tabbar icon-class="vux-center" slot="bottom">
       <tabbar-item v-for="item in navDatas" :link="{name: item.link}" :selected="item.value == navSelected" :key="item.value">
-      	<img :class="{'icon-big': item.value == 'mall'}" slot="icon" :src="item.img">
+        <img v-if="item.value == 'mall'" :class="{'icon-big': item.value == 'mall'}" slot="icon" :src="item.img">
+        <i v-else :class="['fa', 'fa-' + item.value ]" slot="icon"></i>
         <span slot="label" class="icon">{{ item.name }}</span>
       </tabbar-item>
     </tabbar>
@@ -30,12 +31,12 @@
     		isDemo: true,
     		navDatas: [
     			{
-    				value: "index",
+    				value: "home",
     				name: "首页",
     				img: imgIndex,
     				link: 'index'
     			},{
-    				value: "course",
+    				value: "headphones",
     				name: "课程",
     				img: imgCourse,
     				link: 'course'
@@ -45,12 +46,12 @@
     				img: imgMall,
     				link: 'mall'
     			},{
-    				value: "msg",
+    				value: "comments-o",
     				name: "消息",
     				img: imgMsg,
     				link: 'msg'
     			},{
-    				value: "userCenter",
+    				value: "user-o",
     				name: "我的",
     				img: imgMy,
     				link: 'userCenter'

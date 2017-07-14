@@ -5,13 +5,21 @@ import store from './store'
 import router from './router'
 import App from './App'
 import myFilter from './filter'
+import wordBook from './commons/wordBook'
+
+import commonFun from './commons'
+
+// console.log(Vue)
 
 import { AjaxPlugin } from 'vux'
 Vue.use(AjaxPlugin)
 
+import  { AlertPlugin } from 'vux'
+Vue.use(AlertPlugin)
+
 Vue.http.defaults.timeout = 5000;                        //响应时间
-Vue.http.defaults.headers.post['Content-Type'] = 'application/json';           //配置请求头
-// Vue.http.defaults.baseURL = 'http://192.168.1.164:81/wechat/';
+Vue.http.defaults.headers.post['Content-Type'] = 'application/raw';           //配置请求头
+// Vue.http.defaults.baseURL = 'http://192.168.1.151:8080/wechat/';
 
 // console.log(Vue.http.defaults)
 // 点击延迟

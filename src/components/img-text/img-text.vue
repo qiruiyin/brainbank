@@ -10,7 +10,8 @@
 		</div>
 		<div class="text">
 			<h5 class="title">{{ imgTextData.title }}
-				<span>{{ imgTextData.priceCurrency }}{{ imgTextData.price }}/{{ imgTextData.priceUnit }}</span>	
+				<span>￥{{ imgTextData.price }}</span>	
+				<!-- <span>{{ imgTextData.priceCurrency }}{{ imgTextData.price }}/{{ imgTextData.priceUnit }}</span>	 -->
 			</h5>
 			<p class="desc">{{ imgTextData.desc }}</p>
 			<p>{{ imgTextData.label }}：{{ imgTextData.speaker }}<span>{{ imgTextData.subscribe }}人订阅</span></p>

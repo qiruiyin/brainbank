@@ -12,23 +12,6 @@ $entry: 'video', 'audio', 'quotation', 'download';
 		text-align: center;
 		display: flex;
 
-		&.entry-videos {
-			& > div {
-				padding-top: $entryVideosIconH;
-		
-				&:before {
-					width: $entryVideosIconW;
-					height: $entryVideosIconH;
-					background-image: url("~assets/img/index/videos.png");
-				}
-
-				p {
-					width: $entryVideosIconW;
-					// text-align: justify;
-				}
-			}
-		}
-
 		& > div {
 			position: relative;
 			flex: 1;
@@ -60,5 +43,27 @@ $entry: 'video', 'audio', 'quotation', 'download';
 					background-image: url("~assets/img/index/entry-#{$iconName}.png");
 				}
 			}
+		}
+	}
+
+	.entry-videos {
+		@include halfpxline(0, $borderColor, 0 , 0, 1px, 0);
+		width: 100%;
+		padding: 20px 0;
+		text-align: center;
+		display: flex;
+
+		& > div {
+			flex: 1;
+
+			p {
+				max-width: $entryVideosIconW;
+				// text-align: justify;
+			}
+		}
+		
+		img {
+		  width: 90%;
+    	margin: 0 auto;
 		}
 	}

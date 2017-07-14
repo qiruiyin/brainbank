@@ -18,7 +18,7 @@
 	// import imgHeader from 'assets/img/index/header.png'
 
 	export default {
-		props: ['tuijianData'],
+		props: ['tuijianData', 'tuijianLink'],
 		data () {
 			return {
 				// img: imgHeader,

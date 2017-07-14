@@ -35,13 +35,13 @@ export const getterIndex = {
 			name: '视频程序',
 			img: 'video',
 			url: 'rankList',
-			type: 'audio'
+			type: 'video'
 		},{
 			value: 'audio',
 			name: '语音程序',
 			img: 'audio',
 			url: 'rankList',
-			type: 'video'
+			type: 'audio'
 		},{
 			value: 'quotation',
 			name: '经典语录',

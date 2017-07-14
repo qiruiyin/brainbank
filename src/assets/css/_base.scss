@@ -1,8 +1,14 @@
 @import '~lib/sandal/core';
 @import '~assets/css/core/functions', '~assets/css/core/mixins', '~assets/css/core/vars';
 
+@import '~assets/fonts/css/font-awesome.min.css';
+
 *, *:before, *:after {
 	box-sizing: border-box;
+}
+
+[class^="vux"], [class^="weui"] {
+  box-sizing: initial;
 }
 
 html, body {
@@ -10,6 +16,7 @@ html, body {
 	height: 100%;
 	margin: 0 auto;
 	background-color: #eee;
+
 }
 
 body {
@@ -56,3 +63,6 @@ input[type="button"], input[type="submit"], input[type="reset"], input[type="fil
 	display: none !important;
 }
 
+.vux-slider > .vux-swiper > .vux-swiper-item {
+	overflow-y: auto;
+}

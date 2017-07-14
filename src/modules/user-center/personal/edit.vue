@@ -68,6 +68,40 @@
 					}
 				]
 			}
+		},
+		mounted () {
+			this.fetchData();
+		},
+		methods: {
+			fetchData() {
+				let _this = this;
+				this.$http.post('/wechat/usercenter/getCustomerInfo',
+						{
+							"customerCode": _this.$store.state.user.userCode,
+						}
+					).then(function(e) {
+						let responseData = e.data.data,
+								arr = [],
+								data = responseData.customerInfoList[0];
+
+						_this.formDatas.map(function(item, index) {
+							if(item.key == "name") {
+								item.value = data.NAME;
+							} else if (item.key == "phone") {
+								item.value = data.mobile;
+							} else if (item.key == "idcard") {
+								item.value = data.idcard;
+							} else if (item.key == "qq") {
+								item.value = data.qq;
+							} else if (item.key == "weixin") {
+								item.value = data.weixinAccount;
+							} else if (item.key == "address") {
+								item.value = data.address;
+							}
+						})
+					}
+				);
+			}
 		}
 	}
 </script>

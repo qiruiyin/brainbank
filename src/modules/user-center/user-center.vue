@@ -15,7 +15,8 @@
 
 		<main>
 			<cell v-for="item in operations" :link="{name: item.url}" :title="item.name" :key="item.value" is-link>
-        <img slot="icon" width="40" style="display:block;margin-right:5px;" :src="item.img">
+        <!-- <img slot="icon" width="40" style="display:block;margin-right:5px;" :src="item.img"> -->
+        <i slot="icon" :class="['fa', 'fa-' + item.icon ]"></i>
       </cell>
 		</main>	
 	</div>
@@ -41,37 +42,57 @@
 				kefuUrl: 'kefu',
 				header: {
 					img: imgUser,
-					name: '梁熙颖',
-					course: '商业思维'
+					name: this.$store.state.user.name,
+					course: this.$store.state.user.course
 				},
 				operations: [
 					{
 						value: '',
 						name: '修改个人资料',
 						url: 'personalEdit',
-						img: imgIcon01
+						img: imgIcon01,
+						icon: 'address-card-o'
 					},{
 						value: '',
 						name: '我的推广积分',
 						url: 'integral',
-						img: imgIcon02
-					},{
-						value: '',
-						name: '我的访问记录',
-						url: '',
-						img: imgIcon03
+						img: imgIcon02,
+						icon: 'diamond'
 					},{
 						value: '',
 						name: '我的商城订单',
 						url: '',
-						img: imgIcon04
+						img: imgIcon04,
+						icon: 'shopping-cart'
+					},{
+						value: '',
+						name: '我上过的课程',
+						url: '',
+						img: imgIcon04,
+						icon: 'bookmark-o'
 					},{
 						value: '',
 						name: '意见反馈',
 						url: 'feedback',
-						img: imgIcon05
+						img: imgIcon05,
+						icon: 'info-circle'
 					}
 				]
+			}
+		},
+		mounted () {
+			this.fetchData();
+		},
+		methods: {
+			fetchData () {
+				let _this = this;
+				this.$http.post('/wechat/usercenter/customerService',
+						{
+							"userCode": _this.$store.state.user.userCode,
+						}
+					).then(function(e) {
+					}
+				);
 			}
 		}
 	}
@@ -122,9 +143,28 @@
 			margin: 0 auto;
     	border-radius: 120px;
 		}
+
+		p {
+			padding-top: 5px;
+			line-height: 1;
+		}
+
+		span {
+			margin-left: 1em;
+			border-left: 1px solid $borderColor;
+			padding-left: 1em;
+		}
 	}
 
 	main {
 		background-color: #fff;
+	}
+
+	.fa {
+		width: 1em;
+		text-align: center;
+		margin-right: 1em;
+		color: red;
+		font-size: 20px;
 	}
 </style>

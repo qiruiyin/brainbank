@@ -8,7 +8,7 @@
 
 		<div class="container">
 			<div class="banner">
-	    	<swiper auto :list="bannerDatas" dots-position="center" :aspect-ratio="768/1366"></swiper>
+	    	<swiper auto :list="bannerTopDatas" dots-position="center" :aspect-ratio="600/1500"></swiper>
 			</div>
 
 			<search 
@@ -27,11 +27,14 @@
 			<!-- 经典推荐(图片) -->
 			<div class="tuijian-img">
 				<div class="tuijian-img-left">
-					<img :src="tuijianImg.imgBig" alt="">
+					<router-link v-for="(item, index) in tuijianImgLeft" :to="{ name: item.link }" :key="index">
+						<img :src="item.img" alt="">
+					</router-link>
 				</div>
 				<div class="tuijian-img-right">
-					<img :src="tuijianImg.imgSmall1" alt="">
-					<img :src="tuijianImg.imgSmall2" alt="">
+					<router-link v-for="(item, index) in tuijianImgRight" :to="{ name: item.link }" :key="index">
+						<img :src="item.img" alt="">
+					</router-link>
 				</div>
 			</div>
 
@@ -42,7 +45,7 @@
 					<p>{{ tuijianBook.desc }}</p>
 				</div>
 				<div class="tuijian-card-body">
-					<div class="goods" v-for="(item, index) in tuijianBook.list" :key="index">
+					<div class="goods" v-for="(item, index) in tuijianBookList" :key="index">
 						<img :src="item.img" alt="">
 						<h5>{{ item.name }}</h5>
 						<p>{{ item.desc }}</p>
@@ -60,7 +63,7 @@
 					<p>{{ tuijianCarrer.desc }}</p>
 				</div>
 				<div class="tuijian-card-body">
-					<div class="goods" v-for="(item, index) in tuijianCarrer.list" :key="index">
+					<div class="goods" v-for="(item, index) in tuijianCarrerList" :key="index">
 						<img :src="item.img" alt="">
 						<h5>{{ item.name }}</h5>
 						<p>{{ item.desc }}</p>
@@ -72,13 +75,13 @@
 			</div>
 
 			<!-- 学员产品推荐 -->
-			<div class="tuijain-card">
+			<!-- <div class="tuijain-card">
 				<div class="tuijian-card-header">
 					<h3>{{ tuijianStudent.title }}</h3>
 					<p>{{ tuijianStudent.desc }}</p>
 				</div>
 				<div class="tuijian-card-body">
-					<div class="goods" v-for="(item, index) in tuijianStudent.list" :key="index">
+					<div class="goods" v-for="(item, index) in tuijianStudentList" :key="index">
 						<img :src="item.img" alt="">
 						<h5>{{ item.name }}</h5>
 						<p>{{ item.desc }}</p>
@@ -87,7 +90,7 @@
 
 					<cell title="查看更多" :link="{name: 'index'}" is-link></cell>
 				</div>
-			</div>
+			</div> -->
 		</div>
 	</div>
 </template>
@@ -111,68 +114,45 @@
 		data () {
 			return {
 				title: '商城',
-	      bannerDatas: getterIndex.bannerDatas,
+	      bannerTopDatas: [],
 	      results: [],
       	value: 'test',
-      	tuijianImg: {
-      		imgBig: imgBig,
-      		imgSmall1: imgSmall1,
-      		imgSmall2: imgSmall2
-      	},
+      	tuijianImgLeft: {},
+      	tuijianImgRight: {},
       	tuijianBook: {
       		title: '阅读是一种乐趣',
       		desc: '经典书籍推荐',
-      		list: [
-      			{
-      				img: imgGoods,
-      				name: '《经典小说》典藏版',
-      				desc: '艺术暑假限量套装',
-      				price: '1231'
-      			},{
-      				img: imgGoods,
-      				name: '《经典小说》典藏版',
-      				desc: '艺术暑假限量套装',
-      				price: '1231'
-      			},{
-      				img: imgGoods,
-      				name: '《经典小说》典藏版',
-      				desc: '艺术暑假限量套装',
-      				price: '1231'
-      			},{
-      				img: imgGoods,
-      				name: '《经典小说》典藏版',
-      				desc: '艺术暑假限量套装',
-      				price: '1231'
-      			}
-      		]
+      		// list: [
+      		// 	{
+      		// 		img: imgGoods,
+      		// 		name: '《经典小说》典藏版',
+      		// 		desc: '艺术暑假限量套装',
+      		// 		price: '1231'
+      		// 	},{
+      		// 		img: imgGoods,
+      		// 		name: '《经典小说》典藏版',
+      		// 		desc: '艺术暑假限量套装',
+      		// 		price: '1231'
+      		// 	},{
+      		// 		img: imgGoods,
+      		// 		name: '《经典小说》典藏版',
+      		// 		desc: '艺术暑假限量套装',
+      		// 		price: '1231'
+      		// 	},{
+      		// 		img: imgGoods,
+      		// 		name: '《经典小说》典藏版',
+      		// 		desc: '艺术暑假限量套装',
+      		// 		price: '1231'
+      		// 	}
+      		// ]
       	},
+      	tuijianBookList: [],
       	tuijianCarrer: {
       		title: '提升职场竞争力',
       		desc: '经典DVD光盘推荐',
-      		list: [
-      			{
-      				img: imgGoods,
-      				name: '《经典小说》典藏版',
-      				desc: '艺术暑假限量套装',
-      				price: '1231'
-      			},{
-      				img: imgGoods,
-      				name: '《经典小说》典藏版',
-      				desc: '艺术暑假限量套装',
-      				price: '1231'
-      			},{
-      				img: imgGoods,
-      				name: '《经典小说》典藏版',
-      				desc: '艺术暑假限量套装',
-      				price: '1231'
-      			},{
-      				img: imgGoods,
-      				name: '《经典小说》典藏版',
-      				desc: '艺术暑假限量套装',
-      				price: '1231'
-      			}
-      		]
+      		list: []
       	},
+      	tuijianCarrerList: [],
       	tuijianStudent: {
       		title: '提升你的生活质量',
       		desc: '思维商学院学员优质产品推荐',
@@ -199,10 +179,27 @@
       				price: '1231'
       			}
       		]
-      	}
+      	},
+      	tuijianStudentList: []
 			}
 		},
+		mounted ()  {
+			this.fetchData();
+		},
 		methods: {
+			fetchData () {
+				let _this = this;
+				_this.$http.post('/wechat/shop/index',{}).then(function(e) {
+					let responseData = e.data.data;
+		  		// 顶部长banner
+		  		_this.resolveField(_this, 'bannerTopDatas', responseData.bannerTop, 'ad_code');
+		  		_this.resolveField(_this, 'tuijianImgLeft', responseData.bannerLeft, 'ad_code');
+		  		_this.resolveField(_this, 'tuijianImgRight', responseData.bannerRight, 'ad_code');
+		  		_this.resolveField(_this, 'tuijianBookList', responseData.book, 'thumbnail');
+		  		_this.resolveField(_this, 'tuijianCarrerList', responseData.cd, 'thumbnail');
+		  		// _this.resolveField(_this, 'tuijianStudentList', responseData.book, 'thumbnail');					
+				});
+			},
 	    setFocus () {
 	      this.$refs.search.setFocus()
 	    },
@@ -267,10 +264,13 @@
 
 	.tuijian-img-right {
 		img {
+			padding-right: 0;
 			padding-left: $tuijianPadding;
-			padding-bottom: $tuijianPadding;
+			// padding-bottom: $tuijianPadding;
+		}
 
-			&:last-child {
+		a:last-child {
+			img {
 				padding-top: $tuijianPadding;
 			}
 		}
@@ -338,10 +338,15 @@
 			width: 80%;
 			margin: 0 auto;
 		}
+		
+		h5, p {
+			overflow:hidden;
+			white-space:nowrap;
+			text-overflow:ellipsis;
+		}
 
 		h5 {
 			font-size: 18px;
-			
 		}
 	}
 </style>

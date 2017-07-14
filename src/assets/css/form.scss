@@ -1,0 +1,12 @@
+@import '~lib/sandal/core';
+@import '~assets/css/core/functions', '~assets/css/core/mixins', '~assets/css/core/vars';
+
+.btns {
+	padding: $padding;
+	margin-top: 40px;
+}
+
+.tips {
+	margin-top: 30px;
+	padding: $padding;
+}

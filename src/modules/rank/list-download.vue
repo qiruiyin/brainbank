@@ -13,22 +13,15 @@
 	      </tab>
 	      <swiper class="list" height="100%" v-model="tabSelected" :show-dots="false">
 	        <swiper-item v-for="(tabDatasList, index) in tabDatas" :key="index">
-	        	<template v-if="tabDatasList.value == 'guanli'">
+	        	<template v-if="tabDatasList.list">
 	        		<div class="type">
-	        			<router-link :to="{name: item.url}" class="type-entrance" v-for="item in guanli" :key="item.value">
+	        			<router-link :to="{name: item.url, params: { typeCode: item.value }}" class="type-entrance" v-for="item in tabDatasList.list" :key="item.value">
 	        				{{ item.name }}
 	        			</router-link>
 	        		</div>
 	        	</template>
-	        	<template v-if="tabDatasList.value == 'hangye'">
-	        		<div class="type">
-	        			<router-link :to="{name: item.url}" class="type-entrance" v-for="item in hangye" :key="item.value">
-	        				{{ item.name }}
-	        			</router-link>
-	        		</div>
-	        	</template>
-	        	<template v-if="tabDatasList.value == 'download'">
-	        		<el-img-text-rank v-for="(item, ind) in download" :img-text-data="item" :key="ind"></el-img-text-rank>
+	        	<template v-else>
+	        		<el-img-text-rank v-for="(item, ind) in download" :img-text-data="item" img-text-btn="1" :key="ind"></el-img-text-rank>
 	        	</template>
 	        </swiper-item>
 	      </swiper>
@@ -38,181 +31,86 @@
 </template>
 
 <script type="text/babel">
-	import { Tab, TabItem, Swiper, SwiperItem } from 'vux'
+	import { Tab, TabItem, Swiper, SwiperItem, Sticky } from 'vux'
 	import elHeaderIndex from 'components/header/header-index'
 	import elImgTextRank from 'components/img-text/img-text-rank'
 
 	export default {
 		name: 'listDownload',
-		components: { Tab, TabItem, Swiper, SwiperItem, elHeaderIndex, elImgTextRank },
+		components: { Tab, TabItem, Swiper, SwiperItem, Sticky, elHeaderIndex, elImgTextRank },
 		data () {
 			return {
 				index: 0,
-				tabDatas: [
-					{
-						value: 'guanli',
-						title: '管理资料',
-					},{
-						value: 'hangye',
-						title: '行业资料',
-					},{
-						value: 'download',
-						title: '下载最多',
-					}
-				],
+				tabDatas: [],
 				tabSelected: 0,
-				download: [
-					{
-						id: '',
-						title: '纪念谷2',
-						type: '文字说明',
-						pay: '1340.0',
-						like: {
-							num: 2234,
-							percent: 3
-						},
-						url: 'audioDetail',
-						params: {
-							id: 1
-						}
-					},{
-						id: '',
-						title: '纪念谷2',
-						type: '游戏',
-						pay: '1340.0',
-						like: {
-							num: 11,
-							percent: 3.4
-						},
-						url: 'audioDetail',
-						params: {
-							id: 1
-						}
-					},{
-						id: '',
-						title: '纪念谷2',
-						type: '游戏',
-						pay: '1340.0',
-						like: {
-							num: 2234,
-							percent: 4
-						},
-						url: 'audioDetail',
-						params: {
-							id: 1
-						}
-					}
-				],
-				guanli: [
-					{
-						value: 'caiwu',
-						name: '财务管理',
-						icon: 'caiwu',
-						url: 'courseList'
-					},{
-						value: 'caiwu',
-						name: '采购管理',
-						icon: 'caiwu',
-						url: 'courseList'
-					},{
-						value: 'caiwu',
-						name: '仓储',
-						icon: 'caiwu',
-						url: 'courseList'
-					},{
-						value: 'caiwu',
-						name: '仓储物流',
-						icon: 'caiwu',
-						url: 'courseList'
-					},{
-						value: 'caiwu',
-						name: '成本管理',
-						icon: 'caiwu',
-						url: 'courseList'
-					},{
-						value: 'caiwu',
-						name: '岗位分析',
-						icon: 'caiwu',
-						url: 'courseList'
-					},{
-						value: 'caiwu',
-						name: '管理宝典',
-						icon: 'caiwu',
-						url: 'courseList'
-					},{
-						value: 'caiwu',
-						name: '行政管理',
-						icon: 'caiwu',
-						url: 'courseList'
-					},{
-						value: 'caiwu',
-						name: '绩效管理',
-						icon: 'caiwu',
-						url: 'courseList'
-					},{
-						value: 'caiwu',
-						name: '客户管理',
-						icon: 'caiwu',
-						url: 'courseList'
-					}
-				],
-				hangye: [
-					{
-						value: 'caiwu',
-						name: '成本管理',
-						icon: 'caiwu',
-						url: 'courseList'
-					},{
-						value: 'caiwu',
-						name: '岗位分析',
-						icon: 'caiwu',
-						url: 'courseList'
-					},{
-						value: 'caiwu',
-						name: '管理宝典',
-						icon: 'caiwu',
-						url: 'courseList'
-					},{
-						value: 'caiwu',
-						name: '行政管理',
-						icon: 'caiwu',
-						url: 'courseList'
-					},{
-						value: 'caiwu',
-						name: '绩效管理',
-						icon: 'caiwu',
-						url: 'courseList'
-					},{
-						value: 'caiwu',
-						name: '客户管理',
-						icon: 'caiwu',
-						url: 'courseList'
-					}
-				],
-				tabContentDatas: [
-					{
-						value: 'guanli',
-						// list:
-					},{
-						value: 'free',
-						list: [
-							{
-								id: '',
-								title: '纪念谷2',
-								type: '游戏',
-								pay: '0',
-								like: {
-									num: 2234,
-									percent: 3.4
-								},
+				download: []
+			}
+		},
+		mounted () {
+			this.fetchData();
+		},
+		methods: {
+			fetchData () {
+				let _this = this,
+						tabDatas = [];
+				// 资料分类
+	  		_this.$http.post('/wechat/coursewaremobile/queryType',{}).then(function(e) {
+	  			let responseData = e.data.data;
+	  			responseData.list.map(function(item, index) {
+	  				let queryTypeData = [];
+	  				item.list.map(function(it, ind) {
+	  					queryTypeData[ind] = {
+	  						value: it.code,
+	  						name: it.name,
+	  						url: 'courseList',
+	  						parentCode: it.parentCode,
+	  						icon: _this.resolveImg(it.thumbnail)
+	  					};
+	  				})
+	  				tabDatas[index] = {
+	  					title: item.name,
+	  					value: item.code,
+	  					id: item.id,
+	  					list: queryTypeData
+	  				};
+	  			})
+
+  				tabDatas.push({
+  					value: '',
+  					title: '下载最多',
+  				})
+
+  				_this.tabDatas = tabDatas;
+	  		});
+	  		// 下载做多
+	  		_this.$http.post('/wechat/coursewaremobile/queryRank',
+	  			{
+	  				"customerCode": "",
+	  				"pageSize": 1,
+	  				"pageCount": 10
+	  			}).then(function(e) {
+	  				let responseData = e.data.data,
+	  						downloadData = [];
+	  				responseData.list.map(function(item, index){
+	  					downloadData[index] = {
+	  						id: item.id,
+	  						code: item.code,
+								title: item.name,
+								type: '文字说明',
+								pay: item.isBuy,
+								download: item.downloads,
+								downloadUrl: _this.resolveImg(item.file_url),
+								price: item.requiredpoints,
 								url: 'audioDetail',
+								img: _this.resolveImg(item.thumbnail),
 								params: {
-									id: 1
+									id: item.code
 								}
-							}
-						]
-					}
-				]
+	  					}
+	  				});
+
+	  				_this.download = downloadData;
+	  		});
 			}
 		}
 	}
@@ -231,6 +129,12 @@
 	@import '~assets/css/rank';
 
 	$typeIconW: 60px;
+
+	// 头部固定
+	.tab {
+		
+	}
+ 	// 头部固定end
 
 	.type {
 		@extend %clearfix;

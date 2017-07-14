@@ -16,7 +16,7 @@
 							<p>工号：{{ service.num }}</p>
 							<p>电话：{{ service.tel }}</p>
 
-							<div class="btn" @click="goPage('kefuDetail')">查看TA的名片</div>
+							<div class="btn" @click="goPage('kefuDetail', service.code)">查看TA的名片</div>
 						</div>
 					</div>
 				</div>
@@ -63,6 +63,7 @@
 					name: '谢学军',
 					num: '12312313213',
 					tel: '12312313213',
+					code: '',
 					link: ''
 				},
 				courseTitle: [ '日期', '课程', '讲师', '时间', '地点' ],
@@ -89,9 +90,49 @@
 				],
 			}
 		},
+		mounted () {
+			this.fetchData();
+		},
 		methods: {
-			goPage (url) {
-	  		this.$router.push({ name: url })
+			fetchData() {
+				let _this = this;
+				this.$http.post('/wechat/usercenter/customerService',
+						{
+							"customerCode": _this.$store.state.user.userCode,
+						}
+					).then(function(e) {
+						let responseData = e.data.data,
+								service = responseData.userList[0];
+						_this.service = {
+							img: _this.resolveImg(service.headPhoto),
+							name: service.NAME,
+							num: service.empId,
+							tel: service.mobile,
+							code: service.CODE,
+							link: ''
+						};
+
+						_this.transData(responseData.lessonList, 'courseList');
+					}
+				);
+			},
+			transData (data, name) {
+				let arr = [];
+				data.map(function(item, index) {
+					arr[index] = {
+						startDate: item.startDate,
+						name: item.name,
+						lecturer: item.author,
+						time: item.continueTime,
+						address: item.address
+					}
+				})
+
+				this[name] = arr;
+			},
+			goPage (url, serviceCode) {
+				console.log(url, serviceCode)
+	  		this.$router.push({ name: url, params: { serviceCode: serviceCode }});
 			}
 		}
 	}
@@ -127,7 +168,7 @@
 		.btn {
 			@include halfpxline($borderRadius, $borderColor, 1px, 1px, 1px, 1px);
 			position: absolute;
-			top: 26px;
+			top: 10px;
 			right: $padding;
 			padding: 0 10px;
 			line-height: 36px;

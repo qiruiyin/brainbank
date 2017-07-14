@@ -14,10 +14,28 @@ const routes = [
 			title: '大脑银行'
 		}
 	},{
+		path: '/register',
+		name: 'register',
+		component:  loadView(loaded => {
+			require(['../modules/index/register.vue'], loaded)
+		}),
+		meta: {
+			title: '注册'
+		}
+	},{
+		path: '/info-add',
+		name: 'infoAdd',
+		component:  loadView(loaded => {
+			require(['../modules/index/info-add.vue'], loaded)
+		}),
+		meta: {
+			title: '信息补充'
+		}
+	},{
 		path: '/retrain',
 		name: 'retrain',
 		component:  loadView(loaded => {
-			require(['../modules/index/enlist.vue'], loaded)
+			require(['../modules/index/pay.vue'], loaded)
 		}),
 		meta: {
 			title: '大脑银行'
@@ -26,7 +44,7 @@ const routes = [
 		path: '/upgrade',
 		name: 'upgrade',
 		component:  loadView(loaded => {
-			require(['../modules/index/enlist.vue'], loaded)
+			require(['../modules/index/pay.vue'], loaded)
 		}),
 		meta: {
 			title: '大脑银行'
@@ -41,7 +59,7 @@ const routes = [
 			title: '富文本'
 		}
 	},{
-		path: '/list/:type',
+		path: '/rank/:type',
 		name: 'rankList',
 		component:  loadView(loaded => {
 			require(['../modules/rank/list.vue'], loaded)
@@ -59,7 +77,7 @@ const routes = [
 			title: '资料下载'
 		}
 	},{
-		path: '/list-course',
+		path: '/list-course/:typeCode',
 		name: 'courseList',
 		component:  loadView(loaded => {
 			require(['../modules/rank/list-course.vue'], loaded)
@@ -88,24 +106,24 @@ const routes = [
 		}
 	},{
 		// 课程 video详情
-		path: '/detail/video/:id',
-		name: 'videoDetail',
+		path: '/:type/detail/:id',
+		name: 'detail',
 		component:  loadView(loaded => {
-			require(['../modules/course/video-detail.vue'], loaded)
+			require(['../modules/course/detail.vue'], loaded)
 		}),
 		meta: {
-			title: '视频课详情'
+			title: '课程详情'
 		}
-	},{
-		// 课程 audio详情
-		path: '/detail/audio/:id',
-		name: 'audioDetail',
-		component:  loadView(loaded => {
-			require(['../modules/course/audio-detail.vue'], loaded)
-		}),
-		meta: {
-			title: '音频课详情'
-		}
+	// },{
+	// 	// 课程 audio详情
+	// 	path: '/audio/detail/:id',
+	// 	name: 'audioDetail',
+	// 	component:  loadView(loaded => {
+	// 		require(['../modules/course/audio-detail.vue'], loaded)
+	// 	}),
+	// 	meta: {
+	// 		title: '音频课详情'
+	// 	}
 	},{
 		// 消息
 		path: '/msg',
@@ -136,7 +154,7 @@ const routes = [
 			title: '我的客服'
 		}
 	},{
-		path: '/user-center/kefu-detail',
+		path: '/user-center/kefu-detail/:serviceCode',
 		name: 'kefuDetail',
 		component:  loadView(loaded => {
 			require(['../modules/user-center/kefu/kefu-detail.vue'], loaded)
@@ -190,6 +208,26 @@ const routes = [
 		meta: {
 			title: '商城首页'
 		}
+	},{
+		// 订单
+		path: '/order/list',
+		name: 'orderList',
+		component:  loadView(loaded => {
+			require(['../modules/order/list.vue'], loaded)
+		}),
+		meta: {
+			title: '订单列表'
+		}
+	// },{
+	// 	// 订单
+	// 	path: '/order/detail',
+	// 	name: 'orderDetail',
+	// 	component:  loadView(loaded => {
+	// 		require(['../modules/order/detail.vue'], loaded)
+	// 	}),
+	// 	meta: {
+	// 		title: '订单详情'
+	// 	}
 	}
 ]
 

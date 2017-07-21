@@ -86,15 +86,16 @@
 			transData (data, name) {
 				let _this =this,
 						arr = [];
-
-				data.map(function(item, index){
-					arr[index] = {
-						id: item.id,
-						name: item.name,
-						img: _this.resolveImg(item.header),
-						date: item.create_time
-					}
-				});
+				if(data) {
+					data.map(function(item, index){
+						arr[index] = {
+							id: item.id,
+							name: item.name,
+							img: _this.resolveImg(item.header),
+							date: item.create_time
+						}
+					});
+				}
 				_this.tabContentDatas[name] = arr;
 			}
 		}

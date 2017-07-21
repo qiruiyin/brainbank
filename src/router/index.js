@@ -2,6 +2,7 @@ import Vue from 'vue'
 import store from '../store'
 import Router from 'vue-router'
 import routerLink from './router-link'
+import hold from 'src/commons/hold'
 
 Vue.use(Router)
 
@@ -15,8 +16,18 @@ let historyCount = history.getItem('count') * 1 || 0
 history.setItem('/', 0)
 
 router.beforeEach((to, from, next) => {
+  // 是否加载
   store.commit('updateLoadingStatus', {isLoading: true})
+  
+  if(!hold.storage.get('openId') && to.path != '/author'){
+    // 第一次进入项目
+    hold.storage.set('beforeLoginUrl', to.fullPath) // 保存用户进入的url
+    next('/author')
+    return false
+  }
+  // 用户是否授权结束
 
+  // 切换效果
   const toIndex = history.getItem(to.path)
   const fromIndex = history.getItem(from.path)
 
@@ -32,13 +43,13 @@ router.beforeEach((to, from, next) => {
     to.path !== '/' && history.setItem(to.path, historyCount)
     store.commit('updateDirection', {direction: 'forward'})
   }
-
   if (/\/http/.test(to.path)) {
     let url = to.path.split('http')[1]
     window.location.href = `http${url}`
   } else {
     next()
   }
+  // 切换效果结束
 })
 
 router.afterEach((to, from, next) => {

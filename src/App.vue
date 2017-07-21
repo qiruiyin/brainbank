@@ -41,13 +41,13 @@ export default {
   @import '~assets/css/core/functions', '~assets/css/core/mixins', '~assets/css/core/vars';
   
   #app {
-    position: relative;
+    // position: relative;
     height: 100%;
     overflow: hidden;
   }
 
   .container {
-    position: relative;
+    // position: relative;
     width: 100%;
     height: 100%;
     padding-bottom: $containerBottom;

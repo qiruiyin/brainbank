@@ -7,8 +7,8 @@
 		<group>
 			<template v-for="item in formDatas">
 	    	<x-input v-if="item.key != 'qrcode'" :title="item.title" :placeholder="item.placeholder" v-model="item.value"></x-input>
-				<x-input v-else title="发送验证码" class="weui-vcode">
-	        <x-button slot="right" type="primary" mini>发送验证码</x-button>
+				<x-input type="number" v-else title="发送验证码" v-model="item.value" class="weui-vcode">
+        	<el-verification-code :tel="item.value" slot="right"></el-verification-code>
 	      </x-input>
 			</template>
 		</group>
@@ -21,10 +21,11 @@
 
 <script type="text/babel">
 	import { XInput, Group, XButton } from 'vux'
+	import elVerificationCode from 'components/verification-code/verification-code'
 
 	export default {
 		components: {
-			XInput, Group, XButton
+			XInput, Group, XButton, elVerificationCode
 		},
 		data () {
 			return {
@@ -34,37 +35,32 @@
 						value: '',
 						key: 'name',
 						title: '姓名',
-						placeholder: '请输入您真实姓名' 
+						placeholder: '请输入您真实姓名',
+						isReadonly: false
 					},{
 						value: '',
 						key: 'phone',
 						title: '手机号',
-						placeholder: '请输入您的手机号' 
+						placeholder: '请输入您的手机号',
+						isReadonly: false
 					},{
 						value: '',
 						key: 'idcard',
 						title: '身份证',
-						placeholder: '请输入您的身份证号码' 
-					},{
-						value: '',
-						key: 'qq',
-						title: 'QQ',
-						placeholder: '请输入QQ号码' 
+						placeholder: '请输入您的身份证号码', 
+						isReadonly: true
 					},{
 						value: '',
 						key: 'weixin',
 						title: '微信',
-						placeholder: '请输入微信号码' 
-					},{
-						value: '',
-						key: 'address',
-						title: '收货地址',
-						placeholder: '请输入收货地址' 
+						placeholder: '请输入微信号码（选填）',
+						isReadonly: false
 					},{
 						value: '',
 						key: 'qrcode',
 						title: '验证码',
-						placeholder: '请输入手机验证码' 
+						placeholder: '请输入手机验证码', 
+						isReadonly: false
 					}
 				]
 			}
@@ -82,23 +78,26 @@
 					).then(function(e) {
 						let responseData = e.data.data,
 								arr = [],
-								data = responseData.customerInfoList[0];
+								data;
+						if(responseData) {
+							data = responseData.customerInfoList[0];
 
-						_this.formDatas.map(function(item, index) {
-							if(item.key == "name") {
-								item.value = data.NAME;
-							} else if (item.key == "phone") {
-								item.value = data.mobile;
-							} else if (item.key == "idcard") {
-								item.value = data.idcard;
-							} else if (item.key == "qq") {
-								item.value = data.qq;
-							} else if (item.key == "weixin") {
-								item.value = data.weixinAccount;
-							} else if (item.key == "address") {
-								item.value = data.address;
-							}
-						})
+							_this.formDatas.map(function(item, index) {
+								if(item.key == "name") {
+									item.value = data.NAME;
+								} else if (item.key == "phone") {
+									item.value = data.mobile;
+								} else if (item.key == "idcard") {
+									item.value = data.idcard;
+								} else if (item.key == "qq") {
+									item.value = data.qq;
+								} else if (item.key == "weixin") {
+									item.value = data.weixinAccount;
+								} else if (item.key == "address") {
+									item.value = data.address;
+								}
+							})
+						}
 					}
 				);
 			}

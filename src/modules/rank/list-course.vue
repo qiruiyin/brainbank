@@ -103,18 +103,11 @@
 				_this[obj] = arr;
 			},
 			downloadScource (args) {
-				console.log(args)
 				let _this = this;
 				if(_this.$store.state.user.userCode == '') {
 					_this.$vux.alert.show({
 		        title: '',
-		        content: '请先登录',
-		        onShow () {
-		          console.log('Plugin: I\'m showing')
-		        },
-		        onHide () {
-		          console.log('Plugin: I\'m hiding now')
-		        }
+		        content: '请先登录'
 		      })
 				} else {
 					_this.$http.post('/wechat/coursewaremobile/buy',{

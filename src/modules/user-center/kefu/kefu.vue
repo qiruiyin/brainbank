@@ -24,22 +24,11 @@
 
 			<card :header="{title:'近期开课行程安排'}">
 				<div slot="content" class="table">
-					<x-table>
-						<thead>
-		          <tr>
-		            <th v-for="(item, index) in courseTitle" :key="index">{{ item }}</th>
-		          </tr>
-		        </thead>
-		        <tbody>
-		          <tr v-for="(item, index) in courseList" :key="index" @click="goPage()">
-		            <td>{{ item.startDate }}</td>
-		            <td>{{ item.name }}</td>
-		            <td>{{ item.lecturer }}</td>
-		            <td>{{ item.time }}</td>
-		            <td>{{ item.address }}</td>
-		          </tr>
-		        </tbody>
-					</x-table>	
+					<timeline>
+						<timeline-item v-for="(item, index) in courseList" :key="index">
+							<p @click="goCourse(item.code, '0')">{{ item.name }}</p>
+						</timeline-item>
+					</timeline>
 				</div>
 			</card>
 		</div>
@@ -47,14 +36,14 @@
 </template>
 
 <script type="text/babel">
-	import { XTable, Card } from 'vux'
+	import { Timeline, TimelineItem, XTable, Card } from 'vux'
 	import elHeaderIndex from 'components/header/header-index'
 	
 	import imgUser from 'assets/img/user-center/user.png'
 	
 	export default {
 		name: 'kefu',
-		components: { XTable, Card, elHeaderIndex },
+		components: { Timeline, TimelineItem, XTable, Card, elHeaderIndex },
 		data () {
 			return {
 				title: '客服',
@@ -67,27 +56,7 @@
 					link: ''
 				},
 				courseTitle: [ '日期', '课程', '讲师', '时间', '地点' ],
-				courseList: [
-					{
-						startDate: '2012-10-01',
-						name: '商业思维',
-						lecturer: '待定',
-						time: 5,
-						address: '广州'
-					},{
-						startDate: '2012-10-01',
-						name: '商业思维',
-						lecturer: '待定',
-						time: 5,
-						address: '广州'
-					},{
-						startDate: '2012-10-01',
-						name: '商业思维',
-						lecturer: '待定',
-						time: 5,
-						address: '广州'
-					}
-				],
+				courseList: [],
 			}
 		},
 		mounted () {
@@ -124,16 +93,20 @@
 						name: item.name,
 						lecturer: item.author,
 						time: item.continueTime,
-						address: item.address
+						address: item.address,
+						code: item.code
 					}
 				})
 
 				this[name] = arr;
 			},
 			goPage (url, serviceCode) {
-				console.log(url, serviceCode)
 	  		this.$router.push({ name: url, params: { serviceCode: serviceCode }});
-			}
+			},
+	  	goCourse(code, status) {
+	  		console.log(code, status)
+	  		this.$router.push({name: "courseDetail", params: { courseCode: code, courseStatus: status }})
+	  	}
 		}
 	}
 </script>

@@ -5,7 +5,11 @@
 <template>
 	<div class="tuijian">
 		<div class="tuijian-left">
-			<div v-for="item in tuijianData" @click="goPage(item.url, item.id)">{{ item.name }}</div>
+
+			<div v-for="item in tuijianData">
+				<div v-if="item.file_url"  @click="goPage('courseTypeDetail', { type: 'audio', id: item.code})" >{{ item.name }}</div>
+				<div v-else @click="goPage('quotation')" >{{ item.name }}</div>
+			</div>
 		</div>
 
 		<div class="tuijian-right">
@@ -40,9 +44,9 @@
 			}
 		},
 		methods: {
-			goPage (url, id) {
-				if(id) {
-		  		this.$router.push({ name: url, params: { id: id }})
+			goPage (url, params) {
+				if(params) {
+		  		this.$router.push({ name: url, params: params})
 				} else {
 		  		this.$router.push({ name: url })
 				}

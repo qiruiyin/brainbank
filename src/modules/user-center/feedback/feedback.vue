@@ -17,11 +17,11 @@
 </template>
 
 <script type="text/babel">
-	import { XTextarea, Group, XInput, XButton } from 'vux'
+	import { XTextarea, Group, XInput, XButton, Toast } from 'vux'
 
 	export default {
 		name: 'feedback',
-		components: { XTextarea, Group, XInput, XButton },
+		components: { XTextarea, Group, XInput, XButton, Toast },
 		data () {
 			return {
 				title: '问题反馈',
@@ -41,16 +41,29 @@
 		methods: {
 			submit () {
 				let _this = this;
-				_this.$http.post('/wechat/usercenter/addFeedback',
-						{
-							"userCode": _this.$store.state.user.userCode,
-							"contactInformation": _this.input.value,
-							"content": _this.textarea.value
+				if(_this.textarea.value == "") {
+					_this.$vux.toast.show({
+	          text: "意见不能为空",
+	        })	
+				} else {
+					_this.$http.post('/wechat/usercenter/addFeedback',
+							{
+								"userCode": _this.$store.state.user.userCode,
+								"contactInformation": _this.input.value,
+								"content": _this.textarea.value
+							}
+						).then(function(e) {
+							_this.$vux.toast.show({
+			          text: e.data.errmsg,
+			          onHide () {
+			            if(e.data.errcode == 1) {
+										_this.$router.push({name: "userCenter"})
+									}
+			          }
+			        })
 						}
-					).then(function(e) {
-
-					}
-				)
+					)
+				}				
 			}
 		}
 	}

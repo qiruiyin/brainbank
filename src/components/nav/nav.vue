@@ -3,15 +3,15 @@
  -->
 
 <template>
-	<nav>
-		<tabbar icon-class="vux-center" slot="bottom">
+  <nav>
+	<tabbar icon-class="vux-center" slot="bottom">
       <tabbar-item v-for="item in navDatas" :link="{name: item.link}" :selected="item.value == navSelected" :key="item.value">
         <img v-if="item.value == 'mall'" :class="{'icon-big': item.value == 'mall'}" slot="icon" :src="item.img">
         <i v-else :class="['fa', 'fa-' + item.value ]" slot="icon"></i>
         <span slot="label" class="icon">{{ item.name }}</span>
       </tabbar-item>
     </tabbar>
-	</nav>
+  </nav>
 </template>
 
 <script type="text/babel">
@@ -70,10 +70,10 @@
 	// 这里的大小取自vux组件的
 	.icon-big {
 		width: 68px;
-    height: 69px;
-    position: absolute;
-    top: -20px;
-    left: 50%;
-    margin-left: -34px;
+        height: 69px;
+        position: absolute;
+        top: -20px;
+        left: 50%;
+        margin-left: -34px;
 	}
 </style>

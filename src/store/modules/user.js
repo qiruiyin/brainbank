@@ -3,11 +3,13 @@ import * as types from '../mutation-types'
 export default {
   state: {
     img: '',
-    name: '梁熙颖',
-    course: '商业思维',
-    userCode: '201705300052529835144771844797952',
+    name: '',
+    course: '',
+    userCode: '',
     level: '',
-    btns: []
+    openId: '',
+    btns: [],
+    bangdingStatus: true
   },
   mutations: {
     updateUserImg (state, payload) {
@@ -25,8 +27,14 @@ export default {
     updateUserLevel (state, payload) {
       state.level = payload.level
     },
+    updateUserOpenId (state, payload) {
+      state.openId = payload.openId
+    },
     updateUserBtns (state, payload) {
       state.btns = payload.btns
+    },
+    updateUserBangdingStatus (state, payload) {
+      state.bangdingStatus = payload.bangdingStatus
     }
   }
 }

@@ -14,6 +14,33 @@ const routes = [
 			title: '大脑银行'
 		}
 	},{
+		path: '/author',
+		name: 'author',
+		component:  loadView(loaded => {
+			require(['../modules/author/author.vue'], loaded)
+		}),
+		meta: {
+			title: '大脑银行'
+		}
+	},{
+		path: '/bangding',
+		name: 'bangding',
+		component:  loadView(loaded => {
+			require(['../modules/index/bangding.vue'], loaded)
+		}),
+		meta: {
+			title: '信息绑定'
+		}
+	},{
+		path: '/header/:introType',
+		name: 'intro',
+		component:  loadView(loaded => {
+			require(['../modules/index/header/intro.vue'], loaded)
+		}),
+		meta: {
+			title: '复训须知'
+		}
+	},{
 		path: '/register',
 		name: 'register',
 		component:  loadView(loaded => {
@@ -32,23 +59,32 @@ const routes = [
 			title: '信息补充'
 		}
 	},{
-		path: '/retrain',
-		name: 'retrain',
+		path: '/course-order/:payType',
+		name: 'courseOrder',
 		component:  loadView(loaded => {
-			require(['../modules/index/pay.vue'], loaded)
+			require(['../modules/index/course-order.vue'], loaded)
 		}),
 		meta: {
 			title: '大脑银行'
 		}
 	},{
-		path: '/upgrade',
-		name: 'upgrade',
+		path: '/pay',
+		name: 'pay',
 		component:  loadView(loaded => {
 			require(['../modules/index/pay.vue'], loaded)
 		}),
 		meta: {
 			title: '大脑银行'
 		}
+	// },{
+	// 	path: '/upgrade/:payType',
+	// 	name: 'upgrade',
+	// 	component:  loadView(loaded => {
+	// 		require(['../modules/index/pay.vue'], loaded)
+	// 	}),
+	// 	meta: {
+	// 		title: '大脑银行'
+	// 	}
 	},{
 		path: '/banner/:bannerId',
 		name: 'banner',
@@ -105,14 +141,24 @@ const routes = [
 			title: '课程'
 		}
 	},{
-		// 课程 video详情
-		path: '/:type/detail/:id',
-		name: 'detail',
+		// 课程详情
+		path: '/course-detail/:courseCode/:courseStatus',
+		name: 'courseDetail',
 		component:  loadView(loaded => {
-			require(['../modules/course/detail.vue'], loaded)
+			require(['../modules/course/detail-course.vue'], loaded)
 		}),
 		meta: {
 			title: '课程详情'
+		}
+	},{
+		// 视频及音频详情
+		path: '/course/detail/:type/:id',
+		name: 'courseTypeDetail',
+		component: loadView(loaded => {
+			require(['../modules/course/detail-type.vue'], loaded)
+		}),
+		meta: {
+			title: '详情'
 		}
 	// },{
 	// 	// 课程 audio详情
@@ -209,14 +255,84 @@ const routes = [
 			title: '商城首页'
 		}
 	},{
+		// 商城详情
+		path: '/mall/detail/:goodsCode',
+		name: 'mallDetail',
+		component:  loadView(loaded => {
+			require(['../modules/mall/detail.vue'], loaded)
+		}),
+		meta: {
+			title: '商品详情'
+		}
+	},{
 		// 订单
-		path: '/order/list',
-		name: 'orderList',
+		path: '/order/list/course',
+		name: 'orderCourseList',
 		component:  loadView(loaded => {
 			require(['../modules/order/list.vue'], loaded)
 		}),
 		meta: {
 			title: '订单列表'
+		}
+	},{
+		// 订单
+		path: '/order/list/mall',
+		name: 'orderMallList',
+		component:  loadView(loaded => {
+			require(['../modules/order/mall-list.vue'], loaded)
+		}),
+		meta: {
+			title: '订单列表'
+		}
+	},{
+		// 订单
+		path: '/confirm-order',
+		name: 'confirmOrder',
+		component:  loadView(loaded => {
+			require(['../modules/order/confirm-order.vue'], loaded)
+		}),
+		meta: {
+			title: '订单'
+		}
+	},{
+		// 购物车
+		path: '/shop-cart',
+		name: 'shopCart',
+		component:  loadView(loaded => {
+			require(['../modules/shop-cart/shop-cart.vue'], loaded)
+		}),
+		meta: {
+			title: '购物车'
+		}
+	},{
+		// 地址信息
+		path: '/address',
+		name: 'address',
+		component:  loadView(loaded => {
+			require(['../modules/address/address.vue'], loaded)
+		}),
+		meta: {
+			title: '地址信息'
+		}
+	},{
+		// 地址信息
+		path: '/address/add',
+		name: 'addressAdd',
+		component:  loadView(loaded => {
+			require(['../modules/address/address-add.vue'], loaded)
+		}),
+		meta: {
+			title: '地址新增'
+		}
+	},{
+		// 地址编辑
+		path: '/address/edit/:code',
+		name: 'addressEdit',
+		component:  loadView(loaded => {
+			require(['../modules/address/address-edit.vue'], loaded)
+		}),
+		meta: {
+			title: '地址编辑'
 		}
 	// },{
 	// 	// 订单

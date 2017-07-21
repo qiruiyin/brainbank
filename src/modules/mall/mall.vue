@@ -27,12 +27,12 @@
 			<!-- 经典推荐(图片) -->
 			<div class="tuijian-img">
 				<div class="tuijian-img-left">
-					<router-link v-for="(item, index) in tuijianImgLeft" :to="{ name: item.link }" :key="index">
+					<router-link v-for="(item, index) in tuijianImgLeft" :to="{ name: item.link, params: {goodsCode: item.code } }" :key="index">
 						<img :src="item.img" alt="">
 					</router-link>
 				</div>
 				<div class="tuijian-img-right">
-					<router-link v-for="(item, index) in tuijianImgRight" :to="{ name: item.link }" :key="index">
+					<router-link v-for="(item, index) in tuijianImgRight" :to="{ name: item.link, params: {goodsCode: item.code } }" :key="index">
 						<img :src="item.img" alt="">
 					</router-link>
 				</div>
@@ -45,7 +45,7 @@
 					<p>{{ tuijianBook.desc }}</p>
 				</div>
 				<div class="tuijian-card-body">
-					<div class="goods" v-for="(item, index) in tuijianBookList" :key="index">
+					<div class="goods" v-for="(item, index) in tuijianBookList" @click="goPage(item.link, item.code)" :key="index">
 						<img :src="item.img" alt="">
 						<h5>{{ item.name }}</h5>
 						<p>{{ item.desc }}</p>
@@ -63,7 +63,7 @@
 					<p>{{ tuijianCarrer.desc }}</p>
 				</div>
 				<div class="tuijian-card-body">
-					<div class="goods" v-for="(item, index) in tuijianCarrerList" :key="index">
+					<div class="goods" v-for="(item, index) in tuijianCarrerList" @click="goPage(item.link, item.code)" :key="index">
 						<img :src="item.img" alt="">
 						<h5>{{ item.name }}</h5>
 						<p>{{ item.desc }}</p>
@@ -122,29 +122,6 @@
       	tuijianBook: {
       		title: '阅读是一种乐趣',
       		desc: '经典书籍推荐',
-      		// list: [
-      		// 	{
-      		// 		img: imgGoods,
-      		// 		name: '《经典小说》典藏版',
-      		// 		desc: '艺术暑假限量套装',
-      		// 		price: '1231'
-      		// 	},{
-      		// 		img: imgGoods,
-      		// 		name: '《经典小说》典藏版',
-      		// 		desc: '艺术暑假限量套装',
-      		// 		price: '1231'
-      		// 	},{
-      		// 		img: imgGoods,
-      		// 		name: '《经典小说》典藏版',
-      		// 		desc: '艺术暑假限量套装',
-      		// 		price: '1231'
-      		// 	},{
-      		// 		img: imgGoods,
-      		// 		name: '《经典小说》典藏版',
-      		// 		desc: '艺术暑假限量套装',
-      		// 		price: '1231'
-      		// 	}
-      		// ]
       	},
       	tuijianBookList: [],
       	tuijianCarrer: {
@@ -192,11 +169,11 @@
 				_this.$http.post('/wechat/shop/index',{}).then(function(e) {
 					let responseData = e.data.data;
 		  		// 顶部长banner
-		  		_this.resolveField(_this, 'bannerTopDatas', responseData.bannerTop, 'ad_code');
-		  		_this.resolveField(_this, 'tuijianImgLeft', responseData.bannerLeft, 'ad_code');
-		  		_this.resolveField(_this, 'tuijianImgRight', responseData.bannerRight, 'ad_code');
-		  		_this.resolveField(_this, 'tuijianBookList', responseData.book, 'thumbnail');
-		  		_this.resolveField(_this, 'tuijianCarrerList', responseData.cd, 'thumbnail');
+		  		_this.resolveField(_this, 'bannerTopDatas', responseData.bannerTop, 'ad_code', 'mallDetail');
+		  		_this.resolveField(_this, 'tuijianImgLeft', responseData.bannerLeft, 'ad_code', 'mallDetail');
+		  		_this.resolveField(_this, 'tuijianImgRight', responseData.bannerRight, 'ad_code', 'mallDetail');
+		  		_this.resolveField(_this, 'tuijianBookList', responseData.book, 'thumbnail', 'mallDetail');
+		  		_this.resolveField(_this, 'tuijianCarrerList', responseData.cd, 'thumbnail', 'mallDetail');
 		  		// _this.resolveField(_this, 'tuijianStudentList', responseData.book, 'thumbnail');					
 				});
 			},
@@ -222,6 +199,9 @@
 	    },
 	    onCancel () {
 	      console.log('on cancel')
+	    },
+	    goPage (link, code) {
+	    	this.$router.push({name: link, params: { goodsCode: code }})
 	    }
 	  },
 	}
@@ -337,6 +317,7 @@
 		img {
 			width: 80%;
 			margin: 0 auto;
+	    padding: $padding 0;
 		}
 		
 		h5, p {

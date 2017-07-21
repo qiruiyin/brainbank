@@ -41,7 +41,7 @@
 				title: '用户中心',
 				kefuUrl: 'kefu',
 				header: {
-					img: imgUser,
+					img: this.$store.state.user.img,
 					name: this.$store.state.user.name,
 					course: this.$store.state.user.course
 				},
@@ -61,13 +61,19 @@
 					},{
 						value: '',
 						name: '我的商城订单',
-						url: '',
+						url: 'orderMallList',
 						img: imgIcon04,
 						icon: 'shopping-cart'
 					},{
 						value: '',
-						name: '我上过的课程',
-						url: '',
+						name: '我的课程订单',
+						url: 'orderCourseList',
+						img: imgIcon04,
+						icon: 'shopping-cart'
+					},{
+						value: '',
+						name: '地址管理',
+						url: 'address',
 						img: imgIcon04,
 						icon: 'bookmark-o'
 					},{
@@ -164,7 +170,7 @@
 		width: 1em;
 		text-align: center;
 		margin-right: 1em;
-		color: red;
-		font-size: 20px;
+		color: $colorGreen;
+		font-size: 24px;
 	}
 </style>

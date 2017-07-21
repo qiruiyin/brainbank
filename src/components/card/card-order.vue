@@ -3,181 +3,73 @@
  -->
 <template>
 	<div class="card-order-list">
-		<div class="card" v-for="(item, index) in cardList" :key="index">
+		<div class="card" v-for="(item, index) in cardData" :key="index">
 			<div class="card-header">
-				<img :src="item.header.img">
-				<p>{{ item.header.title }}</p>
-				<span>{{ item.header.status }}</span>
+				<img v-if="item.icon" :src="item.icon">
+				<p>{{ item.title }}</p>
+				<span>{{ item.status }}</span>
 			</div>
 			<div class="card-content">
-				<img :src="item.content.img" alt="">
+				<img v-if="item.img" :src="item.img" alt="">
 				<div class="card-content-right">
-					<div class="title">{{ item.content.title }}
-						<p class="price">￥{{ item.content.price }}</p>
-					</div>
-					 <x-number v-model="item.content.num" :min="1"></x-number>
+					<cell title="订单号" :value="item.code"></cell>
+					<cell title="应付金额" :value="item.amount"></cell>
+					<cell v-if="item.actualAmount" title="实付金额" :value="item.actualAmount"></cell>
+					<cell v-if="item.num" title="数量" :value="item.num"></cell>
 				</div>
 			</div>
 			<div class="card-footer">
-				<p>共{{ item.content.num }}件商品</p>
-				<x-button class="btn" v-if="item.footer.status" type="primary">立即支付</x-button>
-				<div class="btn" v-else>总价：￥{{ item.content.price * item.content.num }}</div>
+				<p v-if="item.num">共{{ item.num }}件商品</p>
+				<x-button class="btn" v-if="item.paymentType != 1" type="primary" @click.native="payment(item.code)" mini>立即支付</x-button>
+				<div class="btn" v-else >总价：￥{{ item.amount }}</div>
 			</div>
 		</div>
-		<load-more :show-loading="true" tip="加载"></load-more>
+		<template v-if="cardCount == cardData.length">
+			<x-button @click.native="loadMore(cardIndex)">加载更多</x-button>
+			<!-- <load-more :show-loading="true" tip="加载"></load-more> -->
+		</template>
+		<template v-else>
+			<divider>没有更多数据</divider>
+		</template>
 	</div>
 </template>
 
 <script type="text/babel">
-	import { Panel, Group, Radio, XNumber, XButton, LoadMore } from 'vux'
+	import { Panel, Group, Cell, Radio, XNumber, XButton, LoadMore, Divider } from 'vux'
 	
 	import imgHeader from 'assets/img/icon/icon.png'
 
 	export default {
 		name: 'card',
-		components: { Panel, XNumber, XButton, LoadMore },
-		props: ['cardData'],
+		components: { Panel, XNumber, Group, Cell, XButton, LoadMore, Divider },
+		props: ['cardData', 'cardCount', 'cardIndex'],
 		data () {
 			return {
 				title: '卡片',
 				cardList: [
 					{
-						header: {
-							img: '',
-							title: '大脑银行',
-							status: '已完成'
-						},
-						content: {
-							img: '',
-							title: '商品名字',
-							num: 1,
-							price: 100,
-						},
-						footer: {
-							status: true
-						}
-					},{
-						header: {
-							img: '',
-							title: '大脑银行',
-							status: '已完成'
-						},
-						content: {
-							img: '',
-							title: '商品名字',
-							num: 1,
-							price: 100,
-						},
-						footer: {
-							status: false
-						}
-					},{
-						header: {
-							img: '',
-							title: '大脑银行',
-							status: '已完成'
-						},
-						content: {
-							img: '',
-							title: '商品名字',
-							num: 1,
-							price: 100,
-						},
-						footer: {
-							status: false
-						}
-					},{
-						header: {
-							img: '',
-							title: '大脑银行',
-							status: '已完成'
-						},
-						content: {
-							img: '',
-							title: '商品名字',
-							num: 1,
-							price: 100,
-						},
-						footer: {
-							status: false
-						}
-					},{
-						header: {
-							img: '',
-							title: '大脑银行',
-							status: '已完成'
-						},
-						content: {
-							img: '',
-							title: '商品名字',
-							num: 1,
-							price: 100,
-						},
-						footer: {
-							status: false
-						}
-					},{
-						header: {
-							img: '',
-							title: '大脑银行',
-							status: '已完成'
-						},
-						content: {
-							img: '',
-							title: '商品名字',
-							num: 1,
-							price: 100,
-						},
-						footer: {
-							status: false
-						}
-					},{
-						header: {
-							img: '',
-							title: '大脑银行',
-							status: '已完成'
-						},
-						content: {
-							img: '',
-							title: '商品名字',
-							num: 1,
-							price: 100,
-						},
-						footer: {
-							status: false
-						}
-					},{
-						header: {
-							img: '',
-							title: '大脑银行',
-							status: '已完成'
-						},
-						content: {
-							img: '',
-							title: '商品名字',
-							num: 1,
-							price: 100,
-						},
-						footer: {
-							status: false
-						}
-					},{
-						header: {
-							img: '',
-							title: '大脑银行',
-							status: '已完成'
-						},
-						content: {
-							img: '',
-							title: '商品名字',
-							num: 1,
-							price: 100,
-						},
-						footer: {
-							status: false
-						}
+						icon: '',
+						code: '',
+						title: "大脑银行",
+						actualAmount: '',
+						amount: '',
+						status: '',
+						img: '',
+						num: '',
+						paymentType: '', // 是否显示按钮
+						status: '' // 支付状态
 					}
 				]
+			}
+		},
+		methods: {
+			payment (code) {
+				// 应传code
+				this.$router.push({name: "confirmOrder"});
+			},
+			loadMore (val) {
+
+				this.$emit("on-load-more", val)
 			}
 		}
 	}
@@ -189,6 +81,7 @@
   
   .card-order-list {
   	padding: $padding 0;
+  	margin-bottom: $containerBottom;
   }
 
   .card {
@@ -208,11 +101,11 @@
   		width: $inputH;
   		height: $inputH;
   		border-radius: $inputH;
+			margin-right: $padding;
   	}
 
   	p {
   		float: left;
-			text-indent: 1em;  		
   	}
 
   	span {
@@ -263,6 +156,8 @@
 		.btn {
 			float: right;
 			width: auto;
+	    margin: 6px 0;
+	    line-height: $inputH - 12px;
 		}
 	}
 </style>

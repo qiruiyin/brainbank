@@ -30,13 +30,26 @@ module.exports = {
     proxyTable: {
         '/wechat': {
             // target: 'http://192.168.1.151:8080/csm/wechat/',
-            // target: 'http://test.yoao.com/wechat',
-            target: 'http://192.168.1.151:8080/csm/wechat/',
+            target: 'http://test.yoao.com/wechat',
+            // target: 'http://192.168.1.156:8080/csm/wechat/',
+            // target: 'http://192.168.1.178:8080/csm/wechat/',
+            // target: 'http://192.168.1.199:81/wechat/',
             changeOrigin: true,
             secure: false, // 接受 运行在 https 上的服务
             pathRewrite: {
               '^/wechat': ''
             }
+        },
+        '/weixin': {
+            // target: 'http://192.168.1.151:8080/csm/wechat/',
+            target: 'http://test.yoao.com',
+            // target: 'http://192.168.1.154:8080/csm/wechat/',
+            // target: 'http://192.168.1.199:81/wechat/',
+            changeOrigin: true,
+            secure: false, // 接受 运行在 https 上的服务
+            pathRewrite: {
+              '^/weixin': ''
+            }  
         }
     },
     // CSS Sourcemaps off by default because relative paths are "buggy"

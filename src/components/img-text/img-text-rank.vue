@@ -16,15 +16,15 @@
 				（{{ imgTextData.like.num | numToCash }}）
 			</p>
 			<p v-if="imgTextData.download">下载次数：{{ imgTextData.download }}</p>
+			
+			<template v-if="imgTextBtn != -1">
+				<template v-if="isClick">
+					<div class="btn">{{ btns[imgTextBtn].name }}</div>
+				</template>
 
-			<template v-if="imgTextData.pay">
-				<div v-if="imgTextData.pay != 0" class="btn" @click.stop="download(imgTextData.code, imgTextData.downloadUrl)">￥{{ imgTextData.pay | numToCash }}</div>
-				<div v-else class="btn" @click.stop="download(imgTextData.code, imgTextData.downloadUrl)">{{ btns[imgTextBtn].name }}</div>
-			</template>
-
-			<template v-else>
-				<div v-if="imgTextData.price == 0" class="btn" @click.stop="download(imgTextData.code, imgTextData.downloadUrl)">￥{{ imgTextData.pay | numToCash }}</div>
-				<div v-else class="btn" @click.stop="download(imgTextData.code, imgTextData.downloadUrl)">{{ btns[imgTextBtn].name }}</div>
+				<template v-else>
+					<div class="btn" @click.stop="download(imgTextData)">￥{{ imgTextData.pay | numToCash }}</div>
+				</template>
 			</template>
 		</div>
 	</div>
@@ -42,6 +42,7 @@
 					title: '总裁商业思维',
 					type: '游戏',
 					pay: '1340.0',
+					isBuy: 0,
 					img: '',
 					like: {
 						num: 2234,
@@ -61,16 +62,27 @@
 				]
 			}
 		},
+		computed: {
+			isClick () {
+				if(this.imgTextData.pay == 0) {
+					return true
+				} else if (this.imgTextData.isBuy == 1) {
+					return true
+				} else {
+					return false
+				}
+			}
+		},
 		mounted () {
 		},
 		methods: {
 			goPage (url, params) {
 				if(url) {
-					this.$router.push({name: url, params: params});
+					this.$emit('on-card-click', { url: url, params: params, status: this.isClick })
 				}
 			},
-			download (code, url) {
-				this.$emit('onBtnClick', { code: code, url: url })
+			download (val) {
+				this.$emit('on-btn-click', val)
 			}
 		}
 	}

@@ -1,20 +1,22 @@
-// 0 游客
-// 1 商业思维
-// 2 系统思维
-// 大于2 思维商学院
+// 1 普通学员
+// 2 思维导图
+// 3 商业思维
+// 4 系统思维
+// 5 思维商学院
 const headerBtns = [
 	{
-		level: 0,
+		level: 1,
 		course: '普通学员',
 		btns: [
 			{
-				value: '',
+				value: 'enlist',
 				name: '我要报名',
-				link: 'register'
+				link: 'enlist'
 			}
 		]
 	},{
-		level: 1,
+		level: 2,
+		value: 'shangyesiwei',
 		course: '商业思维',
 		btns: [
 			{
@@ -28,7 +30,23 @@ const headerBtns = [
 			}
 		]
 	},{
-		level: 2,
+		level: 3,
+		value: 'siweidaotu',
+		course: '思维导图',
+		btns: [
+			{
+				value: 'retrain',
+				name: '复训',
+				link: 'retrain'
+			},{
+				value: 'upgrade',
+				name: '升级',
+				link: 'upgrade'
+			}
+		]
+	},{
+		level: 4,
+		value: 'xitongsiwei',
 		course: '系统思维',
 		btns: [
 			{
@@ -42,8 +60,9 @@ const headerBtns = [
 			}
 		]
 	},{
-		level: 3,
-		course: '思维商学院',
+		level: 5,
+		value: 'shangxueyuan',
+		course: '商学院',
 		btns: [
 			{
 				value: 'retrain',

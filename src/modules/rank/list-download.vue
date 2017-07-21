@@ -16,6 +16,7 @@
 	        	<template v-if="tabDatasList.list">
 	        		<div class="type">
 	        			<router-link :to="{name: item.url, params: { typeCode: item.value }}" class="type-entrance" v-for="item in tabDatasList.list" :key="item.value">
+	        				<img :src="item.icon" alt="">
 	        				{{ item.name }}
 	        			</router-link>
 	        		</div>
@@ -148,18 +149,28 @@
 		@include halfpxline(0, $borderColor, 0, 1px, 1px, 0);
 		line-height: 2;
 
-		&:before {
-			content: "";
+		// &:before {
+		// 	content: "";
+		// 	position: absolute;
+		// 	top: $padding;
+		// 	width: $typeIconW;
+		// 	height: $typeIconW;
+		// 	background: url("~assets/img/icon/header.png") no-repeat;
+		// 	background-size: 100%;
+		// }
+
+		&:nth-child(3n) {
+			@include halfpxline(0, $borderColor, 0, 0, 1px, 0);
+		}
+
+		img {
 			position: absolute;
 			top: $padding;
 			width: $typeIconW;
 			height: $typeIconW;
-			background: url("~assets/img/icon/header.png") no-repeat;
-			background-size: 100%;
-		}
-
-		&:nth-child(3n) {
-			@include halfpxline(0, $borderColor, 0, 0, 1px, 0);
+	    left: 0;
+   	 	right: 0;
+    	margin: 0 auto;
 		}
 	}
 </style>

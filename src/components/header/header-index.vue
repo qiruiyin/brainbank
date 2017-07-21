@@ -12,7 +12,7 @@
 				</p>
 			</div>
 			<div class="link">
-				<router-link v-for="item in user.btns" :to="{ name: item.link }" :key="item.value">{{ item.name }}</router-link>	
+				<div class="btn" @click="goPage(item.link)" v-for="item in user.btns" :key="item.value">{{ item.name }}</div>
 			</div>
 		</header>
 	</sticky>
@@ -22,6 +22,7 @@
 	import { Sticky } from 'vux'
 	import { mapState } from 'vuex'
 	import imgHeader from 'assets/img/header.png'
+	import hold from 'src/commons/hold'
 
 	export default {
 		components: {
@@ -51,35 +52,76 @@
 	    })
 	  },
 		mounted () {
-			this.fetchData();
+			this.getUserCode();
 		},
 		methods: {
-			fetchData () {
-				let _this = this;
-	  		_this.$http.post('/wechat/discover/userinfo/get',
+			getUserCode () {
+				let _this = this,
+						storageOpenId = hold.storage.get("openId"),
+						storeOpenId = _this.$store.state.user.openId,
+				 		openId = storageOpenId || storeOpenId;
+
+				_this.$http.post('/wechat/discover/usercode/get',
 		  			{
-		  				"userCode": "201705300052529835144771844797952",
-		  				"openId": "201705300052529835144771844797952"
+		  				"openId": openId
 		  			}
 		  		).then(function(e) {
-		  			let responseData = e.data.data;
-		  			_this.$store.commit('updateUserImg', {img: responseData.headerUrl ? _this.resolveImg(responseData.headerUrl) : imgHeader})
+		  			_this.fetchData(openId, e.data.data.userCode);
+		  	});
+			},
+			fetchData (openId, code) {
+				let _this = this;
+
+  			hold.storage.set("openId", openId);
+				hold.storage.set("userCode", code);
+				_this.$store.commit("updateUserUserCode", { userCode: code });
+				_this.$store.commit("updateUserOpenId", { openId: openId });
+
+				if(code) {
+  				_this.$store.commit('updateUserBangdingStatus', {bangdingStatus: true});
+				}
+
+				_this.$http.post('/wechat/discover/userinfo/get',
+		  			{
+		  				"userCode": code,
+		  				"openId": openId
+		  			}
+		  		).then(function(e) {
+		  			let responseData = e.data.data,
+		  					headerUrl;
+
+		  			if(responseData.headerUrl.substr(0, 4) == "http") {
+		  				headerUrl = responseData.headerUrl;
+		  			} else {
+		  				headerUrl = _this.resolveImg(responseData.headerUrl) ;
+		  			}
+
+		  			_this.$store.commit('updateUserImg', {img: headerUrl});
 		  			_this.$store.commit('updateUserName', {name: responseData.name ? responseData.name : '游客'})
 
 		  			if(responseData.userLevelMap) {
-		  				if( responseData.userLevelMap.categoryLevel == 1 ) {
-		  					_this.$store.commit('updateUserBtns', {btns: _this.wordBook.headerBtns[1].btns})
-			  			} else if ( responseData.userLevelMap.categoryLevel == 2 ) {
-		  					_this.$store.commit('updateUserBtns', {btns: _this.wordBook.headerBtns[2].btns})
-			  			} else if ( responseData.userLevelMap.categoryLevel > 2 ) {
-		  					_this.$store.commit('updateUserBtns', {btns: _this.wordBook.headerBtns[3].btns})
-			  			}
+		  				_this.$store.commit('updateUserLevel', {level: responseData.userLevelMap.categoryLevel });
+		  				_this.$store.commit('updateUserBtns', {btns: _this.wordBook.headerBtns[responseData.userLevelMap.categoryLevel-1].btns})
 		  				_this.$store.commit('updateUserCourse', {course: responseData.userLevelMap.categoryName})
 		  			} else {
 	  					_this.$store.commit('updateUserBtns', {btns: _this.wordBook.headerBtns[0].btns})
 		  				_this.$store.commit('updateUserCourse', {course: _this.wordBook.headerBtns[0].course})
+		  				_this.$store.commit('updateUserLevel', {level: 1 });
 		  			}
-	  		});
+	  			});
+			},
+			goPage (link) {
+				let _this = this;
+
+				if(!_this.$store.state.user.userCode) {
+					_this.$router.push({name: 'bangding'})
+				} else if (link == "enlist") {
+					_this.$router.push({ name: 'courseOrder', params: { payType: 'enlist' }})
+				} else if (link == "retrain") {
+					_this.$router.push({ name: 'intro', params: { introType: "retrain" }})
+				} else if (link == "upgrade") {
+					_this.$router.push({ name: 'intro', params: { introType: "upgrade" }})
+				}
 			}
 		}
 	}
@@ -140,7 +182,7 @@
 			margin-top: ($headerContentH - $headerLinkH)/2;
 			line-height: $headerLinkH;
 
-			& > a {
+			.btn {
 				float: left;
 				padding: 0 .5em;
 				margin-left: $paddingLeft;

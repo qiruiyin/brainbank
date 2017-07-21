@@ -9,8 +9,7 @@
     </tab>
     <swiper v-model="tabSelected" height="100%" :show-dots="false">
       <swiper-item v-for="(item, index) in tabData" :key="index">
-      	<el-card-order></el-card-order>
-        <!-- <div class="tab-swiper vux-center">{{item.name}} Container</div> -->
+    		<el-card-order @on-load-more="loadMore" :card-data="item.list" :card-count="count" :card-index="index"></el-card-order>
       </swiper-item>
     </swiper>
 	</div>
@@ -27,22 +26,115 @@
 		data () {
 			return {
 				title: '订单列表页面',
+				count: 10,
 				tabData: [
 					{
 						value: 'all',
-						name: '全部'
+						name: '全部',
+						status: 'all',
+						pagesize: 1,
+						list: []
 					},{
 						value: 'unpay',
-						name: '待付款'
+						name: '待付款',
+						status: 'unpay',
+						pagesize: 1,
+						list: []
 					},{
 						value: 'undelievery',
-						name: '待发货'
+						name: '已付款',
+						status: 'undelievery',
+						pagesize: 1,
+						list: []
 					},{
 						value: 'untake',
-						name: '待收货'
-					},
+						name: '未上课',
+						status: 'untake',
+						pagesize: 1,
+						list: []
+					},{
+						value: 'take',
+						name: '已上课',
+						status: 'take',
+						pagesize: 1,
+						list: []
+					}
 				],
 				tabSelected: 0
+			}
+		},
+		watch: {
+			tabSelected (newValue, oldValue) {
+				this.onTabClick(newValue)
+			}
+		},
+		mounted () {
+			// 取全部数据
+			this.fetchData(1, 0);
+		},
+		methods: {
+			fetchData (pageSize = 1, ind = 0, paymentStatus = "", ticketStatus = "") {
+				let _this = this;
+				this.$http.post('/wechat/usercenter/getCustomerLessonList',
+						{
+							"customerCode": _this.$store.state.user.userCode,
+							"pageSize": pageSize,
+							"pageCount": _this.count,
+							"paymentStatus": paymentStatus,
+							"ticketStatus": ticketStatus
+						}
+					).then(function(e) {
+						let responseData = e.data.data,
+								customerStudyedLessonList;
+
+						if(responseData.customerStudyedLessonList) {
+							customerStudyedLessonList = responseData.customerStudyedLessonList.map(function(item, index) {
+								return {
+									icon: '',
+									code: item.orderCode,
+									title: item.NAME,
+									actualAmount: item.actualAmount,
+									amount: item.amount,
+									status: item.paymentStatus,
+									paymentType: item.paymentType,
+									img: '',
+									num: item.count
+								}
+							});
+
+							if(pageSize == 1) {
+								_this.tabData[ind].list = customerStudyedLessonList;
+							} else {
+								_this.tabData[ind].list.push.apply(_this.tabData[ind].list, customerStudyedLessonList);
+							}
+						}
+				})
+			},
+			onTabClick (val) {
+				if(this.tabData[val].list.length == 0){
+					if(val == 1) {
+						this.fetchData(1, val, "0")
+					} else if (val == 2) {
+						this.fetchData(1, val, "1")
+					} else if (val == 3) {
+						this.fetchData(1, val, "", "0")
+					} else if (val == 4) {
+						this.fetchData(1, val, "", "1")
+					} 
+				}
+			},
+			loadMore (val) {
+				if(val == 0){
+					this.fetchData(++this.tabData[val].pagesize, val)
+				} else if (val == 1) {
+					this.fetchData(++this.tabData[val].pagesize, val, "0")
+				} else if (val == 2) {
+					this.fetchData(++this.tabData[val].pagesize, val, "1")
+				} else if (val == 3) {
+					this.fetchData(++this.tabData[val].pagesize, val, "", "0")
+				} else if (val == 4) {
+					this.fetchData(++this.tabData[val].pagesize, val, "", "1")
+				} 
 			}
 		}
 	}

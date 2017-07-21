@@ -7,13 +7,13 @@ import imgCourseOther from 'assets/img/index/course.png'
 export const getterIndex = {
 	bannerDatas: [
 		{
-		  url: 'banner/1',
+		  // url: 'banner/1',
 		  img: imgBanner,
 		},{
-		  url: 'banner/1',
+		  // url: 'banner/1',
 		  img: imgBanner,
 		},{
-		  url: 'banner/1',
+		  // url: 'banner/1',
 		  img: imgBanner,
 		}
 	],

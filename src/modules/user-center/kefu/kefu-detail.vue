@@ -36,27 +36,7 @@
 					<a class="link-icon-weixin">{{ header.weixin }}<span>（复制微信号添加服务老师）</span></a>
 				</div>
 			</card>
-			
-			<card :header="{title: '近期课程行程安排'}">
-				<div slot="content">
-					<x-table>
-						<thead>
-		          <tr>
-		            <th v-for="(item, index) in courseTitle" :key="index">{{ item }}</th>
-		          </tr>
-		        </thead>
-		        <tbody>
-		          <tr v-for="(item, index) in courseList" :key="index">
-		            <td>{{ item.startDate }}</td>
-		            <td>{{ item.name }}</td>
-		            <td>{{ item.lecturer }}</td>
-		            <td>{{ item.time }}</td>
-		            <td>{{ item.address }}</td>
-		          </tr>
-		        </tbody>
-					</x-table>	
-				</div>
-			</card>
+
 		</div>
 	</div>
 </template>
@@ -86,8 +66,6 @@
 					serviceLevel: ''			
 				},
 				courseAll: [],
-				courseTitle: [ '日期', '课程', '讲师', '时间', '地点' ],
-				courseList: [],
 			}
 		},
 		mounted () {
@@ -117,8 +95,6 @@
 							customerWitness: '25',
 							serviceLevel: '75'	
 						};
-
-						_this.transData(responseData.lessonList, 'courseList');
 
 						let courseAll = [];
 						responseData.medalBeanList.map(function(item, index) {

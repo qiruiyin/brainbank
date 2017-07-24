@@ -38,7 +38,7 @@
 				this.cartDatas.map(function(item, index){
 					data += item.price * item.num;
 				});
-				return parseFloat(data);
+				return data.toFixed(2);
 			}
 		},
 		mounted () {

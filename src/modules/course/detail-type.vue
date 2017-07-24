@@ -14,10 +14,10 @@
 	      </tab>
 	      <div class="list">
 	      	<template  v-if="tabSelected == 0">
-	        	<template v-if="courseType == 'video'">        		
+	        	<template v-if="courseInfo.type == 'video'">        		
 		          <video :src="course.fileUrl"></video>
 	        	</template>
-	        	<template v-if="courseType == 'audio'">        		
+	        	<template v-if="courseInfo.type == 'audio'">        		
 		          <div class="audio-msg">
 		          	音频展示
 		          </div>
@@ -26,7 +26,7 @@
 	          	<x-button type="warn">『{{ course.course }}』第{{ course.courseNum }}期</x-button>
 							<div class="detail-header-msg-desc">					
 								<p>讲师备课不易，给Ta点鼓励吧</p>
-								<div class="reward">奖赏</div>
+								<el-reward :reward-data="courseInfo"></el-reward>
 							</div>
 						</div>
 						<el-comment :comment-data="commentData"></el-comment>
@@ -42,6 +42,8 @@
 	      </div>
 	    </div>
 		</div>
+
+		
 	</div>
 </template>
 
@@ -50,14 +52,22 @@
 	import elHeaderIndex from 'components/header/header-index'
 	import elImgTextRank from 'components/img-text/img-text-rank'
 	import elComment from 'components/comment/comment'
+	import elReward from 'components/reward/reward'
 
 	export default {
 		name: 'detail',
-		components: { XButton, Flexbox, FlexboxItem, Tab, TabItem, Swiper, SwiperItem, Sticky, elHeaderIndex, elImgTextRank, elComment },
+		components: { 
+			XButton, Flexbox, FlexboxItem, Tab, TabItem, Swiper, SwiperItem, Sticky, 
+			elHeaderIndex, elImgTextRank, elComment, elReward 
+		},
 		data () {
 			return {
 				title: '课程详情',
-				courseType: this.$route.params.type,
+				courseInfo: {
+					type: this.$route.params.type,
+					code: this.$route.params.code,
+					name: ""
+				},
 				list: {
 					title: '总裁商业思维',
 					type: '游戏',
@@ -106,7 +116,7 @@
 					}
 				],
 				commentData: {
-					productCode: this.$route.params.id,
+					productCode: this.$route.params.code,
 					pagesize: 1,
 					pagecount: 10
 				}
@@ -114,6 +124,7 @@
 		},
 		mounted () {
 			let _this = this;
+	  	this.signUrl(location.href);
 			this.fetchData();
 			this.addRecode();
 		},
@@ -124,7 +135,7 @@
 				this.$http.post('/wechat/discover/product/details',
 						{
 							"userCode": _this.$store.state.user.userCode,
-							"productCode": _this.$route.params.id
+							"productCode": _this.$route.params.code
 						}
 					).then(function(e) {
 						let responseData = e.data.data.product;
@@ -138,6 +149,7 @@
 
 						_this.course.fileUrl = _this.resolveImg(responseData.file_url);
 						_this.course.desc = responseData.DESCRIPTION;
+						_this.courseInfo.name = responseData.name;
 
 
 						e.data.data.recommend.map(function(item, index) {
@@ -231,17 +243,7 @@
 			text-align: center;
 		}
 
-		.reward {
-			width: 5em;
-			margin: 0  auto;
-			margin-top: $padding;
-			line-height: $inputH;
-			background: $colorRed;
-			color: #fff;
-			font-size: 20px;
-			letter-spacing: .5em;
-			text-indent: .5em;
-		}
+		
 	}
 
 	.swiper-desc {

@@ -52,7 +52,13 @@
 	    })
 	  },
 		mounted () {
-			this.getUserCode();
+			let userCode = this.$store.state.user.userCode || hold.storage.get("userCode");
+			
+			if(userCode) {
+				this.fetchData(hold.storage.get("openId"), userCode);
+			} else {
+				this.getUserCode();
+			}
 		},
 		methods: {
 			getUserCode () {

@@ -18,8 +18,8 @@ history.setItem('/', 0)
 router.beforeEach((to, from, next) => {
   // 是否加载
   store.commit('updateLoadingStatus', {isLoading: true})
-  
-  if(!hold.storage.get('openId') && to.path != '/author'){
+
+  if(!(hold.storage.get('openId') || hold.storage.get('userCode')) && to.path != '/author'){
     // 第一次进入项目
     hold.storage.set('beforeLoginUrl', to.fullPath) // 保存用户进入的url
     next('/author')

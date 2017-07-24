@@ -18,12 +18,13 @@
 	      </tab>
 	      <swiper class="list" height="500px" v-model="tabSelected" :show-dots="false">
 	        <swiper-item v-for="(tabContentDatasData, index) in tabDatas" :key="index">
-	          <div class="integral-man" v-for="(item, ind) in tabContentDatas[tabContentDatasData.value]" :key="ind">
+	          <div @click="goMsg(item.code, item.name)" class="integral-man" v-for="(item, ind) in tabContentDatas[tabContentDatasData.value]" :key="ind">
 							<img :src="item.img">
 							<div class="title">
 								<p>{{ item.name }}</p>
 								<span>到期时间：{{ item.date }}</span>
 							</div>
+							<div class="info fa fa-envelope-o"></div>
 						</div>
 	        </swiper-item>
 	      </swiper>
@@ -90,6 +91,7 @@
 					data.map(function(item, index){
 						arr[index] = {
 							id: item.id,
+							code: item.code,
 							name: item.name,
 							img: _this.resolveImg(item.header),
 							date: item.create_time
@@ -97,6 +99,12 @@
 					});
 				}
 				_this.tabContentDatas[name] = arr;
+			},
+			goMsg (userCode, name) {
+				this.$store.commit("updateMsgName", { name: name });
+				this.$store.commit("updateMsgUserCode", { userCode: userCode });
+				this.$store.commit("updateMsgUrl", { url: 'integral' });
+				this.$router.push({ name: 'msgAdd' })
 			}
 		}
 	}
@@ -141,6 +149,15 @@
   	p {
 			font-size: 18px;
   	}
+  }
+
+  .info {
+  	position: absolute;
+  	right: $padding;
+		top: 50%;
+		font-size: 20px;
+		line-height: 1;
+		margin-top: -10px;
   }
 	
 </style>

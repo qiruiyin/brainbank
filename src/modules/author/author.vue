@@ -21,7 +21,7 @@
 		mounted () {
 			// alert(location.href);
 			let _this = this,
-					userCode = hold.storage.get('userCode'),
+					userCode = hold.storage.get('userCode') || this.$store.state.user.userCode,
 					urlJson = _this.parseToJson(location.href),
 					openId = hold.storage.get("openId");
 
@@ -32,9 +32,8 @@
 			// alert("urlJson" + urlJson);
 			// alert("openId" + openId);
 			// alert("userCode" + userCode)
-
 			if(userCode){
-				_this.login("", hold.storage.get('userCode'));
+				_this.login(openId, hold.storage.get('userCode'));
 			} else if(!openId) {
 	      // let ua = window.navigator.userAgent.toLowerCase()
 	      // if(ua.match(/MicroMessenger/i) == 'micromessenger'){
@@ -97,10 +96,10 @@
   				_this.$store.commit('updateUserBangdingStatus', {bangdingStatus: true});
 				}
 
-				alert("storageOpenID: " + hold.storage.get("openId"));
-				alert("storageUserCode: " + hold.storage.get("userCode"));
-				alert("storeOpenId: " + _this.$store.state.user.openId);
-				alert("storeUserCode: " + _this.$store.state.user.userCode);
+				// alert("storageOpenID: " + hold.storage.get("openId"));
+				// alert("storageUserCode: " + hold.storage.get("userCode"));
+				// alert("storeOpenId: " + _this.$store.state.user.openId);
+				// alert("storeUserCode: " + _this.$store.state.user.userCode);
 
 				_this.$http.post('/wechat/discover/userinfo/get',
 		  			{

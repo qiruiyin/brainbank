@@ -141,7 +141,7 @@
 								},
 								url: 'courseTypeDetail',
 								params: {
-									id: item.code,
+									code: item.code,
 									type: _this.$route.params.type
 								}
 							}

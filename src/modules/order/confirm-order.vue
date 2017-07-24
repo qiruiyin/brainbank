@@ -93,7 +93,7 @@
 				this.cartDatas.map(function(item, index){
 					data += item.price * item.num;
 				});
-				return parseFloat(data);
+				return data.toFixed(2);
 			}
 		},
 		mounted () {
@@ -141,7 +141,7 @@
 	    	_this.cartDatas.map(function(item, index){
 	    		productCode += index == 0 ? item.code : "," + item.code;
 	    		amount += index == 0 ? item.num : "," + item.num;
-	    		money += index == 0 ? parseFloat(item.price * item.num): "," + parseFloat(item.price * item.num)
+	    		money += index == 0 ? (item.price * item.num).toFixed(2): "," + (item.price * item.num).toFixed(2)
 	    	});
 				this.$http.post('/wechat/order/create',
 						{

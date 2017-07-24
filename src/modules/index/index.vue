@@ -19,7 +19,7 @@
 
 			<div class="entry-videos">
 				<!-- <div v-for="item in entryVideosDatas" @click="videoAudioDetail(item.url, item.id)"> -->
-				<div @click="goPage('courseTypeDetail', { type: 'video', id: item.code})" v-for="(item, index) in entryVideosDatas" :key="index">
+				<div @click="goPage('courseTypeDetail', { type: 'video', code: item.code})" v-for="(item, index) in entryVideosDatas" :key="index">
 					<img :src="item.img" alt="">
 					<p>{{ item.name }}</p>
 				</div>

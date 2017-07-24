@@ -6,6 +6,7 @@ import loadbar from './modules/loadbar'
 import common from './modules/common'
 import direction from './modules/direction'
 import user from './modules/user'
+import msg from './modules/msg'
 
 Vue.use(Vuex)
 
@@ -18,7 +19,8 @@ export default new Vuex.Store({
   	loadbar,
   	common,
     direction,
-    user
+    user,
+    msg
     // cart,
     // products
   },

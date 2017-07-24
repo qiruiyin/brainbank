@@ -3,43 +3,60 @@
  -->
 
 <template>
-	<div class="comment-list">
-		<div class="comment-list-title">评论</div>
-		<group>
-      <x-textarea v-model="textareaData"  placeholder="请输入评论" @on-focus="onEvent('focus')"></x-textarea>
-      <cell title="五星好评哦">
-        <rater v-model="rater" slot="value" active-color="#04BE02"></rater>
-      </cell>
-    </group>
-    <div class="btn">
-    	<x-button type="primary" @click.native="btnClick">确定</x-button>
-    </div>
-    <div class="comment" v-for="(item, index) in commentList" :key="index">
-			<div class="comment-header">
-				<img :src="item.header">
-				<div class="title">{{ item.name }}</div>
-				<div class="time">{{ item.date }}</div>
-			</div>
-
-			<div class="comment-body">
-				<p>{{ item.content }}</p>
-        <div class="rater">
-        	<rater v-model="item.rater" slot="value" active-color="#04BE02"></rater>
-				</div>
-			</div>
+	<div class="comment">
+		<div class="comment-title">评论
+			
+			<div @click="commentClick" class="comment-btn fa fa-commenting-o"></div>
 		</div>
 
-		<load-more class="loading" :show-loading="loading.status" :tip="loading.value"></load-more>
+		<div class="comment-list">
+			<div class="comment-detail" v-for="(item, index) in commentList" :key="index">
+				<div class="comment-header">
+					<img :src="item.header">
+					<div class="title">{{ item.name }}</div>
+					<div class="time">{{ item.date }}</div>
+				</div>
+
+				<div class="comment-body">
+					<p>{{ item.content }}</p>
+	        <div class="rater">
+	        	<rater v-model="item.rater" slot="value" active-color="#04BE02"></rater>
+					</div>
+				</div>
+			</div>
+			<load-more class="loading" :show-loading="loading.status" :tip="loading.value"></load-more>
+		</div>
+
+		<div v-transfer-dom>
+      <popup class="comment-popup" v-model="commentStatus" is-transparent>
+        <div class="comment-popup-body">
+        	<group>
+          	<x-textarea v-model="textareaData"  placeholder="请输入评论" @on-focus="onEvent('focus')"></x-textarea>
+			      <cell title="五星好评哦">
+			        <rater v-model="rater" slot="value" active-color="#04BE02"></rater>
+			      </cell>
+         	</group>
+         	<div class="btns">
+         		<x-button type="primary" @click.native="btnClick">确定</x-button>
+          	<x-button type="default" @click.native="btnCancel">取消</x-button>	
+         	</div>
+          
+        </div>
+      </popup>
+    </div>
 	</div>	
 </template>
 
 <script type="text/babel">
-	import { Scroller, Divider, Spinner, XButton, XTextarea, Group, Cell, LoadMore, Toast, Rater } from 'vux'
+	import { TransferDom, Popup, Divider, Spinner, XButton, XTextarea, Group, Cell, LoadMore, Toast, Rater } from 'vux'
 
 	export default {
 		name: 'comment',
+		directives: {
+	    TransferDom
+	  },
 		components: {
-			Scroller, Divider, Spinner, XButton, XTextarea, Group, Cell, LoadMore, Toast, Rater
+			Popup, Group, Divider, Spinner, XButton, XTextarea, Group, Cell, LoadMore, Toast, Rater
 		},
 		props: [ 'commentData' ],
 		data () {
@@ -58,7 +75,8 @@
 				loading: {
 					status: false,
 					value: 'loading'
-				}
+				},
+				commentStatus: false
 			}
 		},
 		mounted () {
@@ -109,6 +127,9 @@
 	    onEvent (event) {
 	      console.log('on', event)
 	    },
+	    commentClick () {
+	    	this.commentStatus = true;
+	    },
 	    btnClick () {
     		let _this = this;
 	    	if(this.textareaData != "") {
@@ -121,7 +142,10 @@
 							}
 						).then(function(e) {
 							_this.$vux.toast.show({
-								text: "评论已发布，审核通过后可查看"
+								text: "评论已发布，审核通过后可查看",
+								onHide () {
+	    						_this.commentStatus = false;
+								}
 							})
 						});
 	    		// this.$emit("on-btn-click", {data: this.textareaData, rater: 3});
@@ -129,6 +153,10 @@
 	    		alert("请输入评论信息")
 	    	}
 	    	this.textareaData = "";
+	    	this.rater = 0;
+	    },
+	    btnCancel () {
+	    	this.commentStatus = false;
 	    }
 		}
 	}
@@ -137,18 +165,23 @@
 <style lang="scss" scoped>
 	@import '~lib/sandal/core';
   @import '~assets/css/core/functions', '~assets/css/core/mixins', '~assets/css/core/vars';
+	
+	.comment-btn {
+		float: right;
+
+	}
 
 	.comment-list {
 
 	}
 
-	.comment-list-title {
+	.comment-title {
 		padding: $padding;
-		font-size: 20px;
+		font-size: 18px;
 		background: $bgGray;
 	}
 
-	.comment {
+	.comment-detail {
 		padding: $padding;
 		@include halfpxline(0, $borderColor, 1px, 0, 0, 0);
 
@@ -193,9 +226,19 @@
 		} 
 	}
 
-	.btn {
+	.btn, .btns {
 		padding: $padding;
 	}
 
+	.comment-popup {
+		padding-top: $padding;
+		margin-bottom: $padding;
+	}
 
+	.comment-popup-body {
+		width: 95%;
+		margin: 0 auto;
+		background: #fff;
+		border-radius: $borderRadius;
+	}
 </style>

@@ -7,7 +7,7 @@
 		<div class="tuijian-left">
 
 			<div v-for="item in tuijianData">
-				<div v-if="item.file_url"  @click="goPage('courseTypeDetail', { type: 'audio', id: item.code})" >{{ item.name }}</div>
+				<div v-if="item.file_url"  @click="goPage('courseTypeDetail', { type: 'audio', code: item.code})" >{{ item.name }}</div>
 				<div v-else @click="goPage('quotation')" >{{ item.name }}</div>
 			</div>
 		</div>

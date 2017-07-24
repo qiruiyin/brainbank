@@ -204,7 +204,7 @@
 	    },
 	    submit () {
 	    	let _this = this,
-	    		money = parseFloat(_this.price.value * _this.num.value),
+	    		money = (_this.price.value * _this.num.value).toFixed(2),
 	    		orderType = _this.orderType[_this.$route.params.payType];
 				this.$http.post('/wechat/order/create',
 						{

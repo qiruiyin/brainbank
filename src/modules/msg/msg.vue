@@ -7,115 +7,133 @@
 		<swipeout class="vux-1px-tb">
       <swipeout-item transition-mode="follow" v-for="(item, index) in msgDatas" :key="item.date">
       	<div slot="left-menu">
-          <swipeout-button type="primary">标记为已读</swipeout-button>
-          <swipeout-button type="warn">删除</swipeout-button>
+          <swipeout-button @click.native="btnDelete(item.code, index)" type="warn">删除</swipeout-button>
         </div>
         <div slot="right-menu">
-          <swipeout-button type="primary">标记为已读</swipeout-button>
-          <swipeout-button type="warn">删除</swipeout-button>
+          <swipeout-button @click.native="btnDelete(item.code, index)" type="warn">删除</swipeout-button>
         </div>
-        <div slot="content" class="msg-simple vux-1px-t">
-      		<header>{{ item.date }}</header>
-					<main>
-						<div class="title">{{ item.title }}</div>
-						<div class="desc">{{ item.content }}</div>
-						<div class="time">时间：{{ item.time }}</div>
-					</main>
-					<footer>
-						<router-link :to="{ name: item.url }">
-							{{ item.urlMsg }}
-						</router-link>
-					</footer>  	
+      	
+      	<div slot="content" class="msg-simple vux-1px-t">
+        <!-- 客户消息 -->
+        	<template  v-if="item.status == 1">
+						<main v-show="item.show" @click="btnReply(item.code, item.sendUserCode,item.sendUserName)">
+							<div class="title">{{ item.title }}</div>
+							<div class="desc">详情：{{ item.content }}</div>
+							<div class="time">时间：{{ item.time }}</div>
+							<div class="reply fa fa-mail-reply"></div>
+						</main>  	 
+	        </template>
+        	<!-- 系统消息 -->
+        	<template v-else>
+						<main>
+							<div class="title">系统{{ item.title }}</div>
+							<div class="desc">详情：{{ item.content }}</div>
+							<div class="time">时间：{{ item.time }}</div>
+							<div class="reply fa fa-mail-reply"></div>
+						</main>
+						<footer v-if="item.url">
+							<router-link :to="{ name: item.url }">
+								{{ item.urlMsg }}
+							</router-link>
+						</footer>  	 
+        	</template>
         </div>
+        
       </swipeout-item>
     </swipeout>
-<!-- 
-		<div class="msg-simple" v-for="item in msgDatas" :key="item.date">
-			<header>{{ item.date }}</header>
-			<main>
-				<div class="title">{{ item.title }}</div>
-				<div class="desc">{{ item.content }}</div>
-				<div class="time">时间：{{ item.time }}</div>
-			</main>
-			<footer>
-				<router-link :to="{ name: item.url }">
-					{{ item.urlMsg }}
-				</router-link>
-			</footer>
-		</div> -->
 	</div>
 </template>
 
 <script type="text/babel">
-	import { GroupTitle, Swipeout, SwipeoutItem, SwipeoutButton, XButton } from 'vux'
+	import { GroupTitle, Swipeout, SwipeoutItem, SwipeoutButton, XButton, Toast } from 'vux'
 
 	export default {
 		name: 'msg',
 		components: {
-			GroupTitle, Swipeout, SwipeoutItem, SwipeoutButton, XButton
+			GroupTitle, Swipeout, SwipeoutItem, SwipeoutButton, XButton, Toast
 		},
 		data () {
 			return {
 				title: '消息',
 				msgDatas: [
 					{
-						date: '2017-01-20 15:20',
+						status: 1,
+						show: true,
 						title: '上课通知',
 						content: '嗨，你报的总裁商业思维要开课啦',
 						time: '6.12-6.15',
 						url: '',
 						urlMsg: '点击我去上课'
-					},{
-						date: '2017-01-20 15:20',
-						title: '上课通知',
-						content: '嗨，你报的总裁商业思维要开课啦',
-						time: '6.12-6.15',
-						url: '',
-						urlMsg: '点击我去上课'
-					},{
-						date: '2017-01-20 15:20',
-						title: '上课通知',
-						content: '嗨，你报的总裁商业思维要开课啦',
-						time: '6.12-6.15',
-						url: '',
-						urlMsg: '点击我去上课'
-					},{
-						date: '2017-01-20 15:20',
-						title: '上课通知',
-						content: '嗨，你报的总裁商业思维要开课啦',
-						time: '6.12-6.15',
-						url: '',
-						urlMsg: '点击我去上课'
-					},{
-						date: '2017-01-20 15:20',
-						title: '上课通知',
-						content: '嗨，你报的总裁商业思维要开课啦',
-						time: '6.12-6.15',
-						url: '',
-						urlMsg: '点击我去上课'
-					},{
-						date: '2017-01-20 15:20',
-						title: '上课通知',
-						content: '嗨，你报的总裁商业思维要开课啦',
-						time: '6.12-6.15',
-						url: '',
-						urlMsg: '点击我去上课'
-					},{
-						date: '2017-01-20 15:20',
-						title: '上课通知',
-						content: '嗨，你报的总裁商业思维要开课啦',
-						time: '6.12-6.15',
-						url: '',
-						urlMsg: '点击我去上课'
-					},{
-						date: '2017-01-20 15:20',
-						title: '上课通知',
-						content: '嗨，你报的总裁商业思维要开课啦',
-						time: '6.12-6.15',
-						url: '',
-						urlMsg: '点击我去上课'
-					},
+					}
 				]
+			}
+		},
+		mounted () {
+			this.fetchData();
+		},
+		methods: {
+			fetchData () {
+				let _this = this;
+				this.$http.post('/wechat/message/index',
+						{
+							"customerCode": _this.$store.state.user.userCode,
+							"pageSize": 1,
+							"pageCount": 10
+						}
+					).then(function(e) {
+						// messageType: 0系统消息,1客户消息
+						let responseData = e.data;
+						if(responseData.errcode == 1) {
+							// 标题：来自某某的短消息
+							// 内容
+							// 时间
+							if(responseData.data.messageList) {
+								_this.msgDatas = responseData.data.messageList.map(function(item, index){
+									return {
+										status: 1,
+										show: true,
+										title: "来自" + item.sendUserName + "的短消息",
+										content: item.content,
+										time: item.createTime,
+										code: item.messageCode,
+										sendUserName: item.sendUserName,
+										sendUserCode: item.sendCode,
+										url: '',
+										urlMsg: '',
+									}
+								})
+							}
+						}
+
+					})
+			},
+			btnDelete (code, ind) {
+				let _this = this;
+
+				_this.msgDatas.map(function(item, index) {
+      		if(index == ind) {
+      			item.show = false
+      		}
+      	})
+
+				this.$http.post('/wechat/message/deleteMessage',
+						{
+							"messageCode": code
+						}
+					).then(function(e) {
+						if(e.data.errcode == 1) {
+							_this.$vux.toast.show({
+			          text: '删除成功',
+			        })
+						}
+					})
+			},
+			btnReply (code, sendUserCode, sendUserName) {
+				console.log(code, sendUserCode, sendUserName)
+				this.$store.commit("updateMsgName", { name: sendUserName });
+				this.$store.commit("updateMsgUserCode", { userCode: sendUserCode });
+				this.$store.commit("updateMsgUrl", { url: 'msg' });
+				this.$router.push({ name: 'msgAdd' })
 			}
 		}
 	}
@@ -151,10 +169,16 @@
 
 	.title {
 		color: $fontColorBlack;
-		font-size: 20px;
+		font-size: 18px;
 	}
 
 	footer {
 		padding: 0 $padding $padding;
+	}
+
+	.reply {
+		position: absolute;
+		top: $padding;
+		right: $padding;
 	}
 </style>

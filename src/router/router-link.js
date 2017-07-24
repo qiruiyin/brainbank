@@ -23,7 +23,7 @@ const routes = [
 			title: '大脑银行'
 		}
 	},{
-		path: '/bangding',
+		path: '?/bangding',
 		name: 'bangding',
 		component:  loadView(loaded => {
 			require(['../modules/index/bangding.vue'], loaded)
@@ -152,7 +152,7 @@ const routes = [
 		}
 	},{
 		// 视频及音频详情
-		path: '/course/detail/:type/:id',
+		path: '/course-type-detail/:type/:code',
 		name: 'courseTypeDetail',
 		component: loadView(loaded => {
 			require(['../modules/course/detail-type.vue'], loaded)
@@ -178,7 +178,17 @@ const routes = [
 			require(['../modules/msg/msg.vue'], loaded)
 		}),
 		meta: {
-			title: '大脑银行'
+			title: '消息列表'
+		}
+	},{
+		// 消息
+		path: '/msg/add',
+		name: 'msgAdd',
+		component:  loadView(loaded => {
+			require(['../modules/msg/add.vue'], loaded)
+		}),
+		meta: {
+			title: '发送消息'
 		}
 	},{
 		// 用户中心

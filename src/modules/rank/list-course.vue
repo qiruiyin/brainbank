@@ -14,10 +14,10 @@
 	      <swiper class="list" height="100%" v-model="tabSelected" :show-dots="false">
 	        <swiper-item v-for="(tabContentDatasList, index) in tabDatas" :key="index">
 	          <template v-if="tabContentDatasList.value == 'new'">
-	          	<el-img-text-rank @onBtnClick="downloadScource" v-for="(item, ind) in newData" :img-text-data="item" img-text-btn="1" :key="ind"></el-img-text-rank>
+	          	<el-img-text-rank  @on-card-click="cardClick" @on-btn-click="btnClick"  v-for="(item, ind) in newData" :img-text-data="item" :is-download=true img-text-btn="1" :key="ind"></el-img-text-rank>
 	          </template>
 	          <template v-if="tabContentDatasList.value == 'most'">
-	          	<el-img-text-rank @onBtnClick="downloadScource" v-for="(item, ind) in mostData" :img-text-data="item" img-text-btn="1" :key="ind"></el-img-text-rank>
+	          	<el-img-text-rank @on-card-click="cardClick" @on-btn-click="btnClick"  v-for="(item, ind) in mostData" :img-text-data="item" :is-download=true img-text-btn="1" :key="ind"></el-img-text-rank>
 	          </template>
 	        </swiper-item>
 	      </swiper>
@@ -87,46 +87,66 @@
 						id: item.id,
 						code: item.code,
 						title: item.name,
-						type: '文字说明',
-						pay: item.isBuy,
+						type: item.memo,
+						pay: item.requiredpoints,
+						isBuy: item.isbuy,
 						download: item.downloads,
 						downloadUrl: _this.resolveImg(item.file_url),
-						peice: item.requiredpoints,
-						url: 'audioDetail',
-						img: _this.resolveImg(item.thumbnail),
+						price: item.requiredpoints,
+						url: "",
 						params: {
-							id: item.code
+							code: item.code
 						}
 					}
 				});
 
 				_this[obj] = arr;
 			},
-			downloadScource (args) {
-				let _this = this;
-				if(_this.$store.state.user.userCode == '') {
-					_this.$vux.alert.show({
-		        title: '',
-		        content: '请先登录'
-		      })
+			cardClick (val) {
+				if(!this.isLogin) return false;
+
+				if(val.status) {
+					this.$router.push({name: val.url, params: val.params });
 				} else {
-					_this.$http.post('/wechat/coursewaremobile/buy',{
-		  			"customerCode": _this.$store.state.user.userCode, // userCode
-		  			"productCode": args.code
-		  		}).then(function(e) {
-		  			if(e.data.data.result.tag == 0) {
-			      	_this.$vux.alert.show({
-				        title: '',
-				        content: e.data.data.result.msg,
-				        onHide () {
-				        	
-				        }
-				      })  		
-			      } else {
-			      	window.location.href(_this.resolveImg(args.url))
-			      }
-					});
+					this.$vux.toast.show({
+					  text: '请先购买！'
+					})
 				}
+			},
+			btnClick (val) {
+				if(!this.isLogin) return false;
+
+				let _this = this;
+				_this.payCode = val.params.code;
+				
+				_this.$vux.confirm.show({
+					content: "需要积分：" + val.pay,
+			    onConfirm () {
+			      _this.$http.post('/wechat/coursewaremobile/buy',
+							{
+								"customerCode": _this.$store.state.user.userCode,
+								"productCode": val.params.code
+							}).then(function(e) {
+								let responseData = e.data.data;
+								if(responseData.result.tag == 1) {
+									_this.newData.map(function(item, index) {
+										if(val.params.code == item.code) {
+											item.isBuy = 1;
+										}
+									});
+									_this.mostData.map(function(item, index) {
+										if(val.params.code == item.code) {
+											item.isBuy = 1;
+										}
+									})
+								} else {
+									_this.$vux.alert.show({
+										content: responseData.result.msg
+									});
+								}
+							})	
+			    }
+				})
 			}
 		}
 	}

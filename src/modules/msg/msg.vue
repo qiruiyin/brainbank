@@ -45,6 +45,7 @@
 </template>
 
 <script type="text/babel">
+import hold from 'src/commons/hold'
 	import { GroupTitle, Swipeout, SwipeoutItem, SwipeoutButton, XButton, Toast } from 'vux'
 
 	export default {
@@ -74,6 +75,7 @@
 		methods: {
 			fetchData () {
 				let _this = this;
+				
 				this.$http.post('/wechat/message/index',
 						{
 							"customerCode": _this.$store.state.user.userCode,

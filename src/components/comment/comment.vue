@@ -5,7 +5,6 @@
 <template>
 	<div class="comment">
 		<div class="comment-title">评论
-			
 			<div @click="commentClick" class="comment-btn fa fa-commenting-o"></div>
 		</div>
 
@@ -28,7 +27,7 @@
 		</div>
 
 		<div v-transfer-dom>
-      <popup class="comment-popup" v-model="commentStatus" is-transparent>
+      <popup class="comment-popup" v-model="commentStatus" :hide-on-blur=false is-transparent>
         <div class="comment-popup-body">
         	<group>
           	<x-textarea v-model="textareaData"  placeholder="请输入评论" @on-focus="onEvent('focus')"></x-textarea>
@@ -80,7 +79,6 @@
 			}
 		},
 		mounted () {
-			console.log("get")
 			let productCode = this.commentData.productCode,
 					pagesize = this.commentData.pagesize,
 					pagecount = this.commentData.pagecount;
@@ -98,16 +96,18 @@
 					).then(function(e) {
 						let responseData = e.data.data;
 
-						_this.commentList = responseData.list.map(function(item, index){
-							return {
-								code: item.code,
-								date: item.create_time,
-								header: item.header,
-								name: item.name,
-								rater: item.rank,
-								content: item.content
-							}
-						});
+						if(responseData.list) {
+							_this.commentList = responseData.list.map(function(item, index){
+								return {
+									code: item.code,
+									date: item.create_time,
+									header: item.header,
+									name: item.name,
+									rater: item.rank,
+									content: item.content
+								}
+							});
+						}
 					});
 			},
 			onScrollBottom () {
@@ -161,6 +161,17 @@
 		}
 	}
 </script>
+
+<style lang="scss">
+	@import '~lib/sandal/core';
+  @import '~assets/css/core/functions', '~assets/css/core/mixins', '~assets/css/core/vars';
+	
+	.comment-popup-body {
+		.weui-cells {
+			border-radius: $borderRadius $borderRadius 0 0;
+		}
+	}
+</style>
 
 <style lang="scss" scoped>
 	@import '~lib/sandal/core';

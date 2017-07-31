@@ -6,22 +6,41 @@
 		<div class="card" v-for="(item, index) in cardData" :key="index">
 			<div class="card-header">
 				<img v-if="item.icon" :src="item.icon">
-				<p>{{ item.title }}</p>
+				<p>{{ item.code }}</p>
 				<span>{{ item.status }}</span>
 			</div>
 			<div class="card-content">
 				<img v-if="item.img" :src="item.img" alt="">
 				<div class="card-content-right">
-					<cell title="订单号" :value="item.code"></cell>
-					<cell title="应付金额" :value="item.amount"></cell>
-					<cell v-if="item.actualAmount" title="实付金额" :value="item.actualAmount"></cell>
-					<cell v-if="item.num" title="数量" :value="item.num"></cell>
+					<template v-if="item.orderProductList">
+						<div class="product-list" >
+							<div v-for="(productItem, productIndex) in item.orderProductList">
+								<p>{{ productItem.productName }}
+									<span><i>{{ productItem.productCount }}</i> * {{ productItem.productPrice }}</span>
+								</p>
+							</div>
+						</div>
+
+						<cell v-if="item.actualAmount" title="金额" :value="item.actualAmount"></cell>
+					</template>
+					
+					<template v-else>
+						<cell title="产品名称" :value="item.title"></cell>
+						<cell title="数量" :value="item.num"></cell>
+						<cell title="应付金额" :value="item.amount"></cell>
+						<cell title="实付金额" :value="item.actualAmount"></cell>
+					</template>
+					
+					<cell v-if="item.time" title="时间" :value="item.time"></cell>
+					<cell v-if="item.expressCompany" title="快递公司" :value="item.expressCompany"></cell>
+					<cell v-if="item.expressNumber" title="快递单号" :value="item.expressNumber"></cell>
+					
 				</div>
 			</div>
-			<div class="card-footer">
-				<p v-if="item.num">共{{ item.num }}件商品</p>
+			<div class="card-footer" >
+				<!-- <p v-if="item.num">共{{ item.num }}件商品</p> -->
 				<x-button class="btn" v-if="item.paymentType != 1" type="primary" @click.native="payment(item.code)" mini>立即支付</x-button>
-				<div class="btn" v-else >总价：￥{{ item.amount }}</div>
+				<div class="btn" v-else>总价：￥{{ item.actualAmount }}</div>
 			</div>
 		</div>
 		<template v-if="cardCount == cardData.length">
@@ -57,7 +76,11 @@
 						img: '',
 						num: '',
 						paymentType: '', // 是否显示按钮
-						status: '' // 支付状态
+						status: '', // 支付状态
+						orderProductList: [],
+						time: '',
+						expressCompany: '',
+						expressNumber: '',
 					}
 				]
 			}
@@ -158,6 +181,25 @@
 			width: auto;
 	    margin: 6px 0;
 	    line-height: $inputH - 12px;
+		}
+	}
+
+	.product-list {
+		p {
+			width: 100%;
+			padding: 6px 0;
+			overflow: hidden;
+
+			span {
+				float: right;
+				color: $fontColorGray;
+			}
+
+			i {
+				font-style: normal;
+				// font-size: 12px;
+				// color: $fontColorGray;
+			}
 		}
 	}
 </style>

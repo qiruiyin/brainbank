@@ -65,8 +65,11 @@
 			if(introType == 'retrain') {
 				this.allData = introData.retrain;
 			} else {
-				let level = this.$store.state.user.level;
-				let	btnValue = this.wordBook.headerBtns[level].value;
+				let level = this.$store.state.user.level,
+						nextLevel = parseInt(level.substr(0, 1)) + 1;
+
+				let	btnValue = this.wordBook.headerBtns['level' + nextLevel].value;
+				console.log(btnValue)
 				this.allData = introData.upgrade[btnValue];
 			}
 		},

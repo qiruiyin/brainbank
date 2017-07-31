@@ -15,12 +15,12 @@
 		data () {
 			return {
 				title: '分享有奖',
-				img: this.resolveImg("/resources/qrcode_share/qrcode_template.png")
+				img: this.$store.state.user.qrcode
 			}
 		},
 		mounted () {
 			// this.fetchData();
-	  	this.signUrl(location.href);
+	  	// this.signUrl(location.href);
 		},
 		methods: {
 			fetchData () {

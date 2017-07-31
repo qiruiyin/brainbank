@@ -2,7 +2,7 @@
 	视频和音频的图文混排
  -->
 <template>
-	<div class="img-text">
+	<div class="img-text" @click="imgTextClick">
 		<div class="img-text-img">
 
 			<img class="img" v-if="imgTextData.img" :src="imgTextData.img" alt="">
@@ -17,7 +17,7 @@
 				<!-- <span>{{ imgTextData.priceCurrency }}{{ imgTextData.price }}/{{ imgTextData.priceUnit }}</span>	 -->
 			</h5>
 			<p class="desc">{{ imgTextData.desc }}</p>
-			<p>{{ imgTextData.label }}：{{ imgTextData.speaker }}<span>{{ imgTextData.subscribe }}人订阅</span></p>
+			<p>{{ imgTextData.label }}：{{ imgTextData.speaker }}</p>
 		</div>
 	</div>
 </template>
@@ -37,8 +37,23 @@
 					speaker: '苏引华',
 					subscribe: '234343',
 					status: '新',
+					isClick: true,
 					date: '2017-04-12',
 					timeLength: '30分58秒'
+				}
+			}
+		},
+		methods: {
+			imgTextClick () {
+				let _this = this;
+				if(this.imgTextData.isClick) {
+					this.$emit("on-img-text-click", this.imgTextData)
+				} else if (!_this.$store.state.user.userCode) {
+					this.$emit("show-bangding")
+				} else {
+					this.$vux.alert.show({
+						content: '你还没有报名，请立即去报名'
+					})
 				}
 			}
 		}

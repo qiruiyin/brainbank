@@ -108,28 +108,17 @@
 		  			}
 		  		).then(function(e) {
 		  			let responseData = e.data.data,
-		  					headerUrl;
-		  			if(responseData.headerUrl.substr(0, 4) == "http") {
-		  				headerUrl = responseData.headerUrl;
-		  			} else {
-		  				headerUrl = _this.resolveImg(responseData.headerUrl) ;
-		  			}
+		  					headerUrl = _this.resolveImg(responseData.headerUrl) ;
 
 		  			_this.$store.commit('updateUserImg', {img: headerUrl});
 		  			_this.$store.commit('updateUserName', {name: responseData.name ? responseData.name : '游客'})
 
 		  			if(responseData.userLevelMap) {
-		  				if( responseData.userLevelMap.categoryLevel == 1 ) {
-		  					_this.$store.commit('updateUserBtns', {btns: _this.wordBook.headerBtns[1].btns})
-			  			} else if ( responseData.userLevelMap.categoryLevel == 2 ) {
-		  					_this.$store.commit('updateUserBtns', {btns: _this.wordBook.headerBtns[2].btns})
-			  			} else if ( responseData.userLevelMap.categoryLevel > 2 ) {
-		  					_this.$store.commit('updateUserBtns', {btns: _this.wordBook.headerBtns[3].btns})
-			  			}
+	  					_this.$store.commit('updateUserBtns', {btns: _this.wordBook.headerBtns["level"+responseData.userLevelMap.categoryLevel].btns})
 		  				_this.$store.commit('updateUserCourse', {course: responseData.userLevelMap.categoryName})
 		  			} else {
-	  					_this.$store.commit('updateUserBtns', {btns: _this.wordBook.headerBtns[0].btns})
-		  				_this.$store.commit('updateUserCourse', {course: _this.wordBook.headerBtns[0].course})
+	  					_this.$store.commit('updateUserBtns', {btns: _this.wordBook.headerBtns.level1.btns})
+		  				_this.$store.commit('updateUserCourse', {course: _this.wordBook.headerBtns.level1.course})
 		  			}
 
 		  			_this.$router.push({name: "index"})

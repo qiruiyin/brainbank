@@ -23,74 +23,24 @@
 				@on-submit="onSubmit"
 				ref="search">
 			</search>
-			
+
 			<!-- 经典推荐(图片) -->
 			<div class="tuijian-img">
 				<div class="tuijian-img-left">
-					<router-link v-for="(item, index) in tuijianImgLeft" :to="{ name: item.link, params: {goodsCode: item.code } }" :key="index">
+					<a v-for="(item, index) in tuijianImgLeft" :href="item.url" :key="index">
 						<img :src="item.img" alt="">
-					</router-link>
+					</a>
 				</div>
 				<div class="tuijian-img-right">
-					<router-link v-for="(item, index) in tuijianImgRight" :to="{ name: item.link, params: {goodsCode: item.code } }" :key="index">
+					<a v-for="(item, index) in tuijianImgRight" :href="item.url" :key="index">
 						<img :src="item.img" alt="">
-					</router-link>
+					</a>
 				</div>
 			</div>
-
-			<!-- 阅读推荐 -->
-			<div class="tuijain-card">
-				<div class="tuijian-card-header">
-					<h3>{{ tuijianBook.title }}</h3>
-					<p>{{ tuijianBook.desc }}</p>
-				</div>
-				<div class="tuijian-card-body">
-					<div class="goods" v-for="(item, index) in tuijianBookList" @click="goPage(item.link, item.code)" :key="index">
-						<img :src="item.img" alt="">
-						<h5>{{ item.name }}</h5>
-						<p>{{ item.desc }}</p>
-						<div class="price">￥{{ item.price }}</div>
-					</div>
-
-					<cell title="查看更多" :link="{name: 'index'}" is-link></cell>
-				</div>
-			</div>
-
-			<!-- 职场推荐 -->
-			<div class="tuijain-card">
-				<div class="tuijian-card-header">
-					<h3>{{ tuijianCarrer.title }}</h3>
-					<p>{{ tuijianCarrer.desc }}</p>
-				</div>
-				<div class="tuijian-card-body">
-					<div class="goods" v-for="(item, index) in tuijianCarrerList" @click="goPage(item.link, item.code)" :key="index">
-						<img :src="item.img" alt="">
-						<h5>{{ item.name }}</h5>
-						<p>{{ item.desc }}</p>
-						<div class="price">￥{{ item.price }}</div>
-					</div>
-
-					<cell title="查看更多" :link="{name: 'index'}" is-link></cell>
-				</div>
-			</div>
-
-			<!-- 学员产品推荐 -->
-			<!-- <div class="tuijain-card">
-				<div class="tuijian-card-header">
-					<h3>{{ tuijianStudent.title }}</h3>
-					<p>{{ tuijianStudent.desc }}</p>
-				</div>
-				<div class="tuijian-card-body">
-					<div class="goods" v-for="(item, index) in tuijianStudentList" :key="index">
-						<img :src="item.img" alt="">
-						<h5>{{ item.name }}</h5>
-						<p>{{ item.desc }}</p>
-						<div class="price">￥{{ item.price }}</div>
-					</div>
-
-					<cell title="查看更多" :link="{name: 'index'}" is-link></cell>
-				</div>
-			</div> -->
+			
+			<el-mall-card :mall-card-data="item" v-for="(item, index) in tuijianList" :key="index"></el-mall-card>
+			
+			<el-cart-frame></el-cart-frame>
 		</div>
 	</div>
 </template>
@@ -99,6 +49,8 @@
 	import { Group, Cell, Swiper, Card, Panel, Search } from 'vux'
 	
 	import elHeaderIndex from 'components/header/header-index'
+	import elMallCard from 'components/mall/card'
+	import elCartFrame from 'components/cart/cart-frame'
 	
 	import { getterIndex } from 'services/index';
 
@@ -109,7 +61,7 @@
 
 	export default {
 		components: {
-			Group, Cell, Swiper, Card, Panel, Search, elHeaderIndex
+			Group, Cell, Swiper, Card, Panel, Search, elHeaderIndex, elMallCard, elCartFrame
 		},
 		data () {
 			return {
@@ -119,45 +71,7 @@
       	value: 'test',
       	tuijianImgLeft: {},
       	tuijianImgRight: {},
-      	tuijianBook: {
-      		title: '阅读是一种乐趣',
-      		desc: '经典书籍推荐',
-      	},
-      	tuijianBookList: [],
-      	tuijianCarrer: {
-      		title: '提升职场竞争力',
-      		desc: '经典DVD光盘推荐',
-      		list: []
-      	},
-      	tuijianCarrerList: [],
-      	tuijianStudent: {
-      		title: '提升你的生活质量',
-      		desc: '思维商学院学员优质产品推荐',
-      		list: [
-      			{
-      				img: imgGoods,
-      				name: '《经典小说》典藏版',
-      				desc: '艺术暑假限量套装',
-      				price: '1231'
-      			},{
-      				img: imgGoods,
-      				name: '《经典小说》典藏版',
-      				desc: '艺术暑假限量套装',
-      				price: '1231'
-      			},{
-      				img: imgGoods,
-      				name: '《经典小说》典藏版',
-      				desc: '艺术暑假限量套装',
-      				price: '1231'
-      			},{
-      				img: imgGoods,
-      				name: '《经典小说》典藏版',
-      				desc: '艺术暑假限量套装',
-      				price: '1231'
-      			}
-      		]
-      	},
-      	tuijianStudentList: []
+      	tuijianList: []
 			}
 		},
 		mounted ()  {
@@ -169,12 +83,36 @@
 				_this.$http.post('/wechat/shop/index',{}).then(function(e) {
 					let responseData = e.data.data;
 		  		// 顶部长banner
-		  		_this.resolveField(_this, 'bannerTopDatas', responseData.bannerTop, 'ad_code', 'mallDetail');
-		  		_this.resolveField(_this, 'tuijianImgLeft', responseData.bannerLeft, 'ad_code', 'mallDetail');
-		  		_this.resolveField(_this, 'tuijianImgRight', responseData.bannerRight, 'ad_code', 'mallDetail');
-		  		_this.resolveField(_this, 'tuijianBookList', responseData.book, 'thumbnail', 'mallDetail');
-		  		_this.resolveField(_this, 'tuijianCarrerList', responseData.cd, 'thumbnail', 'mallDetail');
-		  		// _this.resolveField(_this, 'tuijianStudentList', responseData.book, 'thumbnail');					
+		  		_this.resolveField(_this, 'bannerTopDatas', responseData.bannerTop, 'ad_code', '', 'ad_link');
+		  		_this.resolveField(_this, 'tuijianImgLeft', responseData.bannerLeft, 'ad_code', "", 'ad_link');
+		  		_this.resolveField(_this, 'tuijianImgRight', responseData.bannerRight, 'ad_code', "", 'ad_link');
+
+		  		// 产品类型列表展示
+		  		if(responseData.list && responseData.list.length > 0) {
+			  		_this.tuijianList = responseData.list.map(function(item, index) {
+			  			let listData = [];
+			  			if(item.list && item.list.length > 0) {
+			  				listData = item.list.map(function(listItem, listIndex){
+			  					return {
+			  						img: _this.resolveImg(listItem.thumbnail),
+										link: 'mallDetail',
+										url: "",
+										name: listItem.name,
+										desc: listItem.description,
+										price: listItem.price,
+										code: listItem.code
+			  					}
+			  				})
+			  			}
+
+			  			return {
+			  				desc: item.desc,
+			  				type: item.type,
+			  				title: item.title,
+			  				list: listData
+			  			}
+			  		})
+		  		}
 				});
 			},
 	    setFocus () {
@@ -199,9 +137,6 @@
 	    },
 	    onCancel () {
 	      console.log('on cancel')
-	    },
-	    goPage (link, code) {
-	    	this.$router.push({name: link, params: { goodsCode: code }})
 	    }
 	  },
 	}
@@ -246,88 +181,12 @@
 		img {
 			padding-right: 0;
 			padding-left: $tuijianPadding;
-			// padding-bottom: $tuijianPadding;
 		}
 
 		a:last-child {
 			img {
 				padding-top: $tuijianPadding;
 			}
-		}
-	}
-
-	.tuijain-card {
-
-	}
-
-	.tuijian-card-header {
-		position: relative;
-		text-align: center;
-		padding: $padding 0;
-		// @include halfpxline(0, #fff, 0 , 0, 1px, 0);
-
-		h3 {
-			font-size: 20px;
-		}
-
-		p {
-			position: relative;
-			width: auto;
-			display: inline;
-
-			&:before, &:after {
-				content: "";
-				position: absolute;
-				top: 6px;
-				left: -26px;
-				width:0;
-		    height:0;
-		    border-width: 8px 8px 0;
-		    border-style: solid;
-		    border-color: $fontColorGray transparent transparent;
-			}
-
-			&:after {
-				left: auto;
-				right: -26px;
-			}
-		}
-	}
-
-	.tuijian-card-body {
-		@extend %clearfix;
-		padding: $padding;
-	}
-
-	.goods {
-		float: left;
-		width: 50%;
-		margin-bottom: $padding;
-		line-height: 1.5;
-		text-align: center;
-		background: #fff;
-
-		&:nth-child(odd) {
-			border-right: $padding/2 solid $bgGray;
-    }
-		&:nth-child(even) {
-			border-left: $padding/2 solid $bgGray;
-    }
-
-		img {
-			width: 80%;
-			margin: 0 auto;
-	    padding: $padding 0;
-		}
-		
-		h5, p {
-			overflow:hidden;
-			white-space:nowrap;
-			text-overflow:ellipsis;
-		}
-
-		h5 {
-			font-size: 18px;
 		}
 	}
 </style>

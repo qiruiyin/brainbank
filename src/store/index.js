@@ -7,6 +7,8 @@ import common from './modules/common'
 import direction from './modules/direction'
 import user from './modules/user'
 import msg from './modules/msg'
+import nav from './modules/nav'
+import cart from './modules/cart'
 
 Vue.use(Vuex)
 
@@ -20,7 +22,9 @@ export default new Vuex.Store({
   	common,
     direction,
     user,
-    msg
+    msg,
+    nav,
+    cart
     // cart,
     // products
   },

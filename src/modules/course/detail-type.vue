@@ -19,7 +19,9 @@
 	        	</template>
 	        	<template v-if="courseInfo.type == 'audio'">        		
 		          <div class="audio-msg">
-		          	音频展示
+		          	<img src="~assets/img/audio.png" alt="">
+		          	<audio :src="course.fileUrl" controls="controls" preload hidden class="play-audio"></audio>	
+		          	<div @click="playBtnClick" :class="['play-btn', {'active': playBtn.status }]"></div>
 		          </div>
 	        	</template>
 	          <div class="detail-header-msg">
@@ -29,11 +31,10 @@
 								<el-reward :reward-data="courseInfo"></el-reward>
 							</div>
 						</div>
-						<el-comment :comment-data="commentData"></el-comment>
 	      	</template>
 	        
 	        <template v-if="tabSelected == 1">	        	
-	          <p>{{ course.desc }}</p>
+						<el-comment :comment-data="commentData"></el-comment>
 	        </template>
 
 	        <template v-if="tabSelected == 2">
@@ -42,8 +43,6 @@
 	      </div>
 	    </div>
 		</div>
-
-		
 	</div>
 </template>
 
@@ -84,8 +83,8 @@
 						value: 'detail',
 						title: '详情',
 					},{
-						value: 'desc',
-						title: '简介',
+						value: 'comment',
+						title: '评论',
 					},{
 						value: 'relate',
 						title: '相关',
@@ -118,13 +117,17 @@
 				commentData: {
 					productCode: this.$route.params.code,
 					pagesize: 1,
-					pagecount: 10
+					pagecount: this.wordBook.pageCount
+				},
+				playBtn: {
+					status: false,
+					obj: ''
 				}
 			}
 		},
 		mounted () {
 			let _this = this;
-	  	this.signUrl(location.href);
+	  	// this.signUrl(location.href);
 			this.fetchData();
 			this.addRecode();
 		},
@@ -178,11 +181,19 @@
 				let _this = this;
 				this.$http.post('/wechat/discover/addProductViewCount',
 						{
-							"code": _this.$route.params.id
+							"code": _this.$route.params.code
 						}
 					).then(function(e) {
 
 					});
+			},
+			playBtnClick () {
+				if(this.playBtn.status) {
+					this.playBtn.obj = document.querySelector(".play-audio").pause();
+				} else {
+					this.playBtn.obj = document.querySelector(".play-audio").play();
+				}
+				this.playBtn.status = !this.playBtn.status;
 			}
 		}
 	}
@@ -197,31 +208,10 @@
   @import '~assets/css/core/functions', '~assets/css/core/mixins', '~assets/css/core/vars';
 
 	.container {
-		// position: absolute;
-		// top: 0;
-		// left: 0;
-		// right: 0;
-		// bottom: 0;
-		// padding-bottom: $containerBottom;
-		// display: flex;
-		// flex-direction: column;
+		
 	}
-	
-	// .detail-header {
-	// 	height: 100px;	
-	// }
-
-	// .tab {
-	// 	position: relative;
-	// 	flex: 1;
-	// }
 
 	.list {
-		// position: absolute;
-		// top: 44px;
-		// left: 0;
-		// right: 0;
-		// bottom: 0;
 	}
 
 	.list {
@@ -233,6 +223,15 @@
 			background: #333;
 		}
 
+		.audio-msg {
+			position: relative;
+			height: auto;
+
+			img {
+				width: 100%;
+			}
+		} 
+
 		.detail-header-msg {
 			padding: $padding;
 			line-height: 2; 	
@@ -242,12 +241,40 @@
 			padding: 40px;
 			text-align: center;
 		}
-
-		
 	}
 
 	.swiper-desc {
 		padding: $padding;
+	}
+
+	// 音乐播放
+	$playBtnW: 60px;
+
+	.play-btn {
+		position: absolute;
+		bottom: $padding;
+		left: 0;
+		right: 0;
+		width: $playBtnW;
+		height: $playBtnW;
+		margin: 0 auto;
+		border-radius: $playBtnW;
+		background: url("~assets/img/index/play-start.png") no-repeat;
+		background-size: 100%;
+
+		&.active {
+			// animation: mymove 2s  linear infinite;
+			background-image: url("~assets/img/index/play.png");
+		}
+	}
+
+	@keyframes mymove {
+		from {
+			transform: rotate(0);
+		}
+		to {
+			transform: rotate(360deg);
+		}
 	}
   
 </style>

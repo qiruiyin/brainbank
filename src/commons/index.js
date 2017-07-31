@@ -6,6 +6,9 @@ import hold from './hold'
 import { AjaxPlugin } from 'vux'
 Vue.use(AjaxPlugin)
 
+import  { ConfirmPlugin } from 'vux'
+Vue.use(ConfirmPlugin)
+
 import { WechatPlugin } from 'vux'
 Vue.use(WechatPlugin)
 
@@ -15,16 +18,31 @@ Vue.use(ToastPlugin)
 
 // 图片链接拼接
 Vue.prototype.resolveImg =  function(img) {
+	// let imgUrl = 'http://glyh.qibeisoft.com/';
 	let imgUrl = 'http://test.yoao.com/';
+
 	// let imgUrl = 'http://192.168.1.170:8080/csm/';
-	if(!img) {
+	if(!img || img.substr(0, 4) == "http") {
 		return img
 	} else {
 		return imgUrl + img.replace(/\\/g, '/');
 	}
 }
+
+// 富文本图片链接地址处理
+Vue.prototype.resolveRichTextImg = function(text) {
+	// let textUrl = 'http://glyh.qibeisoft.com';
+	let imgUrl = 'http://test.yoao.com';
+	if(!text) return text;
+	text = text.replace(/<img\ssrc=\"http/g, '-CC309AB4-89E6-44D2-9A7C-A8F33F40F3BB-');
+	text = text.replace(/<img\ssrc=\"/g, "<img src=\""+ textUrl);
+	text = text.replace(/\-CC309AB4\-89E6\-44D2\-9A7C\-A8F33F40F3BB\-/g, "<img src=\"http");
+	return text;
+}
+
 // 视频链接拼接
 Vue.prototype.resolveVideo =  function(video) {
+	// let imgUrl = 'http://glyh.qibeisoft.com/';
 	let imgUrl = 'http://test.yoao.com/';
 	// let videoUrl = 'http://192.168.1.170:8080/csm/';
 	if(!video) {
@@ -33,23 +51,46 @@ Vue.prototype.resolveVideo =  function(video) {
 		return videoUrl + video.replace(/\\/g, '/');
 	}
 }
+
 // 处理首页通用的字段转换
-Vue.prototype.resolveField =  function (_this, $obj, datas, img, link) {
+Vue.prototype.resolveField =  function (_this, $obj, datas, img, link, url = "") {
 	// 获取banner数据并处理
 	let arr = [];
 
-	datas.map((item, i) => {
-		arr[i] = {
-			img: _this.resolveImg(item[img]),
-			link: link,
-			name: item.name,
-			desc: item.description,
-			price: item.price,
-			code: item.code
-		}
-	})
+	if(datas && datas.length > 0) {
+		arr = datas.map((item, i) => {
+			let data = "";
+			// if(url != "" && item[url]) 
+			// data =  item[url].replace("http://test.yoao.com/mobile/wechat/index.html", "http://localhost:9001")
+
+			return {
+				img: Vue.prototype.resolveImg(item[img]),
+				link: link,
+				url: data,
+				name: item.name,
+				desc: item.description,
+				price: item.price,
+				code: item.code
+			}
+		})
+	}
 
 	_this[$obj] = arr;
+}
+
+// 判断数组中是否包含指定元素
+Vue.prototype.arrContain = function(arr, obj) {
+	let status = false;
+
+	if(arr && arr.length > 0) {
+		arr.map(function(item, index){
+			if(item == obj) {
+				status = true
+				return
+			}
+		})
+	}
+	return status;
 }
 
 // 支付订单
@@ -82,7 +123,22 @@ Vue.prototype.resolveField =  function (_this, $obj, datas, img, link) {
 // 	});
 // }
 
-
+// 是否登录
+Vue.prototype.isLogin = () => {
+  if(store.state.user.userCode == '') {
+		Vue.$vux.confirm.show({
+	    content: '您还没有绑定信息, 确定去绑定信息',
+	    onCancel () {
+	    	return false
+	    },
+	    onConfirm () {
+	      router.push({name: 'bangding'});
+	    }
+	  });
+  } else {
+  	return true
+	} 
+}
 
 // 登陆后页面跳转方法
 Vue.prototype.goBeforeLoginUrl = () => {
@@ -165,6 +221,7 @@ let openShare = (baseUrl, title, desc, openId, imgUrl) => {
 		let qrcodePath = e.data.data.qrcodePath;
 		if(qrcodePath && qrcodePath != null && qrcodePath.length > 0){
 			// $("#share-tip").show();
+			store.commit("updateUserQrcode", { 'qrcode': baseUrl+qrcodePath + "?time=" + Date.parse(new Date())})
 			setShareProductUrl(title, desc, baseUrl+qrcodePath, baseUrl+imgUrl);
 		} else {
 			// toastr.error("二维码获取失败,请稍后再试!");
@@ -178,9 +235,11 @@ let openShare = (baseUrl, title, desc, openId, imgUrl) => {
 Vue.prototype.signUrl = (url) => {
   Vue.http.post("/wechat/wx/sign/url",{url: url}).then(function(e) {
   	let data = e.data.data.signature;
+  	
   	if(data.status != 0){
 			return false;
 		}
+
 		Vue.wechat.config({
 			debug : false,
 			appId : data.signature.appId,
@@ -202,7 +261,8 @@ Vue.prototype.signUrl = (url) => {
 			}
 		});
 
-		openShare("http://test.yoao.com/", "测试", "测试111", window.localStorage.getItem("openId"), "");
+		openShare("http://test.yoao.com/", "分享", "分享二维码", window.localStorage.getItem("openId"), "");
+		// openShare("http://glyh.qibeisoft.com/", "分享", "分享二维码", window.localStorage.getItem("openId"), "");
   });
 }
 

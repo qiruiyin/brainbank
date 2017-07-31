@@ -18,7 +18,6 @@
 			</div>
 
 			<div class="entry-videos">
-				<!-- <div v-for="item in entryVideosDatas" @click="videoAudioDetail(item.url, item.id)"> -->
 				<div @click="goPage('courseTypeDetail', { type: 'video', code: item.code})" v-for="(item, index) in entryVideosDatas" :key="index">
 					<img :src="item.img" alt="">
 					<p>{{ item.name }}</p>
@@ -26,19 +25,21 @@
 			</div>
 
 			<div class="tuijian">
-				<el-tuijian tuijian-link="audio" :tuijian-data="tuijianAudioDatas.list">
+				<el-tuijian :tuijian-status="playAudioInfo.index" tuijian-link="audio" :tuijian-data="tuijianAudioDatas.list">
 					<div class="play">
-						<div class="play-prev" @click="play('prev')"></div>
+						<div class="play-audio">
+							<audio :src="item.src" @ended="audioEnded" controls="controls" preload hidden :class="'play-audio-' + index" class="play-audio-btn" v-for="(item, index) in tuijianAudioDatas.list" :key="index">
+							</audio>	
+						</div>
 						<div :class="['play-img', {'active': playStatus}]" @click="play('start')"></div>
-						<div class="play-next" @click="play('next')"></div>
 						<p>{{ tuijianAudioDatas.num }}</p>
 					</div>
 				</el-tuijian>
 			</div>
 
 			<div class="tuijian">
-				<el-tuijian tuijian-link="quotation" :tuijian-data="tuijianQuotationDatas.list">
-					<div>
+				<el-tuijian tuijian-status="-1" tuijian-link="quotation" :tuijian-data="tuijianQuotationDatas.list">
+					<div class="tuijian-data">
 						<img :src="tuijianQuotationDatas.img" alt="">
 						<p>{{ tuijianQuotationDatas.name }}</p>	
 					</div>
@@ -46,9 +47,9 @@
 			</div>
 
 			<div class="video-course">
-				<card :header="{title:'视频教程'}">
+				<card :header="{title:'在线学习区'}">
 					<div slot="content">
-						<el-img-text @click.native="goPage('courseDetail', { courseCode: item.code, courseStatus: '0'})" v-for="(item, index) in tuijianVideoDatas" :img-text-data="item" :key="index"></el-img-text>
+						<el-img-text @show-bangding="showBangding" @on-img-text-click="videoClick" v-for="(item, index) in tuijianVideoDatas" :img-text-data="item" :key="index"></el-img-text>
 					</div>
 				</card>
 			</div>
@@ -66,9 +67,8 @@
 	
 
 		<div v-transfer-dom>
-			<popup v-model="bangdingShow" position="bottom">
-	       <group label-width="4em" label-margin-right="2em" label-align="right">
-		      <!-- <x-input :title="name.title" v-model="name.value" :placeholder="name.placeholder"></x-input> -->
+			<popup v-model="bangdingShow" position="bottom" :hide-on-blur="false">
+	      <group label-width="4em" label-margin-right="2em" label-align="right">
 		      <x-input :title="bangding.idCard.title" v-model="bangding.idCard.value" :placeholder="bangding.idCard.placeholder"></x-input>
 		      <x-input type="number" :title="bangding.tel.title" v-model="bangding.tel.value" :placeholder="bangding.tel.placeholder" class="weui-vcode">
 		       	<el-verification-code :tel="bangding.tel.value" slot="right"></el-verification-code>
@@ -78,6 +78,7 @@
 				
 				<div class="btns">
 					<x-button type="primary" @click.native="submitBangDing" >确定</x-button>
+					<x-button type="default" @click.native="cancelBangDing" >取消</x-button>
 				</div>
 	    </popup>
 	   </div>
@@ -105,6 +106,10 @@
 		components: { Group, Cell, Swiper, Card, Panel, Popup, XInput, XButton, Toast, elHeaderIndex, elTuijian, elImgText, elVerificationCode },
 	  data () {
 	    return {
+	    	playAudioInfo: {
+	    		index: -1,
+	    		current: ''
+	    	},
 	      bannerTopDatas: [],
 	      bannerBottom1Datas: [],
 	      bannerBottom2Datas: [],
@@ -122,7 +127,7 @@
 	      },
 	      // courseOthers: getterIndex.courseOthers,
 	      playStatus: false,
-	      
+	      bangdingShow: !(hold.storage.get("userCode") || this.$store.state.user.userCode) || this.bangdingShowStatus,
 	      bangding: {
 	      	name: {
 						value: "",
@@ -147,36 +152,42 @@
 	      }
 	    }
 	  },
-	  computed: {
-	  	bangdingShow () {
-	  		return !this.$store.state.user.bangdingStatus;
-	  	}
-	  },
 	  mounted () {
-	  	this.signUrl(location.href);
 	  	this.fetchData();
 	  },
 	  methods: {
 	  	fetchData	() {
 	  		// 获取所有数据
 	  		let _this = this;
-	  		_this.$http.post('/wechat/discover/index',{}).then(function(e) {
+	  		_this.$http.post('/wechat/discover/index',{
+	  				"userCode": _this.$store.state.user.userCode
+	  			}).then(function(e) {
 		  		let responseData = e.data.data,
 		  				tuijianQuotationDatas = [],
 		  				tuijianVideoDatas = [];
 		  		// 顶部长banner
-		  		_this.resolveField(_this, 'bannerTopDatas', responseData.bannerTop, 'ad_code');
+		  		_this.resolveField(_this, 'bannerTopDatas', responseData.bannerTop, 'ad_code', "", 'ad_link');
 		  		// 底部banner
-		  		_this.resolveField(_this, 'bannerBottom1Datas', responseData.bannerBottom1, 'ad_code');
+		  		_this.resolveField(_this, 'bannerBottom1Datas', responseData.bannerBottom1, 'ad_code', "", 'ad_link');
 		  		// 底部banner
-		  		_this.resolveField(_this, 'bannerBottom2Datas', responseData.bannerBottom2, 'ad_code');
+		  		_this.resolveField(_this, 'bannerBottom2Datas', responseData.bannerBottom2, 'ad_code', "", 'ad_link');
 		  		// 视频推荐
 		  		_this.resolveField(_this, 'entryVideosDatas', responseData.movies, 'thumbnail');
+
 					// 音频推荐
 					_this.tuijianAudioDatas.num = responseData.voicesPlayCount | 13421;
-					_this.tuijianAudioDatas.list = responseData.voices;
+					_this.tuijianAudioDatas.list = responseData.voices.map(function(item, index){
+						return {
+							src: _this.resolveImg(item.file_url),
+							name: item.name
+						}
+					});
 					// 语录推荐
 					responseData.quList.map(function(item, index) {
+						if(index == 0 && item.img && item.img.length > 0) {
+							_this.tuijianQuotationDatas.img = _this.resolveImg(item.img[0]);
+						}
+
 						tuijianQuotationDatas[index] = {
 							name: item.title,
 							code: item.code,
@@ -193,12 +204,13 @@
 							// priceCurrency: '￥',
 							desc: item.description || '介绍',
 							label: '主讲', 
-							speaker: item.author | '苏引华',
+							speaker: item.author || '苏引华',
 							subscribe: item.subCount,
 							code: item.code,
 							url: '',
 							id: '',
-							img: _this.$store.state.common.imgUrl + item['thumbnail'].replace(/\\/g, '/')
+							isClick: item.jurisdiction,
+							img: _this.resolveImg(item['thumbnail'])
 						}
 					});
 
@@ -212,13 +224,38 @@
 	  		this.$router.push({ name: url, params: { id: id }})
 	  	},
 	  	play (status) {
-	  		if(status == 'start') {
-					this.playStatus = !this.playStatus;
-	  		} else if (status == 'prev') {
-	  			
-	  		} else if (status == 'next') {
-
+	  		if(this.playAudioInfo.index == -1) this.playAudioInfo.index = 0;
+	  		if(!this.playStatus) {
+	  			this.playAudio();
+					// document.querySelector(".play-audio-btn").play();
+	  		} else {
+	  			this.pauseAudio();
+	  			document.querySelector(".play-audio-btn").pause();
 	  		}
+				this.playStatus = !this.playStatus;
+	  	},
+	  	playAudio () {
+	  		this.playAudioInfo.current = document.querySelector('.play-audio-' + this.playAudioInfo.index).play();
+	  	},
+	  	pauseAudio () {
+	  		this.playAudioInfo.current = document.querySelector('.play-audio-' + this.playAudioInfo.index).pause();
+	  	},
+	  	audioEnded () {
+  			if(this.playAudioInfo.index == 2) {
+  				this.playAudioInfo.index = 0;
+  			} else {
+  				++this.playAudioInfo.index;
+  			}
+	  		this.playAudio();
+	  	},
+	  	videoClick (val) {
+				this.goPage('courseDetail', { courseCode: val.code, courseStatus: '0'}) 
+	  	},
+	  	cancelBangDing () {
+				this.bangdingShow = false;
+	  	},
+	  	showBangding () {
+	  		this.bangdingShow = true
 	  	},
 			submitBangDing () {
 				let _this = this;
@@ -291,10 +328,16 @@
 	
 	$playImgW: 60px;
 	$playBtnW: 30px;
+
 	.play {
 		position: relative;
 		width: $tuijianImgW;
     // overflow: hidden;
+
+    .play-audio {
+    	position: absolute;
+    	opacity: 0;
+    }
 
 		.play-prev, .play-next {
 			position: absolute;
@@ -376,6 +419,12 @@
 
 		img {
 			width: 100%;
+		}
+	}
+
+	.tuijian-data {
+		img {
+			border-radius: $tuijianImgW
 		}
 	}
 </style>

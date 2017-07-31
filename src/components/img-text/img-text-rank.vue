@@ -4,7 +4,7 @@
 
 <template>
 	<div class="img-text img-text-rank" @click="goPage(imgTextData.url, imgTextData.params)">
-		<div class="img-text-img">
+		<div v-if="imgTextData.img" class="img-text-img">
 			<img class="img" :src="imgTextData.img" alt="">
 		</div>
 		
@@ -15,11 +15,12 @@
 				<rater v-model="imgTextData.like.percent" :margin="0" slot="value" :max="5" :font-size="15" active-color="#04BE02"></rater>
 				（{{ imgTextData.like.num | numToCash }}）
 			</p>
-			<p v-if="imgTextData.download">下载次数：{{ imgTextData.download }}</p>
+			<p v-if="imgTextData.download || imgTextData.download == 0">下载次数：{{ imgTextData.download }}</p>
 			
 			<template v-if="imgTextBtn != -1">
 				<template v-if="isClick">
-					<div class="btn">{{ btns[imgTextBtn].name }}</div>
+					<a @click.stop="downloadFile" v-if="isDownload" :href="imgTextData.downloadUrl" class="btn">{{ btns[imgTextBtn].name }}</a>
+					<div v-else class="btn">{{ btns[imgTextBtn].name }}</div>
 				</template>
 
 				<template v-else>
@@ -35,7 +36,7 @@
 
 	export default {
 		components: { Rater },
-		props: ['imgTextData', 'imgTextBtn'],
+		props: ['imgTextData', 'imgTextBtn', 'isDownload'],
 		data () {
 			return {
 				list: {
@@ -82,7 +83,10 @@
 				}
 			},
 			download (val) {
-				this.$emit('on-btn-click', val)
+				this.$emit('on-btn-click', val, )
+			},
+			downloadFile () {
+
 			}
 		}
 	}

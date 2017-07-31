@@ -5,9 +5,8 @@
 <template>
 	<div class="tuijian">
 		<div class="tuijian-left">
-
-			<div v-for="item in tuijianData">
-				<div v-if="item.file_url"  @click="goPage('courseTypeDetail', { type: 'audio', code: item.code})" >{{ item.name }}</div>
+			<div :class="{'active': tuijianStatus == index}"  v-for="(item, index) in tuijianData" :key="index">
+				<div v-if="item.src" @click="goPage('courseTypeDetail', { type: 'audio', code: item.code})" >{{ item.name }}</div>
 				<div v-else @click="goPage('quotation')" >{{ item.name }}</div>
 			</div>
 		</div>
@@ -22,7 +21,7 @@
 	// import imgHeader from 'assets/img/index/header.png'
 
 	export default {
-		props: ['tuijianData', 'tuijianLink'],
+		props: ['tuijianData', 'tuijianLink', 'tuijianStatus'],
 		data () {
 			return {
 				// img: imgHeader,
@@ -68,11 +67,15 @@
 	.tuijian-left {
 		flex: 1;
 		line-height: 2;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 
 		& > div {
 			position: relative;
+			width: 100%;
 			padding-left: 20px;
-
+			
 			&:before {
 				content: "";
 				position: absolute;
@@ -85,17 +88,32 @@
     		border-left: 10px solid transparent;
     		transform: rotate(-45deg);
 			}
+
+			&.active {
+				color: red;
+
+				&:before {
+					border-bottom-color: red;
+				}
+			}
+
+			div {
+				overflow:hidden;
+				text-overflow:ellipsis; 
+			}
 		}
+
 	}
 
 	.tuijian-right {
-		width: $tuijianImgW;
+		width: $tuijianImgW + 10px;
 		text-align: center;
 		line-height: 30px;
 
 		img {
 			width: $tuijianImgW;
 			height: $tuijianImgW;
+			margin: 0 auto;
 		}
 	}
 

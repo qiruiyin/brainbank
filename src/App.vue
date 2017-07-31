@@ -1,13 +1,13 @@
 <template>
   <div id="app">
     <loading v-model="isLoading"></loading>
-    <div class="container">
+    <div :class="['container', {'active': nav.status}]">
       <transition :name="'vux-pop-' + (direction.direction === 'forward' ? 'in' : 'out')">
           <router-view class="router-view"></router-view>
         </transition>
       <!-- <router-view></router-view>     -->
     </div>
-    <el-nav></el-nav>
+    <el-nav v-show="nav.status"></el-nav>
   </div>
 </template>
 
@@ -22,8 +22,13 @@ export default {
   components: {
     Loading, elNav
   },
+  data () {
+    return {
+    }
+  },
   computed: {
     ...mapState({
+      nav: state => state.nav,
       isLoading: state => state.isLoading,
       direction: state => state.direction
     })
@@ -50,10 +55,14 @@ export default {
     // position: relative;
     width: 100%;
     height: 100%;
-    padding-bottom: $containerBottom;
+    // padding-bottom: $containerBottom;
     overflow: auto;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
+
+    &.active {
+      padding-bottom: $containerBottom;
+    }
   }
 
 .vux-pop-out-enter-active,

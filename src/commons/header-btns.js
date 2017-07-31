@@ -3,9 +3,8 @@
 // 3 商业思维
 // 4 系统思维
 // 5 思维商学院
-const headerBtns = [
-	{
-		level: 1,
+const headerBtns = {
+	level1: {
 		course: '普通学员',
 		btns: [
 			{
@@ -14,8 +13,8 @@ const headerBtns = [
 				link: 'enlist'
 			}
 		]
-	},{
-		level: 2,
+	},
+	level2: {
 		value: 'shangyesiwei',
 		course: '商业思维',
 		btns: [
@@ -29,8 +28,8 @@ const headerBtns = [
 				link: 'upgrade'
 			}
 		]
-	},{
-		level: 3,
+	},
+	level31: {
 		value: 'siweidaotu',
 		course: '思维导图',
 		btns: [
@@ -44,8 +43,8 @@ const headerBtns = [
 				link: 'upgrade'
 			}
 		]
-	},{
-		level: 4,
+	},
+	level3: {
 		value: 'xitongsiwei',
 		course: '系统思维',
 		btns: [
@@ -59,8 +58,8 @@ const headerBtns = [
 				link: 'upgrade'
 			}
 		]
-	},{
-		level: 5,
+	},
+	level4: {
 		value: 'shangxueyuan',
 		course: '商学院',
 		btns: [
@@ -75,6 +74,6 @@ const headerBtns = [
 			}
 		]
 	},
-];
+};
 
 export default  headerBtns

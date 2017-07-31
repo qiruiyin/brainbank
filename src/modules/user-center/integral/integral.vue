@@ -75,7 +75,7 @@
 					).then(function(e) {
 						let responseData = e.data.data.result;
 
-						_this.interval = responseData.integralInfo;
+						_this.integral = responseData.integralInfo;
 						_this.tabDatas[0].title = "已邀请普通学员" + responseData.type1 + "位";
 						_this.tabDatas[1].title = responseData.type2 + "位报名总裁商业思维";
 
@@ -115,6 +115,7 @@
 	@import '~assets/css/core/functions', '~assets/css/core/mixins', '~assets/css/core/vars';
 	
   $imgW: 44px;
+  
 	.integral {
 
 	}

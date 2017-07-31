@@ -1,3 +1,4 @@
+// 用户信息存储
 import * as types from '../mutation-types'
 
 export default {
@@ -9,7 +10,8 @@ export default {
     level: '',
     openId: '',
     btns: [],
-    bangdingStatus: true
+    bangdingStatus: false,
+    qrcode: ""
   },
   mutations: {
     updateUserImg (state, payload) {
@@ -35,6 +37,9 @@ export default {
     },
     updateUserBangdingStatus (state, payload) {
       state.bangdingStatus = payload.bangdingStatus
+    },
+    updateUserQrcode (state, payload) {
+      state.qrcode = payload.qrcode
     }
   }
 }

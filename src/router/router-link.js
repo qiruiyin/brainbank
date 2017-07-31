@@ -23,7 +23,7 @@ const routes = [
 			title: '大脑银行'
 		}
 	},{
-		path: '?/bangding',
+		path: '/bangding',
 		name: 'bangding',
 		component:  loadView(loaded => {
 			require(['../modules/index/bangding.vue'], loaded)
@@ -59,7 +59,7 @@ const routes = [
 			title: '信息补充'
 		}
 	},{
-		path: '/course-order/:payType',
+		path: '/confirm-order/:payType',
 		name: 'courseOrder',
 		component:  loadView(loaded => {
 			require(['../modules/index/course-order.vue'], loaded)
@@ -86,13 +86,13 @@ const routes = [
 	// 		title: '大脑银行'
 	// 	}
 	},{
-		path: '/banner/:bannerId',
+		path: '/banner/:bannerCode',
 		name: 'banner',
 		component:  loadView(loaded => {
 			require(['../modules/banner/banner.vue'], loaded)
 		}),
 		meta: {
-			title: '富文本'
+			title: '大脑银行'
 		}
 	},{
 		path: '/rank/:type',
@@ -265,6 +265,16 @@ const routes = [
 			title: '商城首页'
 		}
 	},{
+		// 商城产品列表
+		path: '/mall/list/:type',
+		name: 'mallList',
+		component:  loadView(loaded => {
+			require(['../modules/mall/list.vue'], loaded)
+		}),
+		meta: {
+			title: '产品列表'
+		}
+	},{
 		// 商城详情
 		path: '/mall/detail/:goodsCode',
 		name: 'mallDetail',
@@ -275,7 +285,7 @@ const routes = [
 			title: '商品详情'
 		}
 	},{
-		// 订单
+		// 课程订单
 		path: '/order/list/course',
 		name: 'orderCourseList',
 		component:  loadView(loaded => {
@@ -285,11 +295,21 @@ const routes = [
 			title: '订单列表'
 		}
 	},{
-		// 订单
+		// 商城订单
 		path: '/order/list/mall',
 		name: 'orderMallList',
 		component:  loadView(loaded => {
 			require(['../modules/order/mall-list.vue'], loaded)
+		}),
+		meta: {
+			title: '订单列表'
+		}
+	},{
+		// 资料订单
+		path: '/order/list/source',
+		name: 'orderSourceList',
+		component:  loadView(loaded => {
+			require(['../modules/order/source-list.vue'], loaded)
 		}),
 		meta: {
 			title: '订单列表'

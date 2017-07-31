@@ -17,34 +17,40 @@
 						<!-- <span>售价：{{ goodsMsg.price }}</span> -->
 						<span>已购买：{{ goodsMsg.sellNum }}</span>
 						<span>{{ goodsMsg.author }} 著</span>
+						<div class="price">单价<i>￥</i>{{ goodsMsg.price }}</div>
+					</div>
+					<div class="num">
+						<x-number title="数量" :min="1" class="num-data" v-model="goodsMsg.num"></x-number>
 					</div>
 				</div>
-				<div class="msg-footer">
-					<div class="price"><i>￥</i>{{ goodsMsg.price }}</div>
-					<div class="cart fa fa-shopping-cart" @click="addCart"></div>
-				</div>
 			</div>
-
-			<div @click="goCart">购物车</div>
+			
+			<div v-transfer-dom>
+				<el-cart :cart-num="cartNum" @on-addCart-click="addCart" @on-balance-click="balance"></el-cart>
+			</div>
 			
 			<div class="tab">
 				<div class="tab">
 		      <tab v-model="tabSelected">
 		        <tab-item :selected="tabSelected == index" v-for="(item, index) in tabDatas" @click="tabSelected = index" :key="index">{{ item.title }}</tab-item>
 		      </tab>
-		      <swiper class="list" height="100%" v-model="tabSelected" :show-dots="false">
-		        <swiper-item v-for="(tabContentDatasList, index) in tabDatas" :key="index">
-		          <template v-if="tabContentDatasList.value == 'detail'">
-		          	
-		          </template>
-		          <template v-if="tabContentDatasList.value == 'comment'">
-		          	<el-comment :comment-data="commentData"></el-comment>
-		          </template>
-		          <template v-if="tabContentDatasList.value == 'record'">
-		          	
-		          </template>
-		        </swiper-item>
-		      </swiper>
+		      <div class="list">
+	      		<template v-if="tabSelected == 0">	      			
+		          <div v-html="goodsMsg.details"></div>
+	      		</template>
+	      		<template v-if="tabSelected == 1">
+	          	<el-comment :comment-data="commentData"></el-comment>
+	      		</template>
+	      		<template v-if="tabSelected == 2">
+		      		<div class="record" v-for="(item, index) in recordData" :key="index">
+								<img :src="item.img">
+								<div class="title">
+									<p>{{ item.name }}</p>
+									<span>购买时间：{{ item.date }}</span>
+								</div>
+							</div>
+	      		</template>
+	      	</div>
 		    </div>
 	    </div>
 
@@ -53,27 +59,36 @@
 </template>
 
 <script type="text/babel">
-	import { Swiper, Card, Tab, TabItem, SwiperItem } from 'vux'
+	import { XNumber, Swiper, Card, Tab, TabItem, SwiperItem, TransferDomDirective as TransferDom } from 'vux'
 
 	import elComment from 'components/comment/comment'
+	import elCart from 'components/cart/cart'
 
+	import hold from 'src/commons/hold'
 	import { getterIndex } from 'services/index';
 
 	export default {
 		name: "mallDatail",
-		components: { Swiper, Card, Tab, TabItem, SwiperItem, elComment },
+		directives: {
+	    TransferDom
+	  },
+		components: { XNumber, Swiper, Card, Tab, TabItem, SwiperItem, elComment, elCart },
 		data () {
 			return {
 				title: "商城详情",
+				cartNum: 0,
 				bannerTopDatas: getterIndex.bannerDatas,
+				productCode: this.$route.params.goodsCode,
 				goodsMsg: {
 					img: "",
 					title: "商品名字",
 					price: "5",
 					sellNum: "100",
+					num: 1,
 					author: "苏引华",
 					address: "江苏苏州",
-					code: ""
+					code: "",
+					details: ""
 				},
 				tabDatas: [
 					{
@@ -93,15 +108,18 @@
 					comment: [],
 					record: []
 				},
+				details: "",
 				commentData: {
-					productcode: '',
+					productCode: this.$route.params.goodsCode,
 					pagesize: 1,
-					pagecount: 10
-				}
+					pagecount: this.wordBook.pageCount
+				},
+				recordData: []
 			}
 		},
 		mounted () {
 			this.fetchData();
+			this.addRecode();
 		},
 		methods: {
 			fetchData () {
@@ -116,25 +134,79 @@
 		  			_this.goodsMsg.title = responseData.name;
 		  			_this.goodsMsg.author = responseData.author;
 		  			_this.goodsMsg.price = responseData.PRICE;
+		  			_this.goodsMsg.details = _this.resolveRichTextImg(responseData.CONTENT);
 		  			_this.goodsMsg.img = _this.resolveImg(responseData.thumbnail);
 		  			_this.commentData.productcode =  _this.$route.params.goodsCode;
 				});
+
+				_this.payRecord(1, 10);	
 			},
-			addCart (num = 1) {
+			payRecord (pageSize = 1, pageCount = 10) {
+				let _this = this;
+				_this.$http.post('/wechat/shop/productByHistory',
+					{
+						code: this.$route.params.goodsCode,
+						userCode: "",
+						pageSize: pageSize,
+						pageCount: pageCount
+					}).then(function(e) {
+						let responseData = e.data.data;
+						if(responseData.list.length > 0) {
+							if(pageSize > 0) {
+								let listData = responseData.list.map(function(item, index) {
+									return {
+										img: _this.resolveImg(item.header),
+										name: item.name,
+										date: item.time
+									}
+								});
+								_this.recordData.push.apply(_this.recordData, listData);
+							} else {
+								_this.recordData = responseData.list.map(function(item, index) {
+									return {
+										img: _this.resolveImg(item.header),
+										name: item.name,
+										date: item.time
+									}
+								});
+							}
+						}
+				});	
+			},
+			addCart () {
 				let _this = this;
 				
 				_this.$http.post('/wechat/shop/addCart',
 					{
 						userCode: _this.$store.state.user.userCode,
 						productCode: _this.$route.params.goodsCode,
-						shopCount: 1
+						shopCount: _this.goodsMsg.num
 					}).then(function(e) {
-						// alert("加入购物车成功")
-		  			// _this.$router.push({name: 'shopCart'});
+						if(e.data.errcode == 1) {
+							_this.$vux.toast.show({
+								text: "加入购物车成功"
+							});
+
+							_this.cartNum += _this.goodsMsg.num;
+						}
 				});
+			},
+			balance () {
+				let _this = this;
+
 			},
 			goCart () {
 				this.$router.push({name: "shopCart"})
+			},
+			addRecode () {
+				let _this = this;
+				this.$http.post('/wechat/discover/addProductViewCount',
+						{
+							"code": _this.$route.params.goodsCode
+						}
+					).then(function(e) {
+
+					});
 			}
 		}
 	}
@@ -144,6 +216,8 @@
 <style lang="scss" scoped>
 	@import '~lib/sandal/core';
 	@import '~assets/css/core/functions', '~assets/css/core/mixins', '~assets/css/core/vars';
+  
+  $imgW: 44px;
 	
 	.banner {
 		img {
@@ -192,4 +266,24 @@
 		}
 	}
 
+	.record {
+		padding: $padding;
+  	display: flex;
+		@include halfpxline(0, $borderColor, 1px, 0, 1px, 0);
+
+  	img {
+  		width: $imgW;
+  		height: $imgW;
+  		border-radius: $imgW;
+  	}
+		
+		.title {
+			padding-left: $padding;
+			flex: 1;
+		}
+
+  	p {
+			font-size: 18px;
+  	}
+	}
 </style>

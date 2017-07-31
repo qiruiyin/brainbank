@@ -1,3 +1,4 @@
+// 消息增加过渡后记录上一个页面
 import * as types from '../mutation-types'
 
 export default {

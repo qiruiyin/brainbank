@@ -12,20 +12,20 @@
 			</group>
 		</div>
 		<div class="btns">
-			<div class="delete" @click="deleteAll">清空</div>
-			<div class="next" @click="next">下订单</div>
+			<x-button type="primary" class="delete" @click.native="deleteAll">清空</x-button>
+			<x-button type="primary" class="next" @click.native="next">下订单</x-button>
 		</div>
 	</div>
 </template>
 
 <script type="text/babel">
-	import { Cell, Group } from 'vux'
+	import { Cell, Group, XButton } from 'vux'
 	import imgTextCart from 'components/img-text/img-text-cart'
 	// import "" from 'assets/img/shop-cart.jpg'
 
 	export default {
 		components: {
-			Cell, Group, imgTextCart
+			Cell, Group, XButton, imgTextCart
 		},
 		data () {
 			return {
@@ -121,7 +121,7 @@
 
 		.next {
 			float: right;
-			width: 4em;
+			// width: 4em;
 		}
 	}
 

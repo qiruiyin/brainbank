@@ -72,6 +72,12 @@
 						icon: 'shopping-cart'
 					},{
 						value: '',
+						name: '我的资料',
+						url: 'orderSourceList',
+						img: imgIcon04,
+						icon: 'shopping-cart'
+					},{
+						value: '',
 						name: '地址管理',
 						url: 'address',
 						img: imgIcon04,

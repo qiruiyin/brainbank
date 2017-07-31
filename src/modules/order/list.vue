@@ -26,37 +26,39 @@
 		data () {
 			return {
 				title: '订单列表页面',
-				count: 10,
+				count: this.wordBook.pageCount,
 				tabData: [
 					{
 						value: 'all',
 						name: '全部',
 						status: 'all',
-						pagesize: 1,
+					  paymentStatus: "",
+					  ticketStatus: "",
+						pageSize: 1,
 						list: []
 					},{
 						value: 'unpay',
 						name: '待付款',
 						status: 'unpay',
-						pagesize: 1,
-						list: []
-					},{
-						value: 'undelievery',
-						name: '已付款',
-						status: 'undelievery',
-						pagesize: 1,
+					  paymentStatus: 0,
+					  ticketStatus: "",
+						pageSize: 1,
 						list: []
 					},{
 						value: 'untake',
 						name: '未上课',
 						status: 'untake',
-						pagesize: 1,
+					  paymentStatus: 1,
+					  ticketStatus: 0,
+					  pageSize: 1,
 						list: []
 					},{
 						value: 'take',
 						name: '已上课',
 						status: 'take',
-						pagesize: 1,
+					  paymentStatus: 1,
+					  ticketStatus: 1,
+						pageSize: 1,
 						list: []
 					}
 				],
@@ -70,18 +72,18 @@
 		},
 		mounted () {
 			// 取全部数据
-			this.fetchData(1, 0);
+			this.fetchData(this.tabData[0], 0);
 		},
 		methods: {
-			fetchData (pageSize = 1, ind = 0, paymentStatus = "", ticketStatus = "") {
+			fetchData (obj, ind = 0) {
 				let _this = this;
 				this.$http.post('/wechat/usercenter/getCustomerLessonList',
 						{
 							"customerCode": _this.$store.state.user.userCode,
-							"pageSize": pageSize,
+							"pageSize": obj.pageSize,
 							"pageCount": _this.count,
-							"paymentStatus": paymentStatus,
-							"ticketStatus": ticketStatus
+							"paymentStatus": obj.paymentStatus,
+							"ticketStatus": obj.ticketStatus
 						}
 					).then(function(e) {
 						let responseData = e.data.data,
@@ -95,14 +97,15 @@
 									title: item.NAME,
 									actualAmount: item.actualAmount,
 									amount: item.amount,
-									status: item.paymentStatus,
 									paymentType: item.paymentType,
 									img: '',
+									status: (item.paymentType == 1 && item.ticketStatus) ? item.ticketStatus : item.paymentStatus,
+									time: item.createTime,
 									num: item.count
 								}
 							});
 
-							if(pageSize == 1) {
+							if(obj.pageSize == 1) {
 								_this.tabData[ind].list = customerStudyedLessonList;
 							} else {
 								_this.tabData[ind].list.push.apply(_this.tabData[ind].list, customerStudyedLessonList);
@@ -112,29 +115,11 @@
 			},
 			onTabClick (val) {
 				if(this.tabData[val].list.length == 0){
-					if(val == 1) {
-						this.fetchData(1, val, "0")
-					} else if (val == 2) {
-						this.fetchData(1, val, "1")
-					} else if (val == 3) {
-						this.fetchData(1, val, "", "0")
-					} else if (val == 4) {
-						this.fetchData(1, val, "", "1")
-					} 
+					this.fetchData(this.tabData[val], val)
 				}
 			},
 			loadMore (val) {
-				if(val == 0){
-					this.fetchData(++this.tabData[val].pagesize, val)
-				} else if (val == 1) {
-					this.fetchData(++this.tabData[val].pagesize, val, "0")
-				} else if (val == 2) {
-					this.fetchData(++this.tabData[val].pagesize, val, "1")
-				} else if (val == 3) {
-					this.fetchData(++this.tabData[val].pagesize, val, "", "0")
-				} else if (val == 4) {
-					this.fetchData(++this.tabData[val].pagesize, val, "", "1")
-				} 
+				this.fetchData(this.tabData[val], val)
 			}
 		}
 	}

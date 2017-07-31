@@ -26,25 +26,47 @@
 		data () {
 			return {
 				title: '订单列表页面',
-				count: 10,
+				count: this.wordBook.pageCount,
 				tabData: [
 					{
-						value: 'all',
-						name: '全部',
-						status: 'all',
-						pagesize: 1,
+						value: 'unpaid',
+						name: '未支付',
+						status: 'unpaid',
+						paymentStatus: 0,
+						expressStatus: "",
+						pageSize: 1,
+						list: []
+					// },{
+					// 	value: 'pending',
+					// 	name: '待发货',
+					// 	status: 'pending',
+					// 	paymentStatus: 1,
+					// 	expressStatus: 0,
+					// 	pageSize: 1,
+					// 	list: []
+					},{
+						value: 'delivered',
+						name: '已发货',
+						status: 'delivered',
+						paymentStatus: 1,
+						expressStatus: 1,
+						pageSize: 1,
 						list: []
 					},{
-						value: 'unpay',
-						name: '待付款',
-						status: 'unpay',
-						pagesize: 1,
+						value: 'unreceive',
+						name: '待收货',
+						status: 'unreceive',
+						paymentStatus: 1,
+						expressStatus: 0,
+						pageSize: 1,
 						list: []
 					},{
-						value: 'undelievery',
-						name: '已付款',
-						status: 'undelievery',
-						pagesize: 1,
+						value: 'receive',
+						name: '已收货',
+						status: 'receive',
+						paymentStatus: 1,
+						expressStatus: 2,
+						pageSize: 1,
 						list: []
 					}
 				],
@@ -58,17 +80,19 @@
 		},
 		mounted () {
 			// 取全部数据
-			this.fetchData(1, 0);
+			this.fetchData(this.tabData[0], 0);
 		},
 		methods: {
-			fetchData (pageSize = 1, ind = 0, paymentStatus = "") {
+			fetchData (obj, ind = 0) {
 				let _this = this;
 				this.$http.post('/wechat/usercenter/getCustomerShopOrder',
 						{
 							"customerCode": _this.$store.state.user.userCode,
-							"pageSize": pageSize,
+							"pageSize": obj.pageSize,
 							"pageCount": _this.count,
-							"paymentStatus": paymentStatus
+							"paymentStatus": obj.paymentStatus, // 0 未支付， 1 已支付 "" 全部
+							"expressStatus": obj.expressStatus //  0 待收货 1已发货 2已收货 "" 全部显示
+																						// 返回参数expressType 0 待收货 1 已发货 2 已签收 3 已退货  
 						}
 					).then(function(e) {
 						let responseData = e.data.data,
@@ -79,17 +103,17 @@
 								return {
 									icon: '',
 									code: item.orderCode,
-									title: item.productName,
-									actualAmount: item.actualAmount,
-									amount: item.amount,
-									status: item.paymentStatus,
+									actualAmount: item.expectAmount,
 									paymentType: item.paymentType,
 									img: '',
-									num: ""
+									time: item.createTime,
+									expressCompany: item.expressCompany,
+									expressNumber: item.expressNumber,
+									orderProductList: item.orderProductList
 								}
 							});
 
-							if(pageSize == 1) {
+							if(obj.pageSize == 1) {
 								_this.tabData[ind].list = customerShopOrderList;
 							} else {
 								_this.tabData[ind].list.push.apply(_this.tabData[ind].list, customerShopOrderList);
@@ -99,21 +123,11 @@
 			},
 			onTabClick (val) {
 				if(this.tabData[val].list.length == 0){
-					if(val == 1) {
-						this.fetchData(1, val, "0")
-					} else if (val == 2) {
-						this.fetchData(1, val, "1")
-					}
+					this.fetchData(this.tabData[val], val)
 				}
 			},
 			loadMore (val) {
-				if(val == 0){
-					this.fetchData(++this.tabData[val].pagesize, val)
-				} else if (val == 1) {
-					this.fetchData(++this.tabData[val].pagesize, val, "0")
-				} else if (val == 2) {
-					this.fetchData(++this.tabData[val].pagesize, val, "1")
-				}
+				this.fetchData(this.tabData[val], val)
 			}
 		}
 	}

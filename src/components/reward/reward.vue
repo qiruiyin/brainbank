@@ -6,23 +6,26 @@
 	<div class="reward">
 		<div @click="btnClick" class="reward-btn">奖赏</div>
 		<div v-transfer-dom>
-	    <popup v-model="reward.status" position="bottom">
+	    <popup v-model="reward.status" position="bottom" :hide-on-blur=false>
 	      <group>
-	        <x-input type="number" title="金额" v-model="reward.value"></x-input>
+	      	<selector title="金额" :options="reward.list" v-model="reward.value"></selector>
+	        <!-- <x-input type="number" title="金额" v-model="reward.value"></x-input> -->
 	      </group>
 	      <div class="btns">
-	        <x-button @click.native="submit" type="primary">确定</x-button>
+	        <x-button @click.native="btnSubmit" type="primary">确定</x-button>
+	        <x-button @click.native="btnCancel('reward')" type="default">取消</x-button>
 	      </div>
 	    </popup>
 	 	</div>
 
 		<div v-transfer-dom>
-			<popup v-model="pay.status" position="bottom">
+			<popup v-model="pay.status" position="bottom" :hide-on-blur=false>
 				<div class="pay">
 					<form-preview header-label="赞赏金额" :header-value="pay.allPrice" :body-items="pay.list"></form-preview>	
 	      	
 	      	<div class="btns">
 						<x-button type="primary" @click.native="payReward">支付</x-button>
+	        	<x-button @click.native="btnCancel('pay')" type="default">取消</x-button>
 	      	</div>
 	    	</div>
 			</popup>
@@ -33,7 +36,7 @@
 
 <script type="text/babel">
 	import hold from 'src/commons/hold'
-	import { TransferDom, Popup, Group, XInput, XButton, FormPreview } from 'vux'
+	import { TransferDom, Popup, Group, XInput, XButton, FormPreview, Selector} from 'vux'
 
 	export default {
 		name: "reward",
@@ -41,7 +44,7 @@
 	    TransferDom
 	  },
 		components: {
-			Popup, Group, XInput, XButton, FormPreview
+			Popup, Group, XInput, XButton, FormPreview, Selector
 		},
 		props: ['rewardData'],
 		data () {
@@ -49,7 +52,29 @@
 				title: "打赏",
 				reward: {
 					status: false,
-					value: ""
+					value: "",
+					list: [
+						{
+							key: 5,
+							value: '5'
+						},
+						{
+							key: 10,
+							value: '10'
+						},
+						{
+							key: 20,
+							value: '20'
+						},
+						{
+							key: 50,
+							value: '50'
+						},
+						{
+							key: 100,
+							value: '100'
+						},
+					]
 				},
 				pay: {
 					status: false,
@@ -70,7 +95,7 @@
 			btnClick () {
 				this.reward.status = true;
 			},
-			submit () {
+			btnSubmit () {
 				let _this = this;
 
 				this.$http.post('/wechat/orderSpare/create',
@@ -95,7 +120,10 @@
 						}
 					})
 			},
-			payReward () {
+			btnCancel (obj) {
+				this[obj].status = false
+			},
+ 			payReward () {
 				let _this = this;
 
 				this.$http.post('/wechat/orderSpare/pay/prepare',

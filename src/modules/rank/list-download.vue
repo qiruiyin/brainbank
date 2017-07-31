@@ -22,7 +22,7 @@
 	        		</div>
 	        	</template>
 	        	<template v-else>
-	        		<el-img-text-rank v-for="(item, ind) in download" :img-text-data="item" img-text-btn="1" :key="ind"></el-img-text-rank>
+	        		<el-img-text-rank @on-card-click="cardClick" @on-btn-click="btnClick" v-for="(item, ind) in download" :img-text-data="item" :is-download=true img-text-btn="1" :key="ind"></el-img-text-rank>
 	        	</template>
 	        </swiper-item>
 	      </swiper>
@@ -86,7 +86,7 @@
 	  		// 下载做多
 	  		_this.$http.post('/wechat/coursewaremobile/queryRank',
 	  			{
-	  				"customerCode": "",
+	  				"customerCode": _this.$store.state.user.userCode,
 	  				"pageSize": 1,
 	  				"pageCount": 10
 	  			}).then(function(e) {
@@ -97,22 +97,63 @@
 	  						id: item.id,
 	  						code: item.code,
 								title: item.name,
-								type: '文字说明',
-								pay: item.isBuy,
+								type: item.memo,
+								pay: item.requiredpoints,
+								isBuy: item.isbuy,
 								download: item.downloads,
 								downloadUrl: _this.resolveImg(item.file_url),
 								price: item.requiredpoints,
-								url: 'audioDetail',
+								url: '',
 								img: _this.resolveImg(item.thumbnail),
 								params: {
-									id: item.code
+									code: item.code
 								}
 	  					}
 	  				});
 
 	  				_this.download = downloadData;
 	  		});
-			}
+			},
+			cardClick (val) {
+				if(!this.isLogin) return false;
+
+				if(val.status) {
+					this.$router.push({name: val.url, params: val.params });
+				} else {
+					this.$vux.toast.show({
+					  text: '请先购买！'
+					})
+				}
+			},
+			btnClick (val) {
+				if(!this.isLogin) return false;
+				let _this = this;
+				_this.payCode = val.params.code;
+				
+				_this.$vux.confirm.show({
+					content: "需要积分：" + val.pay,
+			    onConfirm () {
+			      _this.$http.post('/wechat/coursewaremobile/buy',
+							{
+								"customerCode": _this.$store.state.user.userCode,
+								"productCode": val.params.code
+							}).then(function(e) {
+								let responseData = e.data.data;
+								if(responseData.result.tag == 1) {
+									_this.download.map(function(item, index) {
+										if(item.code == val.params.code) {
+											item.isBuy = 1;
+										}
+									})
+								} else {
+									_this.$vux.alert.show({
+										content: responseData.result.msg
+									});
+								}
+							})	
+			    }
+				})
+			},
 		}
 	}
 </script>
@@ -148,16 +189,6 @@
 		text-align: center;
 		@include halfpxline(0, $borderColor, 0, 1px, 1px, 0);
 		line-height: 2;
-
-		// &:before {
-		// 	content: "";
-		// 	position: absolute;
-		// 	top: $padding;
-		// 	width: $typeIconW;
-		// 	height: $typeIconW;
-		// 	background: url("~assets/img/icon/header.png") no-repeat;
-		// 	background-size: 100%;
-		// }
 
 		&:nth-child(3n) {
 			@include halfpxline(0, $borderColor, 0, 0, 1px, 0);

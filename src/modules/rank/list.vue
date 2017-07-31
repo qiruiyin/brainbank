@@ -55,7 +55,7 @@
 		data () {
 			return {
 				index: 0,
-				count: 2,
+				count: this.wordBook.pageCount,
 				tabDatas: [
 					{
 						value: 'pay',
@@ -102,7 +102,7 @@
 			let _this = this,
 					count = _this.count,
 					type = _this.$route.params.type;
-			
+
 			_this.typeCurrent = _this.type[type];
 
 			this.$http.all([
@@ -127,25 +127,29 @@
 						}
 					).then(function(e) {
 						let data = [];
-						e.data.data.list.map(function(item, index) {
-							data[index] = {
-								img: _this.resolveImg(item.thumbnail),
-								id: item.id,
-								title: item.name,
-								type: item.DESCRIPTION,
-								pay: item.price,
-								isBuy: item.isBuy,
-								like: {
-									num: item.commentAmount,
-									percent: item.rank | 3.2
-								},
-								url: 'courseTypeDetail',
-								params: {
-									code: item.code,
-									type: _this.$route.params.type
+						if(e.data.data && e.data.data.list && e.data.data.list.length > 0) {
+							e.data.data.list.map(function(item, index) {
+								data[index] = {
+									img: _this.resolveImg(item.thumbnail),
+									id: item.id,
+									title: item.name,
+									type: item.DESCRIPTION,
+									pay: item.price,
+									isBuy: item.isBuy,
+									like: {
+										num: item.commentAmount,
+										percent: item.rank || 3.2
+									},
+									url: 'courseTypeDetail',
+									params: {
+										code: item.code,
+										type: _this.$route.params.type
+									}
 								}
-							}
-						})
+							})
+						}
+
+						console.log(rankType, data, e.data.data.list)
 						
 						if(rankType == 1) {
 							_this.tabContentDatas.pay.push.apply(_this.tabContentDatas.pay, data);
@@ -168,6 +172,8 @@
 				}
 			},
 			cardClick (val) {
+				if(!this.isLogin) return false;
+
 				if(val.status) {
 					this.$router.push({name: val.url, params: val.params });
 				} else {
@@ -177,13 +183,17 @@
 				}
 			},
 			btnClick (val) {
+				if(!this.isLogin) return false;
+	  		// this.signUrl(location.href);
+				
 				let _this = this;
-				_this.payCode = val.params.id;
+				_this.payCode = val.params.code;
+				console.log(val)
 					
 				this.$http.post('/wechat/order/create',
 					{
 						"userCode": _this.$store.state.user.userCode,
-						"productCode": val.params.id,
+						"productCode": val.params.code,
 						"amount": 1,
 						"money": val.pay,
 						"allMoney": val.pay,
@@ -230,7 +240,7 @@
 			          if(res.err_msg == "get_brand_wcpay_request:ok" ) {
 			          	// alert("")
 			          	_this.tabContentDatas.pay.map(function(item, index) {
-			          		if(item.params.id == _this.payCode) {
+			          		if(item.params.code == _this.payCode) {
 			          			item.isBuy = true
 			          		}
 			          	})

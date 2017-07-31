@@ -1,8 +1,10 @@
 import Vue from 'vue'
-import store from '../store'
+import commonFun from 'src/commons'
+import store from 'src/store'
 import Router from 'vue-router'
 import routerLink from './router-link'
 import hold from 'src/commons/hold'
+import wordBook from 'src/commons/wordBook'
 
 Vue.use(Router)
 
@@ -13,7 +15,7 @@ const router = new Router({
 const history = window.sessionStorage
 history.clear()
 let historyCount = history.getItem('count') * 1 || 0
-history.setItem('/', 0)
+history.setItem('/', 0);
 
 router.beforeEach((to, from, next) => {
   // 是否加载
@@ -26,6 +28,9 @@ router.beforeEach((to, from, next) => {
     return false
   }
   // 用户是否授权结束
+
+  // 底部显不显示（Vue.prototype.wordBook.nav不显示列表）
+  store.commit("updateNavStatus", { status: !Vue.prototype.arrContain(Vue.prototype.wordBook.nav, to.name) })
 
   // 切换效果
   const toIndex = history.getItem(to.path)
@@ -53,6 +58,12 @@ router.beforeEach((to, from, next) => {
 })
 
 router.afterEach((to, from, next) => {
+  if(from.path != "/") {
+    Vue.prototype.signUrl(location.href.replace(from.path, to.path));
+  } else {
+    Vue.prototype.signUrl(location.href);
+  }
+ 
   store.commit('updateLoadingStatus', {isLoading: false})
   // 设置标题
   global.document.title = to.meta.title || '大脑银行'

@@ -23,7 +23,7 @@
 		data () {
 			return {
 				msg: "发送验证码",
-				num: 10,
+				num: 60,
 				status: false
 			}
 		},
@@ -52,7 +52,7 @@
 			},
 			finish () {
 				this.status = false;
-				this.num = 10;
+				this.num = 60;
 			}
 		}
 	}

@@ -127,7 +127,7 @@
 	.tab .vux-slider {
 		height: 100%;
 	}
-</style>>
+</style>
 
 <style lang="scss" scoped>
 	@import '~lib/sandal/core';
@@ -135,6 +135,8 @@
   
 	.detail-type, .container {
 		height: 100%;
+
+		padding-bottom: 18px;
 	}
 
 	.tab {

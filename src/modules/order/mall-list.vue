@@ -32,7 +32,7 @@
 						value: 'unpaid',
 						name: '未支付',
 						status: 'unpaid',
-						paymentStatus: 0,
+						paymentStatus: "0",
 						expressStatus: "",
 						pageSize: 1,
 						list: []
@@ -48,24 +48,24 @@
 						value: 'delivered',
 						name: '已发货',
 						status: 'delivered',
-						paymentStatus: 1,
-						expressStatus: 1,
+						paymentStatus: "1",
+						expressStatus: "1",
 						pageSize: 1,
 						list: []
 					},{
 						value: 'unreceive',
 						name: '待收货',
 						status: 'unreceive',
-						paymentStatus: 1,
-						expressStatus: 0,
+						paymentStatus: "1",
+						expressStatus: "0",
 						pageSize: 1,
 						list: []
 					},{
 						value: 'receive',
 						name: '已收货',
 						status: 'receive',
-						paymentStatus: 1,
-						expressStatus: 2,
+						paymentStatus: "1",
+						expressStatus: "2",
 						pageSize: 1,
 						list: []
 					}
@@ -109,7 +109,8 @@
 									time: item.createTime,
 									expressCompany: item.expressCompany,
 									expressNumber: item.expressNumber,
-									orderProductList: item.orderProductList
+									orderProductList: item.orderProductList,
+									expressType: item.expressType
 								}
 							});
 

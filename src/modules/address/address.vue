@@ -33,6 +33,8 @@
 		components: { Radio, Group, XButton, Swipeout, SwipeoutItem, SwipeoutButton },
 		data () {
 			return {
+				// 来自订单的传参
+				orderCode: this.$route.query.orderCode || "",
 				addressDatas: [
 					{
 						address: "",
@@ -57,7 +59,7 @@
 						let responseData = e.data.data;
 						_this.addressDatas = responseData.list;
 						responseData.list.map(function(item, index){
-							if(item.state == 1) {
+							if (item.state == 1) {
 								_this.addressState = index
 							}
 						})
@@ -66,20 +68,34 @@
 			setCheck (code, ind) {
 				let _this = this;
 
-				_this.$http.post('/wechat/shop/setDefaultArea',{
-	  			"userCode": _this.$store.state.user.userCode,
-	  			"code": code
-	  			}).then(function(e) {
-	  				if(e.data.errcode == 1) {
-	  					_this.addressState = ind
-	  				}
-	  				_this.$vux.toast.show({
-		          text: e.data.errmsg
-		        })
-	  		});
+				if(_this.orderCode) {
+					_this.$http.post('/wechat/shop/updateOrderAddress',{
+		  			"orderCode": _this.orderCode,
+		  			"address": code
+		  			}).then(function(e) {
+		  				_this.$router.push({ name: "confirmOrder", query: { orderCode: _this.orderCode } });
+		  			});
+				} else {
+					_this.$http.post('/wechat/shop/setDefaultArea',{
+		  			"userCode": _this.$store.state.user.userCode,
+		  			"code": code
+		  			}).then(function(e) {
+		  				if(e.data.errcode == 1) {
+		  					_this.addressState = ind
+		  				}
+		  				_this.$vux.toast.show({
+			          text: e.data.errmsg
+			        })
+		  		});
+				}
 			},
 			editClick (code) {
-				this.$router.push({name: "addressEdit", params: { code: code }})
+				let _this = this;
+				if(_this.orderCode) {
+					this.$router.push({name: "addressEdit", params: { code: code }, query: { orderCode: _this.orderCode }})
+				} else {
+					this.$router.push({name: "addressEdit", params: { code: code }})
+				}
 			},
 			deleteClick (code, ind) {
 				let _this = this;
@@ -99,7 +115,12 @@
 	  		});
 			},
 			addAddress () {
-				this.$router.push({name: "addressAdd"})
+				let _this = this;
+				if(_this.orderCode) {
+  				_this.$router.push({ name: "addressAdd", query: { orderCode: _this.orderCode } });
+				} else {
+					this.$router.push({name: "addressAdd"})
+				}
 			}
 		}
 	}

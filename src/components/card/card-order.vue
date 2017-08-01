@@ -6,7 +6,8 @@
 		<div class="card" v-for="(item, index) in cardData" :key="index">
 			<div class="card-header">
 				<img v-if="item.icon" :src="item.icon">
-				<p>{{ item.code }}</p>
+				<p v-if="item.lessonCommodityList">{{ item.title }}</p>
+				<p v-else>{{ item.code }}</p>
 				<span>{{ item.status }}</span>
 			</div>
 			<div class="card-content">
@@ -23,12 +24,23 @@
 
 						<cell v-if="item.actualAmount" title="金额" :value="item.actualAmount"></cell>
 					</template>
+
+					<template v-if="item.lessonCommodityList">
+						<div class="lesson-list" >
+							<div v-for="(lessonItem, lessonIndex) in item.lessonCommodityList">
+								<p>{{ lessonItem.customerName }}<span>{{ lessonItem.mobile }}</span></p>
+								<p>{{ lessonItem.idCard }}</p>
+							</div>
+						</div>
+
+						<cell v-if="item.actualAmount" title="金额" :value="item.actualAmount"></cell>
+					</template>
 					
-					<template v-else>
+					<template v-if="!item.orderProductList && !item.lessonCommodityList" >
 						<cell title="产品名称" :value="item.title"></cell>
-						<cell title="数量" :value="item.num"></cell>
-						<cell title="应付金额" :value="item.amount"></cell>
-						<cell title="实付金额" :value="item.actualAmount"></cell>
+						<cell v-if="item.num" title="数量" :value="item.num"></cell>
+						<cell v-if="item.amount" title="应付金额" :value="item.amount"></cell>
+						<cell v-if="item.actualAmount" title="实付金额" :value="item.actualAmount"></cell>
 					</template>
 					
 					<cell v-if="item.time" title="时间" :value="item.time"></cell>
@@ -39,8 +51,25 @@
 			</div>
 			<div class="card-footer" >
 				<!-- <p v-if="item.num">共{{ item.num }}件商品</p> -->
-				<x-button class="btn" v-if="item.paymentType != 1" type="primary" @click.native="payment(item.code)" mini>立即支付</x-button>
-				<div class="btn" v-else>总价：￥{{ item.actualAmount }}</div>
+				<template v-if="item.expressType">
+					<template v-if="item.expressType == 1">
+						<x-button class="btn" type="primary" @click.native="payment(item.code)" mini>确认收货</x-button>
+					</template>
+
+					<template v-if="item.expressType == 2">
+						<x-button class="btn" type="primary" @click.native="payment(item.code)" mini>评价</x-button>
+					</template>
+				</template>
+
+				<template v-else>
+					<template v-if="item.paymentType != 1" >				
+						<x-button class="btn" type="primary" @click.native="payment(item.code)" mini>立即支付</x-button>
+						<x-button class="btn" type="warn" @click.native="deleteOrder(item.code, index)" mini>删除</x-button>
+					</template>
+
+					<div class="btn" v-else>总价：￥{{ item.actualAmount }}</div>	
+				</template>
+				
 			</div>
 		</div>
 		<template v-if="cardCount == cardData.length">
@@ -88,7 +117,17 @@
 		methods: {
 			payment (code) {
 				// 应传code
-				this.$router.push({name: "confirmOrder"});
+				this.$router.push({name: "confirmOrder", query: { "orderCode" : code}});
+			},
+			deleteOrder (code, ind) {
+				let _this = this;
+				_this.cardData.splice(ind, 1);
+				_this.$http.post('/wechat/usercenter/deleteOrder',
+		  			{
+	  					"orderCode": code
+		  			}).then(function(e) {
+
+		  		});
 			},
 			loadMore (val) {
 
@@ -118,6 +157,7 @@
 		line-height: $inputH;
 		padding: 4px 0;
   	@include halfpxline(0, $borderColor, 0, 0, 1px, 0);
+  	display: flex;
 
   	img {
   		float: left;
@@ -128,11 +168,16 @@
   	}
 
   	p {
-  		float: left;
+  		flex: 1;
+	    overflow: hidden;
+    	text-overflow: ellipsis;
+    	white-space: nowrap;
   	}
 
   	span {
-  		float: right;
+  		width: 6em;
+  		text-align: right;
+  		display: block;
   	}
   }
 
@@ -180,11 +225,12 @@
 			float: right;
 			width: auto;
 	    margin: 6px 0;
+	    margin-left: 10px;
 	    line-height: $inputH - 12px;
 		}
 	}
 
-	.product-list {
+	.product-list, .lesson-list  {
 		p {
 			width: 100%;
 			padding: 6px 0;
@@ -197,9 +243,11 @@
 
 			i {
 				font-style: normal;
-				// font-size: 12px;
-				// color: $fontColorGray;
 			}
 		}
+	}
+
+	.lesson-list {
+		padding: 4px 0;		
 	}
 </style>

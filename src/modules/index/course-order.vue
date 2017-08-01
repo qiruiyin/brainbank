@@ -112,6 +112,7 @@
 				},
 				period: {
 					value: '',
+					productCode: "",
 					title: '期数',
 					name: 'period',
 					placeholder: '请选择期数',
@@ -207,6 +208,8 @@
 		watch: {
 			periodSelected (newValue, oldValue) {
 				let _this = this;
+				_this.period.productCode = _this.allData.lessonList[newValue].product_code;
+				console.log(_this.allData.lessonList[newValue])
 				_this.count.value = _this.allData.lessonList[newValue].balance_count || 0;
 				_this.date.value = _this.allData.lessonList[newValue].start_date;
 				_this.address.value = _this.allData.lessonList[newValue].address;
@@ -221,7 +224,7 @@
 				let _this = this,
 						payType = _this.$route.params.payType;
 				
-				if(payType == "enlist" ||payType == "upgrade") {
+				if(payType == "enlist" || payType == "upgrade") {
 					this.$http.post('/wechat/discover/upgrade/lesson',
 					{
 							"userCode": _this.$store.state.user.userCode
@@ -245,10 +248,13 @@
 				_this.course.value = responseData.lessonName;
 				_this.period.list = responseData.lessonList.map(function(item, index){
 					return {
+						productCode: item.product_code,
 						key: item.code,
 						value: item.name
 					}
 				});
+				console.log(_this.period.list[_this.periodSelected])
+				_this.period.productCode = _this.period.list[_this.periodSelected].productCode;
 				_this.period.value = _this.period.list[_this.periodSelected].key;
 				_this.count.value = responseData.lessonList[_this.periodSelected].balance_count || 0;
 				_this.price.value = responseData.lessonList[_this.periodSelected].money;
@@ -301,6 +307,7 @@
 	    		money = _this.price.value.toFixed(2),
 	    		orderType = _this.orderType[_this.$route.params.payType];
 
+	    	console.log( _this.period);
 	    	if(_this.userStatus == 0) {
 	    		if(_this.addMan.list.length == 0) {
 	    			this.$vux.alert.show({
@@ -334,7 +341,7 @@
 	    		this.$http.post('/wechat/order/enroll/create',
 						{
 							"userCode": _this.$store.state.user.userCode,
-							"productCode":  _this.course.code,
+							"productCode":  _this.period.productCode,
 							"amount": _this.addMan.list.length,
 							"money": money,
 							"orderType": orderType,
@@ -363,7 +370,7 @@
 					this.$http.post('/wechat/order/create',
 							{
 								"userCode": _this.$store.state.user.userCode,
-								"productCode": _this.course.code,
+								"productCode": _this.period.productCode,
 								"amount": 1,
 								"money": money,
 								"orderType":  orderType,

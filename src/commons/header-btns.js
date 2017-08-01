@@ -60,17 +60,17 @@ const headerBtns = {
 		]
 	},
 	level4: {
-		value: 'shangxueyuan',
+		value: 'siweishangxueyuan',
 		course: '商学院',
 		btns: [
 			{
-				value: 'retrain',
-				name: '复训',
-				link: 'retrain'
-			},{
+			// 	value: 'retrain',
+			// 	name: '复训',
+			// 	link: 'retrain'
+			// },{
 				value: 'takeCourse',
 				name: '参加课程',
-				link: 'pay'
+				link: 'courseOrder'
 			}
 		]
 	},

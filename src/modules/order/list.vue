@@ -40,7 +40,7 @@
 						value: 'unpay',
 						name: '待付款',
 						status: 'unpay',
-					  paymentStatus: 0,
+					  paymentStatus: "0",
 					  ticketStatus: "",
 						pageSize: 1,
 						list: []
@@ -48,16 +48,16 @@
 						value: 'untake',
 						name: '未上课',
 						status: 'untake',
-					  paymentStatus: 1,
-					  ticketStatus: 0,
+					  paymentStatus: "1",
+					  ticketStatus: "0",
 					  pageSize: 1,
 						list: []
 					},{
 						value: 'take',
 						name: '已上课',
 						status: 'take',
-					  paymentStatus: 1,
-					  ticketStatus: 1,
+					  paymentStatus: "1",
+					  ticketStatus: "1",
 						pageSize: 1,
 						list: []
 					}
@@ -95,13 +95,14 @@
 									icon: '',
 									code: item.orderCode,
 									title: item.NAME,
-									actualAmount: item.actualAmount,
+									actualAmount: item.expectAmount,
 									amount: item.amount,
 									paymentType: item.paymentType,
 									img: '',
 									status: (item.paymentType == 1 && item.ticketStatus) ? item.ticketStatus : item.paymentStatus,
 									time: item.createTime,
-									num: item.count
+									num: item.count,
+									lessonCommodityList: item.lessonCommodityList
 								}
 							});
 

@@ -22,10 +22,10 @@
 				</div>
 			</div>
 			
-			<card :header="{title: '联系方式'}">
+			<card v-if="header.tel || header.weixin" :header="{title: '联系方式'}">
 				<div slot="content" class="kefu-link">
-					<a class="link-icon-tel" :href="'tel:' + header.tel">{{ header.tel }}<span>（点击拨打）</span></a>
-					<a class="link-icon-weixin">{{ header.weixin }}<span>（复制微信号添加服务老师）</span></a>
+					<a v-if="header.tel" class="link-icon-tel" :href="'tel:' + header.tel">{{ header.tel }}<span>（点击拨打）</span></a>
+					<a v-if="header.weixin" class="link-icon-weixin">{{ header.weixin }}<span>（复制微信号添加服务老师）</span></a>
 				</div>
 			</card>
 			
@@ -83,7 +83,7 @@
 						}
 					).then(function(e) {
 						let responseData = e.data.data,
-								header = responseData.customerServiceInfoList[0];
+								header = responseData.customerServiceInfoList;
 
 						_this.header = {
 							img: _this.resolveImg(header.headPhoto),

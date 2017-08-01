@@ -3,17 +3,15 @@
  -->
 <template>
 	<div class="img-text" @click="setCheck">
-		<check-icon v-if="imgTextData.check" :value.sync="imgTextData.check"></check-icon>
+		<check-icon @click.native="setCheck" v-if="imgTextData.hasCheck" :value.sync="imgTextData.check"></check-icon>
 		<img :src="imgTextData.imgPath" alt="图片">
 		<div class="img-text-content">
 			<div class="title">{{ imgTextData.title }}</div>
 			<div class="price" v-if="imgTextData.price">价格：<span>￥{{ imgTextData.price }}</span></div>
 			<div class="num" v-if="imgTextData.num">数量：
-				<x-number v-if="imgTextData.check" @click.native.stop="numClick" :min="1" class="num-data" v-model="imgTextData.num"></x-number>
+				<x-number v-if="imgTextData.hasCheck" @click.native.stop="numClick" :min="1" class="num-data" v-model="imgTextData.num"></x-number>
 				<span v-else>{{ imgTextData.num }}</span>
 			</div>
-
-			
 		</div>
 	</div>
 </template>
@@ -59,14 +57,7 @@
 		padding: $imgTextPadding $padding $imgTextPadding;
 		background-color: #fff;
 		border-bottom: 1px solid $borderColor;
-		display: -webkit-box;
-		display: -moz-box;
-		display: -ms-flexbox;
 		display: flex;
-
-		&.img-text-check {
-			// padding-left: px2em(80);
-		}
 
 		img {
 			width: 100px;

@@ -61,6 +61,7 @@
 			}
 		},
 		mounted () {
+			console.log(this.$store.state.user)
 			let introType = this.$route.params.introType;
 			if(introType == 'retrain') {
 				this.allData = introData.retrain;

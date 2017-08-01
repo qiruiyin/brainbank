@@ -30,20 +30,33 @@ Vue.http.defaults.timeout = 5000;                        //响应时间
 Vue.http.defaults.headers.post['Content-Type'] = 'application/raw';           //配置请求头
 // Vue.http.defaults.baseURL = '';
 
-
+// james
 // window.localStorage.setItem("openId", "oOVVesxggAc3RBs5XTU0Uf7jIazw");
-// 自己
-// window.localStorage.setItem("openId", "oOVVesxAHQ4C78mSV8FmQTDUpjPQ");
+
 // 赵陵
 // window.localStorage.setItem("userCode", "20170718220214960433651736252496");
-// 定向
+// james 
 // window.localStorage.setItem("userCode", "201707281605164831276233257855888");
 // 自己
+// window.localStorage.setItem("openId", "oOVVesxAHQ4C78mSV8FmQTDUpjPQ");
 // window.localStorage.setItem("userCode", "20170718161939537457373403958833");
+
+// frank
+// window.localStorage.setItem("openId", "20170719115339110483535886346825");
+// window.localStorage.setItem("userCode", "20170719115339110483535886346825");
+
+// 马一鸣
+// window.localStorage.setItem("openId", "oOVVesw9m3Q8SQbYebfQ05u53BqE");
+// window.localStorage.setItem("userCode", "20170721160758734671595511675408");
 
 if(!store.state.user.userCode) {
 	store.commit('updateUserUserCode', {userCode: hold.storage.get("userCode")});
 }
+
+if(!store.state.user.openId) {
+	store.commit('updateUserOpenId', {openId: hold.storage.get("openId")});
+}
+
 // 点击延迟
 // const FastClick = require('fastclick')
 // FastClick.attach(document.body)

@@ -5,6 +5,6 @@ import nav from './nav';
 Vue.prototype.wordBook = {
 	headerBtns: headerBtns,
 	nav: nav,
-	pageCount: 20
+	pageCount: 10
 	// orderType: {}
 }

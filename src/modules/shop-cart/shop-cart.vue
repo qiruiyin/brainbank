@@ -3,10 +3,19 @@
  -->
 <template>
 	<div class="shop-cart">
-		<imgTextCart :ref="'imgText'+index" :img-text-data="item" v-for="(item, index) in cartDatas" :key="index" @on-check="onCheck">
-		</imgTextCart>
+		<swipeout>
 
-		<div class="all-price">
+      <swipeout-item v-for="(item, index) in cartDatas" :key="index" transition-mode="follow">
+        <div slot="right-menu">
+          <swipeout-button @click.native="deleteCart(item, index)" type="warn">删除</swipeout-button>
+        </div>
+
+        <imgTextCart slot="content" :ref="'imgText'+index" :img-text-data="item"  @on-check="onCheck"></imgTextCart>
+      </swipeout-item>
+    
+    </swipeout>
+
+		<div v-if="allPrice > 0" class="all-price">
 			<group>
 		 		<cell title="总价格" :value="allPrice"></cell>
 			</group>
@@ -19,13 +28,12 @@
 </template>
 
 <script type="text/babel">
-	import { Cell, Group, XButton } from 'vux'
+	import { Cell, Group, XButton, Swipeout, SwipeoutItem, SwipeoutButton } from 'vux'
 	import imgTextCart from 'components/img-text/img-text-cart'
-	// import "" from 'assets/img/shop-cart.jpg'
 
 	export default {
 		components: {
-			Cell, Group, XButton, imgTextCart
+			Cell, Group, XButton, Swipeout, SwipeoutItem, SwipeoutButton, imgTextCart
 		},
 		data () {
 			return {
@@ -61,34 +69,86 @@
 									price: item.price,
 									num: item.shop_count,
 									code: item.code,
-									check: true
+									check: true,
+									hasCheck: true
 								}
 							})
-
 						}
-		  			// _this.$router.push({name: 'shopCart'});
+				});
+			},
+			deleteCart (obj, ind = -1) {
+				let _this = this;
+				console.log(obj)
+				if(ind > -1) {
+					_this.cartDatas.splice(ind, 1);;
+				}
+				_this.$store.commit("updateCartNum", { num: _this.$store.state.cart.num - obj.num });
+	
+				_this.$http.post('/wechat/shop/delCart',
+					{
+						userCode: _this.$store.state.user.userCode,
+						productCode: obj.code
+					}).then(function(e) {
 				});
 			},
 			deleteAll () {
 				let _this = this;
-				this.cartDatas = [];
-				_this.$http.post('/wechat/shop/emptyCart',
-					{
-						userCode: _this.$store.state.user.userCode,
-					}).then(function(e) {
-		  			
-				});
+				if(_this.cartDatas.length > 0) {
+					this.cartDatas = [];
+					_this.$http.post('/wechat/shop/emptyCart',
+						{
+							userCode: _this.$store.state.user.userCode,
+						}).then(function(e) {
+			  			_this.$store.commit("updateCartNum", { num: 0 });
+					});
+				}
 			},
 			next () {
-				this.$router.push({name: 'confirmOrder'});
+				let _this = this,
+						payCartNum = 0, // 订单商品总数量
+	    	 		productCode = "", // 商品code
+	    	 		amount = "", // 商品单价
+	    	 		money = "", // 订单总价
+			    	cartDatas = _this.cartDatas.filter(function(item, index){
+			    		if(item.check) {
+			    			productCode += productCode == "" ? item.code : "," + item.code;
+			    			amount += amount == "" ? item.num : "," + item.num;
+			    			money += money == "" ? (item.price * item.num).toFixed(2): "," + (item.price * item.num).toFixed(2);
+			    			payCartNum += item.num;
+			    		}
+		    			return item.check;
+			    	});
+
+	    	if(cartDatas[0]) {
+					this.$http.post('/wechat/order/create',
+							{
+								"userCode": _this.$store.state.user.userCode,
+								"productCode": productCode,
+								"amount": amount,
+								"money": money,
+								"allMoney": _this.allPrice,
+								"orderType":  3,
+								"lessonCode": "",
+								"address": ""
+							}
+						).then(function(e) {
+							if(e.data.errcode == 1) {
+								// 移除下了订单的产品
+								cartDatas.map(function(item, index) {
+									_this.deleteCart(item)
+								});
+								// 更新购物车数量
+								_this.$store.commit("updateCartNum", { num: _this.$store.state.cart.num - payCartNum });
+
+								_this.$router.push({name: 'confirmOrder', query: { "orderCode": e.data.data.order.code }});
+							}
+						});
+	    	} else {
+	    		_this.$vux.toast.show({
+	    			text: "请至少选择一个商品"
+	    		})
+	    	}
 			},
-			
-			// selectAll () {
-			// 	this.checkAll = true
-			// 	for (let key in this.$refs) {
-			// 		this.$refs[key][0].setChecked()
-			// 	}
-			// },
 			onCheck (val) {
 				let data;
 				if (val) {

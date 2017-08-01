@@ -1,5 +1,5 @@
 <!-- 
-	音频详情页
+	课程详情页
  -->
 <template>
 	<div class="detail">
@@ -197,6 +197,7 @@
 	
 	.top-video {
 		width: 100%;
+		background: #000;
 	}
 
 	.list {

@@ -71,7 +71,7 @@
 						}
 					).then(function(e) {
 						let responseData = e.data.data,
-								service = responseData.userList[0];
+								service = responseData.userList;
 						_this.service = {
 							img: _this.resolveImg(service.headPhoto),
 							name: service.NAME,

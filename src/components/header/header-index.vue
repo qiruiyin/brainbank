@@ -123,6 +123,8 @@
 					_this.$router.push({ name: 'intro', params: { introType: "retrain" }})
 				} else if (link == "upgrade") {
 					_this.$router.push({ name: 'intro', params: { introType: "upgrade" }})
+				} else {
+					_this.$router.push({ name: 'courseOrder', params: { payType: 'retrain' } })
 				}
 			}
 		}

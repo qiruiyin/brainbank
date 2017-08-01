@@ -66,7 +66,7 @@
 		</div>
 	
 
-		<div v-transfer-dom>
+		<!-- <div v-transfer-dom>
 			<popup v-model="bangdingShow" position="bottom" :hide-on-blur="false">
 	      <group label-width="4em" label-margin-right="2em" label-align="right">
 		      <x-input :title="bangding.idCard.title" v-model="bangding.idCard.value" :placeholder="bangding.idCard.placeholder"></x-input>
@@ -81,7 +81,7 @@
 					<x-button type="default" @click.native="cancelBangDing" >取消</x-button>
 				</div>
 	    </popup>
-	   </div>
+	   </div> -->
 	</div>
 </template>
 

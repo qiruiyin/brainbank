@@ -33,6 +33,7 @@
 		},
 		data () {
 			return {
+				orderCode: this.$route.query.orderCode || "",
 	      addressData: ChinaAddressV3Data,
 	      address: [],
 	      province: {
@@ -127,7 +128,7 @@
 		  			"state": _this.checkAddress ? 1 : 0
 		  			}).then(function(e) {
 							if(e.data.errcode == 1) {
-								_this.$router.push({name: "address"});								
+								_this.$router.push({ name: "address", query: { orderCode: _this.orderCode } });
 							} else {
 								_this.$vux.toast.show({
 				          text: e.data.errmsg

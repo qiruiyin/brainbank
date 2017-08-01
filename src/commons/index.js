@@ -32,7 +32,7 @@ Vue.prototype.resolveImg =  function(img) {
 // 富文本图片链接地址处理
 Vue.prototype.resolveRichTextImg = function(text) {
 	// let textUrl = 'http://glyh.qibeisoft.com';
-	let imgUrl = 'http://test.yoao.com';
+	let textUrl = 'http://test.yoao.com';
 	if(!text) return text;
 	text = text.replace(/<img\ssrc=\"http/g, '-CC309AB4-89E6-44D2-9A7C-A8F33F40F3BB-');
 	text = text.replace(/<img\ssrc=\"/g, "<img src=\""+ textUrl);

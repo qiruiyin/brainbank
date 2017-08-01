@@ -7,15 +7,14 @@
 		<header>
 			<router-link :to="{ name: kefuUrl }">我的客服</router-link>
 			<div class="header-msg">
-				<img :src="header.img" alt="">
-				<p>{{ header.name }}<span>{{ header.course }}</span></p>
+				<img :src="user.img" alt="">
+				<p>{{ user.name }}<span>{{ user.course }}</span></p>
 			</div>
 			<router-link :to="{ name: 'share' }">分享有奖</router-link>
 		</header>
 
 		<main>
 			<cell v-for="item in operations" :link="{name: item.url}" :title="item.name" :key="item.value" is-link>
-        <!-- <img slot="icon" width="40" style="display:block;margin-right:5px;" :src="item.img"> -->
         <i slot="icon" :class="['fa', 'fa-' + item.icon ]"></i>
       </cell>
 		</main>	
@@ -23,6 +22,7 @@
 </template>
 
 <script type="text/babel">
+	import { mapState } from 'vuex'
 	import { Cell } from 'vux'
 	
 	import imgUser from 'assets/img/user-center/user.png'
@@ -40,11 +40,6 @@
 			return {
 				title: '用户中心',
 				kefuUrl: 'kefu',
-				header: {
-					img: this.$store.state.user.img,
-					name: this.$store.state.user.name,
-					course: this.$store.state.user.course
-				},
 				operations: [
 					{
 						value: '',
@@ -72,7 +67,7 @@
 						icon: 'shopping-cart'
 					},{
 						value: '',
-						name: '我的资料',
+						name: '我的学习',
 						url: 'orderSourceList',
 						img: imgIcon04,
 						icon: 'shopping-cart'
@@ -92,19 +87,42 @@
 				]
 			}
 		},
+		computed: {
+	    ...mapState({
+	      user: state => state.user,
+	    })
+	  },
 		mounted () {
 			this.fetchData();
 		},
 		methods: {
 			fetchData () {
 				let _this = this;
-				this.$http.post('/wechat/usercenter/customerService',
-						{
-							"userCode": _this.$store.state.user.userCode,
-						}
-					).then(function(e) {
-					}
-				);
+
+				_this.$http.post('/wechat/discover/userinfo/get',
+		  			{
+		  				"userCode": _this.$store.state.user.userCode,
+		  				"openId": _this.$store.state.user.openId
+		  			}
+		  		).then(function(e) {
+		  			let responseData = e.data.data,
+		  					headerUrl;
+
+	  				headerUrl = _this.resolveImg(responseData.headerUrl) ;
+
+		  			_this.$store.commit('updateUserImg', {img: headerUrl});
+		  			_this.$store.commit('updateUserName', {name: responseData.name ? responseData.name : '普通用户'})
+
+		  			if(responseData.userLevelMap) {
+		  				_this.$store.commit('updateUserLevel', {level: responseData.userLevelMap.categoryLevel });
+		  				_this.$store.commit('updateUserBtns', {btns: _this.wordBook.headerBtns['level' + responseData.userLevelMap.categoryLevel].btns})
+		  				_this.$store.commit('updateUserCourse', {course: responseData.userLevelMap.categoryName})
+		  			} else {
+	  					_this.$store.commit('updateUserBtns', {btns: _this.wordBook.headerBtns.level1.btns})
+		  				_this.$store.commit('updateUserCourse', {course: _this.wordBook.headerBtns.level1.course})
+		  				_this.$store.commit('updateUserLevel', {level: 1 });
+		  			}
+	  			});
 			}
 		}
 	}
@@ -123,14 +141,25 @@
 	header {
 		position: relative;
 		padding-top: $headerPadding;
-		padding-bottom: $padding;
+		padding-bottom: $padding*2;
 		margin-bottom: $padding;
 		text-align: center;
-		background: #fff url("~assets/img/user-center/user-bg.png") no-repeat;
-		background-size: 100% auto;
+		background: #fff;
+		// background: #fff url("~assets/img/user-center/user-bg.png") no-repeat;
+		// background-size: 100% auto;
+
+		&:before {
+			content: "";
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 56%;
+			background: $colorBlue;
+		}
 
 		a {
-			@include halfpxline($borderRadius, #fff, 1px, 1px, 1px, 1px);
+			// @include halfpxline($borderRadius, #fff, 1px, 1px, 1px, 1px);
 			position: absolute;
 			top: $headerPadding;
 			left: auto;
@@ -138,6 +167,7 @@
 			line-height: 30px;
 			padding: 0 1em;
 			color: #fff;
+			z-index: 2;
 
 			&:first-child {
 				left: 30px;
@@ -149,11 +179,13 @@
 	.header-msg {
 		margin: 0 auto;
 		text-align: center;
+		z-index: 1;
+    position: relative;
 
 		img {
-			width: 120px;
+			width: 80px;
 			margin: 0 auto;
-    	border-radius: 120px;
+    	border-radius: 80px;
 		}
 
 		p {
@@ -163,7 +195,7 @@
 
 		span {
 			margin-left: 1em;
-			border-left: 1px solid $borderColor;
+			// border-left: 1px solid $borderColor;
 			padding-left: 1em;
 		}
 	}
@@ -176,7 +208,7 @@
 		width: 1em;
 		text-align: center;
 		margin-right: 1em;
-		color: $colorGreen;
+		color: $colorBlue;
 		font-size: 24px;
 	}
 </style>

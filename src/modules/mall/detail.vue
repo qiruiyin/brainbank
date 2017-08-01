@@ -14,7 +14,6 @@
 				<div class="msg-header">{{ goodsMsg.title }}</div>
 				<div class="msg-body">
 					<div class="msg-body-info">
-						<!-- <span>售价：{{ goodsMsg.price }}</span> -->
 						<span>已购买：{{ goodsMsg.sellNum }}</span>
 						<span>{{ goodsMsg.author }} 著</span>
 						<div class="price">单价<i>￥</i>{{ goodsMsg.price }}</div>
@@ -25,9 +24,8 @@
 				</div>
 			</div>
 			
-			<div v-transfer-dom>
-				<el-cart :cart-num="cartNum" @on-addCart-click="addCart" @on-balance-click="balance"></el-cart>
-			</div>
+			
+			<el-cart :product-info="goodsMsg"></el-cart>
 			
 			<div class="tab">
 				<div class="tab">
@@ -53,26 +51,25 @@
 	      	</div>
 		    </div>
 	    </div>
-
 		</div>
+
+		<el-back-index></el-back-index>
 	</div>
 </template>
 
 <script type="text/babel">
-	import { XNumber, Swiper, Card, Tab, TabItem, SwiperItem, TransferDomDirective as TransferDom } from 'vux'
+	import { XNumber, Swiper, Card, Tab, TabItem, SwiperItem } from 'vux'
 
 	import elComment from 'components/comment/comment'
 	import elCart from 'components/cart/cart'
+	import elBackIndex from 'components/cart/back-index'
 
 	import hold from 'src/commons/hold'
 	import { getterIndex } from 'services/index';
 
 	export default {
 		name: "mallDatail",
-		directives: {
-	    TransferDom
-	  },
-		components: { XNumber, Swiper, Card, Tab, TabItem, SwiperItem, elComment, elCart },
+		components: { XNumber, Swiper, Card, Tab, TabItem, SwiperItem, elComment, elCart, elBackIndex },
 		data () {
 			return {
 				title: "商城详情",
@@ -131,6 +128,7 @@
 						code: goodsCode
 					}).then(function(e) {
 						let responseData = e.data.data;
+		  			_this.goodsMsg.code = responseData.code;
 		  			_this.goodsMsg.title = responseData.name;
 		  			_this.goodsMsg.author = responseData.author;
 		  			_this.goodsMsg.price = responseData.PRICE;
@@ -173,31 +171,6 @@
 						}
 				});	
 			},
-			addCart () {
-				let _this = this;
-				
-				_this.$http.post('/wechat/shop/addCart',
-					{
-						userCode: _this.$store.state.user.userCode,
-						productCode: _this.$route.params.goodsCode,
-						shopCount: _this.goodsMsg.num
-					}).then(function(e) {
-						if(e.data.errcode == 1) {
-							_this.$vux.toast.show({
-								text: "加入购物车成功"
-							});
-
-							_this.cartNum += _this.goodsMsg.num;
-						}
-				});
-			},
-			balance () {
-				let _this = this;
-
-			},
-			goCart () {
-				this.$router.push({name: "shopCart"})
-			},
 			addRecode () {
 				let _this = this;
 				this.$http.post('/wechat/discover/addProductViewCount',
@@ -218,10 +191,15 @@
 	@import '~assets/css/core/functions', '~assets/css/core/mixins', '~assets/css/core/vars';
   
   $imgW: 44px;
+
+  .detail {
+  	padding-bottom: $containerBottom;
+  }
 	
 	.banner {
 		img {
 			width: 100%;
+			padding: $padding*2 0;
 		}
 	}
 

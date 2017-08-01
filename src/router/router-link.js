@@ -4,6 +4,15 @@ const routes = [
 	{
 		path: '*',
 		redirect: '/index' 
+	// },{
+	// 	path: '/demo',
+	// 	name: 'demo',
+	// 	component:  loadView(loaded => {
+	// 		require(['../modules/demo.vue'], loaded)
+	// 	}),
+	// 	meta: {
+	// 		title: '大脑银行'
+	// 	}
 	},{
 		path: '/index',
 		name: 'index',

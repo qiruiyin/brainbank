@@ -4,12 +4,11 @@
 
 <template>
 	<div class="reward">
-		<div @click="btnClick" class="reward-btn">奖赏</div>
+		<div @click="btnClick" class="reward-btn">打赏</div>
 		<div v-transfer-dom>
 	    <popup v-model="reward.status" position="bottom" :hide-on-blur=false>
 	      <group>
-	      	<selector title="金额" :options="reward.list" v-model="reward.value"></selector>
-	        <!-- <x-input type="number" title="金额" v-model="reward.value"></x-input> -->
+	      	<selector title="打赏金额" :options="reward.list" v-model="reward.value"></selector>
 	      </group>
 	      <div class="btns">
 	        <x-button @click.native="btnSubmit" type="primary">确定</x-button>
@@ -17,25 +16,26 @@
 	      </div>
 	    </popup>
 	 	</div>
-
+<!-- 
 		<div v-transfer-dom>
 			<popup v-model="pay.status" position="bottom" :hide-on-blur=false>
 				<div class="pay">
 					<form-preview header-label="赞赏金额" :header-value="pay.allPrice" :body-items="pay.list"></form-preview>	
 	      	
 	      	<div class="btns">
-						<x-button type="primary" @click.native="payReward">支付</x-button>
+						<x-button type="primary" :class="{'disabled': !user.pay}" @click.native="payReward">支付</x-button>
 	        	<x-button @click.native="btnCancel('pay')" type="default">取消</x-button>
 	      	</div>
 	    	</div>
 			</popup>
-	  </div>
-	</div>
+	  </div>-->
+	</div> 
 	
 </template>
 
 <script type="text/babel">
 	import hold from 'src/commons/hold'
+  import { mapState } from 'vuex'
 	import { TransferDom, Popup, Group, XInput, XButton, FormPreview, Selector} from 'vux'
 
 	export default {
@@ -91,6 +91,11 @@
 				}
 			}
 		},
+		computed: {
+			...mapState({
+        user: state => state.user
+      })
+		},
 		methods: {
 			btnClick () {
 				this.reward.status = true;
@@ -100,7 +105,7 @@
 
 				this.$http.post('/wechat/orderSpare/create',
 						{
-							"userCode": _this.$store.state.user.userCode,
+							"openId": _this.$store.state.user.openId,
 							"productCode": _this.rewardData.code,
 							"money": _this.reward.value
 						}
@@ -112,25 +117,26 @@
 			          text: responseData.errmsg
 			        })
 						} else {
-							_this.reward.status = false;
 							_this.pay.status = true;
-							_this.pay.allPrice = responseData.data.money;
-							_this.pay.list[0].value = responseData.data.orderCode;
-							_this.pay.list[1].value = _this.rewardData.name;
+							_this.payReward(responseData.data.orderCode)
+							// _this.reward.status = false;
+							// _this.pay.allPrice = responseData.data.money;
+							// _this.pay.list[0].value = responseData.data.orderCode;
+							// _this.pay.list[1].value = _this.rewardData.name;
 						}
 					})
 			},
 			btnCancel (obj) {
 				this[obj].status = false
 			},
- 			payReward () {
+ 			payReward (orderCode) {
 				let _this = this;
 
 				this.$http.post('/wechat/orderSpare/pay/prepare',
 						{
 							
 							"openId": _this.$store.state.user.openId,
-							"orderCode": _this.pay.list[0].value
+							"orderCode": orderCode
 						}
 					).then(function(e) {
 						let responseData = e.data.data,
@@ -145,9 +151,19 @@
 						WeixinJSBridge.invoke(
 			       'getBrandWCPayRequest', weixinConfig,
 			       function(res){
-			       		alert(res.err_msg)
-			          if(res.err_msg == "get_brand_wcpay_request:ok" ) {
-			          }
+			       		if(res.err_msg == "get_brand_wcpay_request:ok" ) {
+									_this.reward.status = false;
+									_this.$vux.alert.show({
+										content: "感谢大神支持！"
+									})
+			          } else if(res.err_msg == "get_brand_wcpay_request:cancel" ) {
+									this.reward.status = false;
+			          } else if(res.err_msg == "get_brand_wcpay_request:fail" ) {
+			          	// Vue.
+			          	Vue.$vux.alert.show({
+			          		content: "调取微信接口失败"
+			          	})
+			          } 
 			           // 使用以上方式判断前端返回,微信团队郑重提示：res.err_msg将在用户支付成功后返回    ok，但并不保证它绝对可靠。 
 			       })
 					})
@@ -174,5 +190,9 @@
 	}
 	.btns {
 		padding: $padding;
+
+		.disabled {
+			background: $disabledPay;
+		}
 	}
 </style>

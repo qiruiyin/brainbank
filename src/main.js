@@ -9,6 +9,8 @@ import wordBook from './commons/wordBook'
 import hold from 'src/commons/hold'
 
 import commonFun from './commons'
+// 微信签名
+import weixinFun from './commons/weixin.js'
 
 import { AjaxPlugin } from 'vux'
 Vue.use(AjaxPlugin)
@@ -30,30 +32,36 @@ Vue.http.defaults.timeout = 5000;                        //响应时间
 Vue.http.defaults.headers.post['Content-Type'] = 'application/raw';           //配置请求头
 // Vue.http.defaults.baseURL = '';
 
-// james
-// window.localStorage.setItem("openId", "oOVVesxggAc3RBs5XTU0Uf7jIazw");
+// 清楚缓存
+// window.localStorage.clear()
+// 未绑定
+// window.localStorage.setItem("openId", "oOVVes2YmKf-O6ChTa5CrOAELfnU");
 
 // 赵陵
 // window.localStorage.setItem("userCode", "20170718220214960433651736252496");
 // james 
 // window.localStorage.setItem("userCode", "201707281605164831276233257855888");
 // 自己
-// window.localStorage.setItem("openId", "oOVVesxAHQ4C78mSV8FmQTDUpjPQ");
-// window.localStorage.setItem("userCode", "20170718161939537457373403958833");
+window.localStorage.setItem("openId", "oOVVesxAHQ4C78mSV8FmQTDUpjPQ");
+window.localStorage.setItem("userCode", "20170718161939537457373403958833");
 
 // frank
-// window.localStorage.setItem("openId", "20170719115339110483535886346825");
+// window.localStorage.setItem("openId", "oOVVesy6LW3Vp5YGDRzkFi9HUzIc");
 // window.localStorage.setItem("userCode", "20170719115339110483535886346825");
 
 // 马一鸣
 // window.localStorage.setItem("openId", "oOVVesw9m3Q8SQbYebfQ05u53BqE");
 // window.localStorage.setItem("userCode", "20170721160758734671595511675408");
 
-if(!store.state.user.userCode) {
+// ceshi
+// window.localStorage.setItem("openId", "oOVVes2x6v6Iv4wHuDv6dUwvfNTM");
+// window.localStorage.setItem("userCode", "201708021130406511691757423092769");
+
+if(!store.state.user.userCode && hold.storage.get("userCode")) {
 	store.commit('updateUserUserCode', {userCode: hold.storage.get("userCode")});
 }
 
-if(!store.state.user.openId) {
+if(!store.state.user.openId && hold.storage.get("openId")) {
 	store.commit('updateUserOpenId', {openId: hold.storage.get("openId")});
 }
 

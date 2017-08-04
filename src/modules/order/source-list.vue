@@ -11,11 +11,11 @@
       <swiper-item v-for="(tabDataItem, tabDataIndex) in tabData" :key="tabDataIndex">
     		<!-- <el-card-order @on-load-more="loadMore" :card-data="item.list" :card-count="count" :card-index="index"></el-card-order> -->
     		<template v-if="tabDataItem.value != 'file'">
-  				<el-img-text-rank @on-card-click="cardClick" @on-btn-click="btnClick" v-for="(item, ind) in tabDataItem.list" :img-text-data="item" img-text-btn="0" :key="ind"></el-img-text-rank>
+  				<el-img-text-rank @on-btn-click="btnClick" v-for="(item, ind) in tabDataItem.list" :img-text-data="item" img-text-btn="0" :key="ind"></el-img-text-rank>
     		</template>
 
     		<template v-else>
-  				<el-img-text-rank @on-card-click="cardFileClick" @on-btn-click="btnFileClick" v-for="(item, ind) in tabDataItem.list" :is-download=true :img-text-data="item" img-text-btn="1" :key="ind"></el-img-text-rank>
+  				<el-img-text-rank @on-btn-click="btnFileClick" v-for="(item, ind) in tabDataItem.list" :is-download=true :img-text-data="item" img-text-btn="1" :key="ind"></el-img-text-rank>
     		</template>
       </swiper-item>
     </swiper>
@@ -140,23 +140,11 @@
 			loadMore (val) {
 				this.fetchData(this.tabData[val], val)
 			},
-			cardClick (val) {
-				if(!this.isLogin) return false;
-
-				if(val.status) {
-					this.$router.push({name: val.url, params: val.params });
-				} else {
-					this.$vux.toast.show({
-					  text: '请先购买！'
-					})
-				}
-			},
 			btnClick (val) {
-				if(!this.isLogin) return false;
+				if(!this.isLogin()) return false;
 				
 				let _this = this;
 				_this.payCode = val.params.code;
-				console.log(val)
 					
 				this.$http.post('/wechat/order/create',
 					{
@@ -184,22 +172,9 @@
 						}
 					})	
 			},
-			cardFileClick (val) {
-				console.log(2)
-				if(!this.isLogin) return false;
-
-				if(val.status) {
-					this.$router.push({name: val.url, params: val.params });
-				} else {
-					this.$vux.toast.show({
-					  text: '请先购买！'
-					})
-				}
-			},
 			btnFileClick (val) {
-				console.log(1)
-				if(!this.isLogin) return false;
-				debugger
+				if(!this.isLogin()) return false;
+				
 				let _this = this;
 				_this.payCode = val.params.code;
 				

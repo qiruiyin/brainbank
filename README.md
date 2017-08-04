@@ -32,3 +32,106 @@ npm test
 ```
 
 For detailed explanation on how things work, checkout the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+
+# 目录结构
+
+## src 开发文件
+
+	### assets 静态资源文件
+
+		css 样式表
+
+		fonts 图标字体
+
+		img 图片
+
+	### commons 公共方法和字典
+
+		index vue prototype扩展
+
+		wordbook 字典
+
+		weixin 微信签名及分享
+
+	### components 组件
+
+		card 卡片
+
+		cart 购物车相关
+
+		comment 评论
+
+		header 头部
+
+		img-text 图文混排
+
+		mall 商城相关
+
+		nav 底部菜单
+
+		order 订单相关
+
+		quotation 语录 参考朋友圈
+
+		reward 打赏
+
+		tuijian 首页推荐
+
+		verification-code 验证码扩展，基于vux
+
+		witness 客户见证
+
+	### datas 数据
+
+	### filter 过滤器
+
+	### modules 具体页面
+
+		address 地址
+
+		author 微信授权
+
+		banner 广告宣传
+
+		course 课程
+
+		index 首页相关
+
+		mall 商城相关
+
+		msg 消息
+
+		order 订单
+
+		quotation 经典语录
+
+		rank 排行榜
+
+		shop-cart 购物车
+
+		user-center 用户中心
+
+	### router 路由
+
+	### services 数据服务
+
+	### store 公共数据
+
+		cart 购物车
+
+		direction 页面切换方向
+
+		loadbar 页面加载过渡效果
+
+		msg 消息来源暂存
+
+		nav 底部菜单状态
+
+		pay 是否可支付，微信签名成功
+
+		user 用户信息
+
+
+
+ 
+

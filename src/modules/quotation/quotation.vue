@@ -130,7 +130,7 @@
 					{
 						userCode: _this.$store.state.user.userCode, //用户code
 						code: _this.commentCurrentClick.code, // 语录code
-						parentCode: _this.commentCurrentClick.commentCode && _this.commentCurrentClick.commentCode, // 评论code
+						parentCode: _this.commentCurrentClick.commentInfo.code && _this.commentCurrentClick.commentInfo.code, // 评论code
 						content: _this.commentValue
 					}).then(function(e) {
 						_this.commentValue = "";

@@ -16,13 +16,16 @@
 </template>
 
 <script type="type/babel">
-	import { Tab, TabItem, Swiper, SwiperItem } from 'vux'
+	import { Tab, TabItem, Swiper, SwiperItem, TransferDom } from 'vux'
 
 	import elCardOrder from 'components/card/card-order'
 
 	export default {
 		name: 'orderList',
 		components: { Tab, TabItem, Swiper, SwiperItem, elCardOrder },
+		directives: {
+	    TransferDom
+	  },
 		data () {
 			return {
 				title: '订单列表页面',
@@ -94,6 +97,8 @@
 								return {
 									icon: '',
 									code: item.orderCode,
+									lessonCode: item.lessonCode,
+									commodityCode: item.commodityCode,
 									title: item.NAME,
 									actualAmount: item.expectAmount,
 									amount: item.amount,
@@ -101,8 +106,10 @@
 									img: '',
 									status: (item.paymentType == 1 && item.ticketStatus) ? item.ticketStatus : item.paymentStatus,
 									time: item.createTime,
+									paymentType: item.paymentType,
+									ticketType: item.ticketType,
 									num: item.count,
-									lessonCommodityList: item.lessonCommodityList
+									// lessonCommodityList: item.lessonCommodityList
 								}
 							});
 

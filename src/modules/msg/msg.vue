@@ -57,15 +57,15 @@ import hold from 'src/commons/hold'
 			return {
 				title: '消息',
 				msgDatas: [
-					{
-						status: 1,
-						show: true,
-						title: '上课通知',
-						content: '嗨，你报的总裁商业思维要开课啦',
-						time: '6.12-6.15',
-						url: '',
-						urlMsg: '点击我去上课'
-					}
+					// {
+					// 	status: 1,
+					// 	show: true,
+					// 	title: '',
+					// 	content: '',
+					// 	time: '',
+					// 	url: '',
+					// 	urlMsg: ''
+					// }
 				]
 			}
 		},
@@ -148,7 +148,8 @@ import hold from 'src/commons/hold'
 	$msgMargin: $padding;
 
 	.msg {
-		padding: $msgMargin 0;
+    min-height: 100%;
+		padding: $msgMargin 0 0;
 		background: $bgGray;
 	}
 

@@ -3,10 +3,10 @@
 		<group label-width="4em" label-margin-right="2em" label-align="right">
       <!-- <x-input :title="name.title" v-model="name.value" :placeholder="name.placeholder"></x-input> -->
       <x-input :title="bangding.idCard.title" v-model="bangding.idCard.value" :placeholder="bangding.idCard.placeholder"></x-input>
-      <x-input type="number" :title="bangding.tel.title" v-model="bangding.tel.value" :placeholder="bangding.tel.placeholder" class="weui-vcode">
+      <x-input type="tel" :title="bangding.tel.title" v-model="bangding.tel.value" :placeholder="bangding.tel.placeholder" class="weui-vcode">
         <el-verification-code :tel="bangding.tel.value" slot="right"></el-verification-code>
       </x-input>
-      <x-input :title="bangding.code.title" v-model="bangding.code.value" :placeholder="bangding.code.placeholder"></x-input>
+      <x-input type="tel" :title="bangding.code.title" v-model="bangding.code.value" :placeholder="bangding.code.placeholder"></x-input>
     </group>
 		
 		<div class="btns">
@@ -56,13 +56,13 @@
 				if(_this.bangding.idCard.value == "") {
 					_this.$vux.toast.show({
 	          text: "身份证号不能为空",
-	          width: "10rem",
+	          width: "80%",
 	          type: "text",
 	        })
 				} else if(_this.bangding.tel.value.length != 11) {
 					_this.$vux.toast.show({
 	          text: "请输入正确的手机号码",
-	          width: "10rem",
+	          width: "80%",
 	          type: "text",
 	        })
 				} else if (_this.bangding.code.value == "") {
@@ -80,24 +80,25 @@
 							"parentOpenId": ""
 						}).then(function(e) {
 							let responseData = e.data;
-							if(responseData.errorData) {
-								_this.$vux.toast.show({
-				          text: responseData.errorData,
-				          width: "80%",
-				          type: "warn",
+							if(responseData.errcode != 1) {
+								_this.$vux.alert.show({
+				          content: responseData.errmsg
+				        })
+							} else if (responseData.data.status == 1) {
+			  				_this.$store.commit('updateUserOpenId', {openId: hold.storage.get("openId")});
+								hold.storage.set("userCode", responseData.data.userCode);
+			  				_this.$store.commit('updateUserUserCode', {userCode: responseData.data.userCode});
+
+			  				_this.$vux.alert.show({
+				          content: "绑定成功",
+				        	onHide () {
+			  						_this.$router.push({ name: "index" });
+				        	}
 				        })
 							} else {
-			  				_this.$store.commit('updateUserOpenId', {openId: hold.storage.get("openId")});
-								hold.storage.set("userCode", responseData.data.customerCode);
-			  				_this.$store.commit('updateUserUserCode', {userCode: responseData.data.customerCode});
-
-			  				_this.$vux.toast.show({
-				          text: "成功",
-				          width: "80%",
-				          type: "text"
+								_this.$vux.alert.show({
+				          content: responseData.data.errorData
 				        })
-
-			  				_this.$router.push({ name: "index" });
 							}
 					});
 				}

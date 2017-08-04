@@ -3,13 +3,15 @@
  -->
 
 <template>
-	<div @click="goIndex" class="back-index fa fa-home" v-transfer-dom>
-		{{ title }}
+	<div v-transfer-dom>
+		<div @click="goIndex" class="back-index fa fa-home">
+			{{ title }}
+		</div>
 	</div>
 </template>
 
 <script type="text/babel">
-	import { TransferDom } from "vux"
+	import { TransferDom } from 'vux'
 
 	export default {
 		name: "elBackIndex",

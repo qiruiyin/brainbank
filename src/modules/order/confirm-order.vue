@@ -6,17 +6,27 @@
 	<div class="order">
 		<div class="order-body">
 			<template v-if="orderInfo.type == '2'">
-				<el-order-mall :order-mall-data="orderMallDatas"></el-order-mall>
+				<el-order-mall :order-mall-data="orderMallDatas" @update-address="setCartPayStatus"></el-order-mall>
+			</template>
+
+			<template v-if="orderInfo.type == '1'">
+				<el-order-course :order-course-data="orderCourseData"></el-order-course>
+			</template>
+
+			<template v-if="orderInfo.type == '3'">
+				<el-order-audio :order-audio-data="orderAudioData"></el-order-audio>
 			</template>
 		</div>
 
-		<el-cart-pay :order-info="orderInfo"></el-cart-pay>
+		<el-cart-pay :order-info="orderInfo" :is-active="orderInfo.isActive"></el-cart-pay>
 	</div>
 </template>
 
 <script type="text/babel">
 	import { Group, Selector, XInput, XButton, FormPreview, Popup, Toast, TransferDomDirective as TransferDom  } from 'vux'
 	import elOrderMall from 'components/order/mall'
+	import elOrderCourse from 'components/order/course'
+	import elOrderAudio from 'components/order/audio'
 	import elCartPay from 'components/cart/cart-pay'
 
 	export default {
@@ -25,19 +35,23 @@
 	    TransferDom
 	  },
 		components: {
-			Group, Selector, XInput, XButton, FormPreview, Popup, Toast, elOrderMall, elCartPay
+			Group, Selector, XInput, XButton, FormPreview, Popup, Toast, elOrderMall, elCartPay, elOrderCourse, elOrderAudio
 		},
 		data () {
 			return {
 				show: true,
+				payClick: false, 
 				orderInfo: {
 					code: this.$route.query.orderCode,
 					type: "", // 1:课程 2:商城 3:视频或音频
 					num: 0,
 					money: "",
-					address: {}
+					address: {},
+					isActive: '' //// 支付按钮是否可点击
 				},
 				orderMallDatas: {},
+				orderCourseData: {},
+				orderAudioData: {},
 				pay: {
 					show: false,
 					allPrice: 0,
@@ -78,7 +92,24 @@
 							_this.orderInfo.address = responseData.data.address;
 							_this.orderInfo.money = responseData.data.money;
 							_this.orderInfo.type = responseData.data.type;
-							_this.orderMallDatas = responseData.data;
+
+							if(responseData.data.type == 1) {
+								_this.orderCourseData = responseData.data.list[0];
+							}
+
+							if(responseData.data.type == 2) {
+								_this.orderMallDatas = responseData.data;
+							}
+
+							if(responseData.data.type == 3) {
+								_this.orderAudioData = responseData.data.list[0];
+							}
+
+							if(_this.orderInfo.type != 2) {
+								_this.orderInfo.isActive = true;
+							} else if (_this.orderInfo.address.address) {
+								_this.orderInfo.isActive = true;
+							}
 
 							responseData.data.list.map(function(item, index) {
 								num += item.count;
@@ -87,6 +118,9 @@
 							_this.orderInfo.num = num;
 						}
 				});
+			},
+			setCartPayStatus (data) {
+				this.orderInfo.isActive = data
 			}
 		}
 	}

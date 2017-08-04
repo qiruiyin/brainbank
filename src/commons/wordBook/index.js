@@ -1,6 +1,7 @@
+// 字典
 import Vue from 'vue'
-import headerBtns from './header-btns';
-import nav from './nav';
+import headerBtns from './header-btns.js';
+import nav from './nav.js';
 
 Vue.prototype.wordBook = {
 	headerBtns: headerBtns,

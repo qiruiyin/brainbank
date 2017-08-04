@@ -31,7 +31,7 @@
 							<div class="course-list">
 								<card>
 									<div slot="content">
-										<el-img-text @click.native="goPage(item.code, '0')" v-for="(item, index) in courseTuijian" :img-text-data="item" :key="index"></el-img-text>
+										<el-img-text v-for="(item, index) in courseTuijian" :img-text-data="item" :key="index"></el-img-text>
 									</div>
 								</card>
 							</div>
@@ -83,7 +83,9 @@
 			fetchData	() {
 	  		// 获取所有数据
 	  		let _this = this;
-	  		_this.$http.post('/wechat/course/index',{}).then(function(e) {
+	  		_this.$http.post('/wechat/course/index',{
+	  			// ""	
+	  		}).then(function(e) {
 					let responseData = e.data.data;
 	  			_this.courseList = responseData.lessonList;
 	  			_this.banner = responseData.adLessonList.map(function(item, index){
@@ -102,6 +104,7 @@
 						return {
 							title: item.productName,
 							price: item.price,
+							isClick: true,
 							// priceUnit: '年',
 							// priceCurrency: '￥',
 							desc: item.DESCRIPTION || '介绍',

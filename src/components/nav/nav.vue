@@ -3,19 +3,21 @@
  -->
 
 <template>
-  <nav>
-	<tabbar icon-class="vux-center" slot="bottom">
-      <tabbar-item v-for="item in navDatas" :link="{name: item.link}" :selected="item.value == navSelected" :key="item.value">
-        <img v-if="item.value == 'mall'" :class="{'icon-big': item.value == 'mall'}" slot="icon" :src="item.img">
-        <i v-else :class="['fa', 'fa-' + item.value ]" slot="icon"></i>
-        <span slot="label" class="icon">{{ item.name }}</span>
-      </tabbar-item>
-    </tabbar>
-  </nav>
+    <div v-transfer-dom>
+      <nav>
+    	<tabbar icon-class="vux-center" slot="bottom">
+          <tabbar-item v-for="item in navDatas" :link="{name: item.link}" :selected="item.value == navSelected" :key="item.value">
+            <img v-if="item.value == 'mall'" :class="{'icon-big': item.value == 'mall'}" slot="icon" :src="item.img">
+            <i v-else :class="['fa', 'fa-' + item.value ]" slot="icon"></i>
+            <span slot="label" class="icon">{{ item.name }}</span>
+          </tabbar-item>
+        </tabbar>
+      </nav>
+    </div>
 </template>
 
 <script type="text/babel">
-	import { Tabbar, TabbarItem } from 'vux'
+	import { Tabbar, TabbarItem, TransferDom } from 'vux'
 	
 	import imgIndex from 'assets/img/nav/nav-index.png'
 	import imgCourse from 'assets/img/nav/nav-course.png'
@@ -24,42 +26,58 @@
 	import imgMy from 'assets/img/nav/nav-my.png'
 
 	export default {
-		// name: 'elNav',
+		name: 'elNav',
 		components: { Tabbar, TabbarItem },
+        directives: {
+            TransferDom
+        },
 		data () {
-    	return {
-    		isDemo: true,
-    		navDatas: [
-    			{
-    				value: "home",
-    				name: "首页",
-    				img: imgIndex,
-    				link: 'index'
-    			},{
-    				value: "headphones",
-    				name: "课程",
-    				img: imgCourse,
-    				link: 'course'
-    			},{
-    				value: "mall",
-    				name: "",
-    				img: imgMall,
-    				link: 'mall'
-    			},{
-    				value: "comments-o",
-    				name: "消息",
-    				img: imgMsg,
-    				link: 'msg'
-    			},{
-    				value: "user-o",
-    				name: "我的",
-    				img: imgMy,
-    				link: 'userCenter'
-    			}
-    		],
-    		navSelected: 'index'
-	    }
-	  }
+        	return {
+        		isDemo: true,
+        		navDatas: [
+        			{
+        				value: "home",
+        				name: "首页",
+        				img: imgIndex,
+        				link: 'index'
+        			},{
+        				value: "headphones",
+        				name: "课程",
+        				img: imgCourse,
+        				link: 'course'
+        			},{
+        				value: "mall",
+        				name: "",
+        				img: imgMall,
+        				link: 'mall'
+        			},{
+        				value: "comments-o",
+        				name: "消息",
+        				img: imgMsg,
+        				link: 'msg'
+        			},{
+        				value: "user-o",
+        				name: "我的",
+        				img: imgMy,
+        				link: 'userCenter'
+        			}
+        		],
+        		navSelected: 'home'
+    	    }
+	    },
+        // computed: {
+        //     navSelected () {
+        //         let _this = this,
+        //             name = this.$route.name,
+        //             data = "home";
+        //         this.navDatas.map(function(item, index){
+        //             if(item.link == name) {
+        //                 data = item.value;
+        //             }
+        //         });
+        //         return data;
+        //     }
+        // }
 	}
 </script>
 

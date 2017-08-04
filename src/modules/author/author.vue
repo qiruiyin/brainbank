@@ -19,9 +19,9 @@
 			}
 		},
 		mounted () {
-			// alert(location.href);
+			// alert("url"+ location.href);
 			let _this = this,
-					userCode = hold.storage.get('userCode') || this.$store.state.user.userCode,
+					userCode = hold.storage.get('userCode'),
 					urlJson = _this.parseToJson(location.href),
 					openId = hold.storage.get("openId");
 
@@ -30,45 +30,37 @@
 			}
 			// alert("url"+ location.href);
 			// alert("urlJson" + urlJson);
-			// alert("openId" + openId);
+			// alert("href" + location.href + "urlJson" + urlJson.openId + "openId" + userCode + "user" + openId);
 			// alert("userCode" + userCode)
-			if(userCode){
+			if(userCode && userCode != "undefined" && userCode != "") {
 				_this.login(openId, hold.storage.get('userCode'));
 			} else if(!openId) {
+				// alert(1)
 	      // let ua = window.navigator.userAgent.toLowerCase()
 	      // if(ua.match(/MicroMessenger/i) == 'micromessenger'){
 	        // 跳转到微信授权页面
         _this.$http.post('/wechat/wx/access/generate',{}).then(function(e) {
+        	// alert("111")
+        	// alert(e.data.data.accessUrl);
 	 				window.location.href = e.data.data.accessUrl
 	  		});
 	    } else {
+				// alert(2)
 	    	_this.getUserCode(openId)
 				// _this.login(openId, hold.storage.get('user'));
 	    }
 		},
 		methods: {
 			parseToJson (url) {
-				// alert(url)
-				// alert(url.indexOf("?") != -1)
-				// alert(url.)
-				// alert(url != "")
-				// alert(location.search != "")
 				if(url != "" && url.indexOf("?") != -1){
-				// alert(1)
 					let	url_json = {};
 					url = url.replace("#/author", "");
-				// alert(url)
 					url = url.split("?");
-				// alert(url)
 					url = url[1].split('&');
-				// alert(url)
 					for (let i = 0; i<url.length ; i++) {
 				    let str = url[i].split('=');
 				    url_json[str[0]]=str[1];
 					}
-				// alert(url_json)
-				// alert(JSON.stringify(url_json))
-					// url_json = JSON.stringify(url_json);
 					return url_json;
 				} else {
 					return "";

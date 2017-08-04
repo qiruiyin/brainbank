@@ -47,12 +47,18 @@
 			imgTextClick () {
 				let _this = this;
 				if(this.imgTextData.isClick) {
-					this.$emit("on-img-text-click", this.imgTextData)
+					this.$router.push({name: 'courseDetail', params: { courseCode: this.imgTextData.code, courseStatus: '0'}}) 
 				} else if (!_this.$store.state.user.userCode) {
-					this.$emit("show-bangding")
+					// this.$emit("show-bangding")
+					_this.$vux.confirm.show({
+						content: "你还没有绑定用户，确定去绑定用户",
+					  onConfirm () {
+					  	_this.$router.push({ name: "bangding" });
+					  }
+					})
 				} else {
 					this.$vux.alert.show({
-						content: '你还没有报名，请立即去报名'
+						content: '你还没有报名，请立即去报名',
 					})
 				}
 			}

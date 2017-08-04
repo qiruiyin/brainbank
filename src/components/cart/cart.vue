@@ -3,10 +3,12 @@
  -->
 
 <template>
-	<div class="cart" v-transfer-dom>
-		<div @click="goShopCart" class="balance fa fa-shopping-cart"><span>购物车</span><i>{{ cartNum }}</i></div>
-		<div @click="addCart" class="add-cart">加入购物车</div>
-		<div @click="goBalance" class="go-balance">立即购买</div>
+	<div v-transfer-dom>
+		<div class="cart">
+			<div @click="goShopCart" class="balance fa fa-shopping-cart"><span>购物车</span><i>{{ cartNum }}</i></div>
+			<div @click="addCart" class="add-cart">加入购物车</div>
+			<div @click="goBalance" class="go-balance">立即购买</div>
+		</div>
 	</div>
 </template>
 
@@ -40,7 +42,7 @@
 	  },
 		mounted () {
 			// 如果还没有取过购物车信息
-			if(!this.$store.state.cart.hasAjax) this.fetchData();
+			if(!this.$store.state.cart.hasAjax && this.$store.state.user.userCode) this.fetchData();
 		},
 		methods: {
 			fetchData () {
@@ -57,6 +59,7 @@
 					});
 			},
 			addCart () {
+				if(!this.isLogin()) return false;
 				// this.$emit("on-addCart-click");
 				let _this = this;
 				
@@ -77,9 +80,11 @@
 				});
 			},
 			goShopCart () {
+				if(!this.isLogin()) return false;
 				this.$router.push({name: "shopCart"});
 			},
 			goBalance () {
+				if(!this.isLogin()) return false;
 				let _this = this,
 						allMoney = (_this.productInfo.price * _this.productInfo.num).toFixed(2);
 

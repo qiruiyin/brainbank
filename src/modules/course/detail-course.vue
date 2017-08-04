@@ -13,16 +13,17 @@
 	        <tab-item :selected="tabSelected == index" v-for="(item, index) in tabDatas" @click="tabSelected = index" :key="index">{{ item.title }}</tab-item>
 	      </tab>
 	      <div class="list">
-	      	<template  v-if="tabSelected == 0">
+	      	<template v-if="tabSelected == 0">
 	      		<div v-html="courseInfo.content"></div>
 	      	</template>
 	        
-	        <template v-if="tabSelected == 1">	        	
-						<el-comment :comment-data="commentData"></el-comment>
+	        <template v-if="tabSelected == 1">
+	        	<el-witness :witness-data="witnessData"></el-witness>     	
+						<!-- <el-comment :comment-data="commentData"></el-comment> -->
 	        </template>
 
 	        <template v-if="tabSelected == 2">
-	        	<el-img-text-rank v-for="(item, ind) in relateData" :img-text-data="item" img-text-btn="0" :key="ind"></el-img-text-rank>
+	        	<el-img-text-rank v-for="(item, ind) in relateData" :img-text-data="item" :key="ind"></el-img-text-rank>
 	        </template>
 	      </div>
 	    </div>
@@ -36,12 +37,13 @@
 	import elImgTextRank from 'components/img-text/img-text-rank'
 	import elComment from 'components/comment/comment'
 	import elReward from 'components/reward/reward'
+	import elWitness from 'components/witness/witness'
 
 	export default {
 		name: 'detail',
 		components: { 
 			XButton, Flexbox, FlexboxItem, Tab, TabItem, Swiper, SwiperItem, Sticky, 
-			elHeaderIndex, elImgTextRank, elComment, elReward 
+			elHeaderIndex, elImgTextRank, elComment, elReward, elWitness
 		},
 		data () {
 			return {
@@ -65,13 +67,13 @@
 				tabDatas: [
 					{
 						value: 'detail',
-						title: '详情',
+						title: '课程详情',
 					},{
 						value: 'comment',
-						title: '评论',
+						title: '客户见证',
 					},{
 						value: 'relate',
-						title: '相关',
+						title: '课程视频',
 					}
 				],
 				tabSelected: 0,
@@ -98,7 +100,7 @@
 						params: {}
 					}
 				],
-				commentData: {
+				witnessData: {
 					productCode: this.$route.params.courseCode,
 					pagesize: 1,
 					pagecount: this.wordBook.pageCount
@@ -110,16 +112,14 @@
 			}
 		},
 		mounted () {
-			let _this = this;
-	  	// this.signUrl(location.href);
 			this.fetchData();
-			this.addRecode();
+			this.visitCount(this.$route.params.code);
 		},
 		methods: {
 			fetchData () {
 				let _this = this,
 						relateData = [];
-				this.$http.post('/wechat/discover/product/details',
+				this.$http.post('/wechat/discover/product/lessonDetails',
 						{
 							"userCode": _this.$store.state.user.userCode,
 							"productCode": _this.$route.params.courseCode
@@ -160,16 +160,6 @@
 						_this.relateData = relateData;
 					}
 				);
-			},
-			addRecode () {
-				let _this = this;
-				this.$http.post('/wechat/discover/addProductViewCount',
-						{
-							"code": _this.$route.params.code
-						}
-					).then(function(e) {
-
-					});
 			},
 			playBtnClick () {
 				if(this.playBtn.status) {

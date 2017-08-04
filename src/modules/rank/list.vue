@@ -13,7 +13,7 @@
 	      </tab>
 	      <swiper class="list" height="100%" v-model="tabSelected" :show-dots="false">
 	        <swiper-item v-for="(tabContentDatasList, index) in tabDatas" :key="index">
-	          <el-img-text-rank @on-card-click="cardClick" @on-btn-click="btnClick" v-for="(item, ind) in tabContentDatas[tabContentDatasList.value]" :img-text-data="item" img-text-btn="0" :key="ind"></el-img-text-rank>
+	          <el-img-text-rank @on-btn-click="btnClick" v-for="(item, ind) in tabContentDatas[tabContentDatasList.value]" :img-text-data="item" img-text-btn="0" :key="ind"></el-img-text-rank>
 						
 						<template v-if="tabContentDatas[tabContentDatasList.value].length == count">						
 							<x-button @click.native="loadMore(tabContentDatasList.value)">加载更多</x-button>
@@ -33,7 +33,7 @@
 					<form-preview header-label="付款金额" :header-value="pay.allPrice" :body-items="pay.list"></form-preview>	
 	      	
 	      	<div class="pay-btn">
-						<x-button type="primary" @click.native="payOrder">支付</x-button>
+						<x-button type="primary" :class="{'disabled': !user.pay}" @click.native="payOrder">支付</x-button>
 	      	</div>
 	    	</div>
 	    </popup>
@@ -43,6 +43,7 @@
 
 <script type="text/babel">
 	import { Tab, TabItem, Swiper, SwiperItem, XButton, Divider, Toast, FormPreview, Popup, TransferDomDirective as TransferDom } from 'vux'
+  import { mapState } from 'vuex'
 	import elHeaderIndex from 'components/header/header-index'
 	import elImgTextRank from 'components/img-text/img-text-rank'
 
@@ -98,6 +99,11 @@
 				payCode: ''
 			}
 		},
+		computed: {
+			...mapState({
+        user: state => state.user
+      })
+		},
 		mounted () {
 			let _this = this,
 					count = _this.count,
@@ -149,8 +155,6 @@
 							})
 						}
 
-						console.log(rankType, data, e.data.data.list)
-						
 						if(rankType == 1) {
 							_this.tabContentDatas.pay.push.apply(_this.tabContentDatas.pay, data);
 						} else if(rankType == 2) {
@@ -171,24 +175,9 @@
 					_this.fetchData(_this.typeCurrent, 3, 2, _this.count, 0)
 				}
 			},
-			cardClick (val) {
-				if(!this.isLogin) return false;
-
-				if(val.status) {
-					this.$router.push({name: val.url, params: val.params });
-				} else {
-					this.$vux.toast.show({
-					  text: '请先购买！'
-					})
-				}
-			},
 			btnClick (val) {
-				if(!this.isLogin) return false;
-	  		// this.signUrl(location.href);
-				
 				let _this = this;
 				_this.payCode = val.params.code;
-				console.log(val)
 					
 				this.$http.post('/wechat/order/create',
 					{
@@ -218,36 +207,40 @@
 			},
 			payOrder () {
 	    	let _this = this;
-				this.$http.post('/wechat/order/pay/prepare',
-						{
-							"openId": _this.$store.state.user.openId,
-							"orderCode": _this.pay.list[0].value,
-						}
-					).then(function(e) {
-						let responseData = e.data.data,
-								weixinConfig = {
-									"appId": responseData.payment.appId,     //公众号名称，由商户传入     
-			           	"timeStamp": responseData.payment.timeStamp,         //时间戳，自1970年以来的秒数     
-			            "nonceStr": responseData.payment.nonceStr, //随机串     
-			            "package": responseData.payment.packageValue,     
-			            "signType": "MD5",         //微信签名方式：     
-			            "paySign": responseData.payment.paySign //微信签名 
-								};
-						WeixinJSBridge.invoke(
-			       'getBrandWCPayRequest', weixinConfig,
-			       function(res){
-			       		alert(res.err_msg)
-			          if(res.err_msg == "get_brand_wcpay_request:ok" ) {
-			          	// alert("")
-			          	_this.tabContentDatas.pay.map(function(item, index) {
-			          		if(item.params.code == _this.payCode) {
-			          			item.isBuy = true
-			          		}
-			          	})
-			          }
-			           // 使用以上方式判断前端返回,微信团队郑重提示：res.err_msg将在用户支付成功后返回    ok，但并不保证它绝对可靠。 
-			       })
-				});
+
+				if(!this.user.pay) return false;
+				this.payWeixinOrder(_this.pay.list[0].value);
+
+				// this.$http.post('/wechat/order/pay/prepare',
+				// 		{
+				// 			"openId": _this.$store.state.user.openId,
+				// 			"orderCode": _this.pay.list[0].value,
+				// 		}
+				// 	).then(function(e) {
+				// 		let responseData = e.data.data,
+				// 				weixinConfig = {
+				// 					"appId": responseData.payment.appId,     //公众号名称，由商户传入     
+			 //           	"timeStamp": responseData.payment.timeStamp,         //时间戳，自1970年以来的秒数     
+			 //            "nonceStr": responseData.payment.nonceStr, //随机串     
+			 //            "package": responseData.payment.packageValue,     
+			 //            "signType": "MD5",         //微信签名方式：     
+			 //            "paySign": responseData.payment.paySign //微信签名 
+				// 				};
+				// 		WeixinJSBridge.invoke(
+			 //       'getBrandWCPayRequest', weixinConfig,
+			 //       function(res){
+			 //       		alert(res.err_msg)
+			 //          if(res.err_msg == "get_brand_wcpay_request:ok" ) {
+			 //          	// alert("")
+			 //          	_this.tabContentDatas.pay.map(function(item, index) {
+			 //          		if(item.params.code == _this.payCode) {
+			 //          			item.isBuy = true
+			 //          		}
+			 //          	})
+			 //          }
+			 //           // 使用以上方式判断前端返回,微信团队郑重提示：res.err_msg将在用户支付成功后返回    ok，但并不保证它绝对可靠。 
+			 //       })
+				// });
 			}
 		}
 	}
@@ -267,6 +260,10 @@
 
 	.pay-btn {
 		padding: $padding;
+
+		.disabled {
+			background: $disabledPay;
+		}
 	}
 	
 </style>

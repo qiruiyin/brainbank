@@ -1,5 +1,7 @@
 <!-- 
 	主题详情卡片
+	lessonCommodityList: 课程列表
+	orderProductList: 商城订单
  -->
 <template>
 	<div class="card-order-list">
@@ -49,9 +51,10 @@
 					
 				</div>
 			</div>
-			<div class="card-footer" >
-				<!-- <p v-if="item.num">共{{ item.num }}件商品</p> -->
-				<template v-if="item.expressType">
+			<div class="card-footer">
+				<!-- 支付状态 -->
+				<template v-if="item.paymentType == 1">
+					<!-- 快递状态 -->
 					<template v-if="item.expressType == 1">
 						<x-button class="btn" type="primary" @click.native="payment(item.code)" mini>确认收货</x-button>
 					</template>
@@ -59,15 +62,20 @@
 					<template v-if="item.expressType == 2">
 						<x-button class="btn" type="primary" @click.native="payment(item.code)" mini>评价</x-button>
 					</template>
+
+					<!-- 改签状态 -->
+					<template v-if="item.ticketType == '' || item.ticketType == 0">
+						<x-button class="btn" type="primary" @click.native="ticketChange(item.commodityCode, item.lessonCode)" mini>改签</x-button>
+					</template>
+
+					<template v-if="item.ticketType == 1">
+						<x-button class="btn" type="primary" @click.native="ticketReview(item.code)" mini>见证</x-button>
+					</template>
 				</template>
 
 				<template v-else>
-					<template v-if="item.paymentType != 1" >				
-						<x-button class="btn" type="primary" @click.native="payment(item.code)" mini>立即支付</x-button>
-						<x-button class="btn" type="warn" @click.native="deleteOrder(item.code, index)" mini>删除</x-button>
-					</template>
-
-					<div class="btn" v-else>总价：￥{{ item.actualAmount }}</div>	
+					<x-button class="btn" type="primary" @click.native="payment(item.code)" mini>立即支付</x-button>
+					<x-button class="btn" type="warn" @click.native="deleteOrder(item.code, index)" mini>删除</x-button>
 				</template>
 				
 			</div>
@@ -79,39 +87,63 @@
 		<template v-else>
 			<divider>没有更多数据</divider>
 		</template>
+
+		<div v-transfer-dom>
+			<popup v-model="ticketChangeData.show" position="bottom" :hide-on-blur=false>
+	      <div class="ticket-change">
+					<group :title="ticketChangeData.title">
+				 		<selector v-model="ticketChangeData.lessonCode" title="期数" :options="ticketChangeData.list"></selector>
+					</group>
+	      	<div class="pay-btn">
+						<x-button type="primary" @click.native="ticketChangeSubmit">改签</x-button>
+						<x-button @click.native="ticketChangeCancel">取消</x-button>
+	      	</div>
+	    	</div>
+	    </popup>
+		</div>
 	</div>
 </template>
 
 <script type="text/babel">
-	import { Panel, Group, Cell, Radio, XNumber, XButton, LoadMore, Divider } from 'vux'
+	import { Panel, Group, Cell, Radio, XNumber, XButton, LoadMore, Divider, Popup, Selector, TransferDom } from 'vux'
 	
 	import imgHeader from 'assets/img/icon/icon.png'
 
 	export default {
 		name: 'card',
-		components: { Panel, XNumber, Group, Cell, XButton, LoadMore, Divider },
+		directives: {
+	    TransferDom
+	  },
+		components: { Panel, XNumber, Group, Cell, XButton, LoadMore, Divider, Popup, Selector },
 		props: ['cardData', 'cardCount', 'cardIndex'],
 		data () {
 			return {
 				title: '卡片',
 				cardList: [
-					{
-						icon: '',
-						code: '',
-						title: "大脑银行",
-						actualAmount: '',
-						amount: '',
-						status: '',
-						img: '',
-						num: '',
-						paymentType: '', // 是否显示按钮
-						status: '', // 支付状态
-						orderProductList: [],
-						time: '',
-						expressCompany: '',
-						expressNumber: '',
+					{ // 数据结构已经改的有点乱，此处只有参考价值
+						// icon: '',
+						// code: '',
+						// title: "大脑银行",
+						// actualAmount: '',
+						// amount: '',
+						// status: '',
+						// img: '',
+						// num: '',
+						// paymentType: '', // 是否
+						// status: '', // 支付状态
+						// orderProductList: [],
+						// time: '',
+						// expressCompany: '',
+						// expressNumber: '',
 					}
-				]
+				],
+				ticketChangeData: {
+					show: false,
+					title: "",
+					lessonCode: "",
+					commodityCode: "",
+					list: []
+				}
 			}
 		},
 		methods: {
@@ -121,16 +153,69 @@
 			},
 			deleteOrder (code, ind) {
 				let _this = this;
-				_this.cardData.splice(ind, 1);
 				_this.$http.post('/wechat/usercenter/deleteOrder',
 		  			{
 	  					"orderCode": code
 		  			}).then(function(e) {
-
+		  				if(e.data.errcode == 1) {
+								_this.cardData.splice(ind, 1);
+								_this.$vux.toast.show({
+									text: "删除成功"
+								})
+		  				}
 		  		});
 			},
-			loadMore (val) {
+			ticketChange (commodityCode, lessonCode) {
+				// 改签
+				let _this = this;
+				_this.$http.post('/wechat/usercenter/getCustomerLessonList/lesson',
+		  			{
+	  					"commodityCode": commodityCode,
+	  					"lessonCode": lessonCode
+		  			}).then(function(e) {
+		  				_this.ticketChangeData.show = true;
+		  				_this.ticketChangeData.commodityCode = commodityCode;
 
+		  				_this.ticketChangeData.list = e.data.data.lessonList.map(function(item, index){
+		  					return {
+		  						key: item.CODE,
+		  						value: item.NAME,
+		  					}
+		  				})
+		  		});
+			},
+			ticketChangeSubmit () {
+				let _this = this;
+				_this.$http.post('/wechat/usercenter/getCustomerLessonList/changeLessonOrder',
+		  			{
+	  					"commodityCode": _this.ticketChangeData.commodityCode,
+	  					"lessonCode": _this.ticketChangeData.lessonCode
+		  			}).then(function(e) {
+		  				if(e.data.data.trueData) {
+								_this.ticketChangeData.show = false;
+		  					// 改签成功
+		  					_this.$vux.toast.show({
+		  						text: e.data.data.trueData,
+		  						onHide() {
+										_this.$router.go(0);
+		  						}
+		  					});
+		  				} else {
+		  					// 改签失败
+		  					_this.$vux.toast.show({
+		  						text: e.data.data.falseData
+		  					});
+		  				}
+		  			})
+			},
+			ticketChangeCancel () {
+				this.ticketChangeData.show = false
+			},
+			ticketReview (code) {
+				// 跳转到见证页面
+				console.log('见证')
+			},
+			loadMore (val) {
 				this.$emit("on-load-more", val)
 			}
 		}

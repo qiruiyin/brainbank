@@ -9,10 +9,10 @@
       <selector v-model="period.value" :title="period.title" :name="period.name" :options="period.list" @on-change="onPeriodChange"></selector>
       
       <template v-if="userStatus == 0">
-      	<x-input type="number" :title="tel.title" v-model="tel.value" :placeholder="tel.placeholder" class="weui-vcode">
+      	<x-input type="tel" :title="tel.title" v-model="tel.value" :placeholder="tel.placeholder" class="weui-vcode">
 	        <el-verification-code :tel="tel.value" slot="right"></el-verification-code>
 	      </x-input>
-	      <x-input :title="code.title" v-model="code.value" :placeholder="code.placeholder"></x-input>
+	      <x-input type="tel" :title="code.title" v-model="code.value" :placeholder="code.placeholder"></x-input>
       </template>
       
       <x-input :title='count.title' v-model="count.value" readonly></x-input>
@@ -55,7 +55,7 @@
 					<form-preview header-label="付款金额" :header-value="pay.allPrice" :body-items="pay.list"></form-preview>	
 	      	
 	      	<div class="pay-btn">
-						<x-button type="primary" @click.native="payOrder">支付</x-button>
+						<x-button :class="{'disabled': !user.pay}" type="primary" @click.native="payOrder">支付</x-button>
 						<x-button @click.native="cancelPayOrder">取消</x-button>
 	      	</div>
 	    	</div>
@@ -66,6 +66,7 @@
 
 <script type="text/babel">
 	import { Group, Selector, XInput, XButton, FormPreview, Popup, Toast, TransferDomDirective as TransferDom } from 'vux'
+  import { mapState } from 'vuex'
 	import elVerificationCode from 'components/verification-code/verification-code'
 
 	export default {
@@ -182,17 +183,14 @@
 			        label: '时间',
 			        value: ''
 			      }
-			    ],
-		      buttons2: [{
-		        style: 'primary',
-		        text: '点击事件',
-		        onButtonClick: (name) => {
-		        }
-		      }]
+			    ]
 				}
 			}
 		},
 		computed: {
+			...mapState({
+        user: state => state.user
+      }),
 			userStatus () {
 				// 0报名 1升级 2复训
 				let payType = this.$route.params.payType;
@@ -209,36 +207,47 @@
 			periodSelected (newValue, oldValue) {
 				let _this = this;
 				_this.period.productCode = _this.allData.lessonList[newValue].product_code;
-				console.log(_this.allData.lessonList[newValue])
 				_this.count.value = _this.allData.lessonList[newValue].balance_count || 0;
 				_this.date.value = _this.allData.lessonList[newValue].start_date;
 				_this.address.value = _this.allData.lessonList[newValue].address;
 			}
 		},
 		mounted () {
-	  	// this.signUrl(location.href);
+	  	let _this = this;
 			this.fetchData();
 		},
 		methods: {
 			fetchData () {
 				let _this = this,
 						payType = _this.$route.params.payType;
-				
+
 				if(payType == "enlist" || payType == "upgrade") {
 					this.$http.post('/wechat/discover/upgrade/lesson',
-					{
+						{
 							"userCode": _this.$store.state.user.userCode
 						}).then(function(e) {
-						_this.allData = e.data.data;
-						_this.assignData(e.data.data)
+							if(e.data.errcode == 1) {
+								_this.allData = e.data.data;
+								_this.assignData(e.data.data)
+							} else {
+								_this.$vux.toast.show({
+									text: e.data.errmsg
+								})
+							}
 					})
 				} else if (payType == "retrain") {
 					this.$http.post('/wechat/discover/retrain/lesson',
 						{
 							"userCode": _this.$store.state.user.userCode
 						}).then(function(e) {
-							_this.allData = e.data.data;
-							_this.assignData(e.data.data)
+							if(e.data.errcode == 1) {
+								_this.allData = e.data.data;
+								_this.assignData(e.data.data)
+							} else {
+								_this.$vux.toast.show({
+									text: e.data.errmsg
+								})
+							}
 						})
 				}
 			},
@@ -253,7 +262,7 @@
 						value: item.name
 					}
 				});
-				console.log(_this.period.list[_this.periodSelected])
+				
 				_this.period.productCode = _this.period.list[_this.periodSelected].productCode;
 				_this.period.value = _this.period.list[_this.periodSelected].key;
 				_this.count.value = responseData.lessonList[_this.periodSelected].balance_count || 0;
@@ -307,7 +316,6 @@
 	    		money = _this.price.value.toFixed(2),
 	    		orderType = _this.orderType[_this.$route.params.payType];
 
-	    	console.log( _this.period);
 	    	if(_this.userStatus == 0) {
 	    		if(_this.addMan.list.length == 0) {
 	    			this.$vux.alert.show({
@@ -398,6 +406,14 @@
 	    payOrder () {
 	    	let _this = this;
 
+	    	alert(_this.$store.state.user.pay);
+	    	alert(1);
+	    	alert(JSON.stringify(_this.$store.state.user));
+
+	    	alert(_this.userStatus);
+
+	    	if(!_this.$store.state.user.pay) return false;
+
 	    	if(_this.userStatus == 0) {
 	    		this.$http.post('/wechat/order/pay/enroll/prepare',
 							{
@@ -424,30 +440,33 @@
 				       })
 						})
 	    	} else {
-					this.$http.post('/wechat/order/pay/prepare',
-							{
-								"openId": _this.$store.state.user.openId,
-								"orderCode": _this.pay.list[0].value,
-							}
-						).then(function(e) {
-							let responseData = e.data.data,
-									weixinConfig = {
-										"appId": responseData.payment.appId,     //公众号名称，由商户传入     
-				           	"timeStamp": responseData.payment.timeStamp,         //时间戳，自1970年以来的秒数     
-				            "nonceStr": responseData.payment.nonceStr, //随机串     
-				            "package": responseData.payment.packageValue,     
-				            "signType": "MD5",         //微信签名方式：     
-				            "paySign": responseData.payment.paySign //微信签名 
-									};
-							WeixinJSBridge.invoke(
-				       'getBrandWCPayRequest', weixinConfig,
-				       function(res){
-				       		alert(res.err_msg)
-				          if(res.err_msg == "get_brand_wcpay_request:ok" ) {
-				          }
-				           // 使用以上方式判断前端返回,微信团队郑重提示：res.err_msg将在用户支付成功后返回    ok，但并不保证它绝对可靠。 
-				       })
-					});
+					this.payWeixinOrder(_this.pay.list[0].value, {name: 'orderDone', query: { type: 1 }})
+
+					// this.$http.post('/wechat/order/pay/prepare',
+					// 		{
+					// 			"openId": _this.$store.state.user.openId,
+					// 			"orderCode": _this.pay.list[0].value,
+					// 		}
+					// 	).then(function(e) {
+					// 		let responseData = e.data.data,
+					// 				weixinConfig = {
+					// 					"appId": responseData.payment.appId,     //公众号名称，由商户传入     
+				 //           	"timeStamp": responseData.payment.timeStamp,         //时间戳，自1970年以来的秒数     
+				 //            "nonceStr": responseData.payment.nonceStr, //随机串     
+				 //            "package": responseData.payment.packageValue,     
+				 //            "signType": "MD5",         //微信签名方式：     
+				 //            "paySign": responseData.payment.paySign //微信签名 
+					// 				};
+					// 		WeixinJSBridge.invoke(
+				 //       'getBrandWCPayRequest', weixinConfig,
+				 //       function(res){
+				 //       		// alert(res.err_msg)
+				 //          if(res.err_msg == "get_brand_wcpay_request:ok" ) {
+				 //          	_this.$router.push({name: 'orderDone', query: { type: 1 }});
+				 //          }
+				 //           // 使用以上方式判断前端返回,微信团队郑重提示：res.err_msg将在用户支付成功后返回    ok，但并不保证它绝对可靠。 
+				 //       })
+					// });
 				}
 	    },
 	    cancelPayOrder () {
@@ -467,15 +486,6 @@
 	}
 </script>
 
-<style>
-	/*.vux-popup-dialog {
-		z-index: 1000 !important;
-	}
-	.vux-popup-mask {
-		z-index: 501 !important;
-	}*/
-</style>
-
 <style lang="scss" scoped>
 	@import '~lib/sandal/core';
 	@import '~assets/css/core/functions', '~assets/css/core/mixins', '~assets/css/core/vars';
@@ -486,6 +496,10 @@
 		.pay-btn {
 			padding: 0 $padding;
 			margin: $padding 0;
+
+			.disabled {
+				background: $disabledPay;
+			}
 		}
 	}
 

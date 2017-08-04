@@ -3,16 +3,22 @@
  -->
 
 <template>
-	<div @click="goCart" class="cart-frame fa fa-shopping-cart">
-		<span>{{ cartNum }}</span>
+	<div v-transfer-dom>
+		<div @click="goCart" class="cart-frame fa fa-shopping-cart">
+			<span>{{ cartNum }}</span>
+		</div>
 	</div>
 </template>
 
 <script type="text/babel">
+	import { TransferDom } from 'vux'
 	import { mapState } from 'vuex'
 
 	export default {
 		name: "cartFrame",
+		directives: {
+	    TransferDom
+	  },
 		data () {
 			return {
 				title: "漂浮的购物车悬窗"
@@ -33,7 +39,7 @@
 	  },
 		mounted () {
 			// 如果还没有取过购物车信息
-			if(!this.$store.state.cart.hasAjax) this.fetchData();
+			if(!this.$store.state.cart.hasAjax && this.$store.state.user.userCode) this.fetchData();
 		},
 		methods: {
 			fetchData () {
@@ -50,6 +56,7 @@
 					});
 			},
 			goCart () {
+				if(!this.isLogin()) return false;
 				this.$router.push({name: "shopCart"});
 			}
 		}

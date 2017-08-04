@@ -20,7 +20,8 @@
 					<div :class="['block-btns', {'active': btnStatus}]" @click="showBtns">
 						<div class="show-btn fa fa-commenting-o"></div>
 						<div class="block-btns-content">
-							<div @click="btnZan" :class="['fa', {'fa-heart-o': quotationData.qulikes == 1, 'fa-heart': quotationData.qulikes == 0 }]">赞</div>
+							<div @click="btnZan" v-if="quotationData.qulikes == 1" class="fa fa-heart-o">赞</div>
+							<div @click="btnZan" v-else class="fa fa-heart">取消赞</div>
 							<div @click="btnComment(quotationData.code)" class="fa fa-commenting-o">评论</div>
 						</div>
 					</div>
@@ -35,7 +36,7 @@
 				</div>
 
 				<div class="comment-list" v-if="quotationData.comments.length > 0">
-					<div @click="btnComment(quotationData.code, commentItem.code)" class="comment-card" v-for="(commentItem, commentIndex) in quotationData.comments" :key="commentIndex">
+					<div @click="btnComment(quotationData.code, commentItem)" class="comment-card" v-for="(commentItem, commentIndex) in quotationData.comments" :key="commentIndex">
 						<div class="comment-card-header">
 							{{ commentItem.sendName }}
 							<template v-if="commentItem.receiveCode">
@@ -94,7 +95,7 @@
 						}
 					],
 					zans: ["球球", "找零", "神奇的人", "找零", "神奇的人", "找零", "神奇的人", "找零", "神奇的人"]
-				}
+				},
 			}
 		},
 		methods: {
@@ -102,6 +103,7 @@
 	      this.$refs.previewer.show(index)
 	    },
 			showBtns () {
+				if(!this.isLogin()) return false;
 				this.btnStatus = !this.btnStatus;
 			},
 			btnZan () {
@@ -141,8 +143,9 @@
 						})
 				}
 			},
-			btnComment (code, commentCode = "") {
-				this.$emit("on-comment-click", {code: code, commentCode: commentCode});
+			btnComment (code, commentInfo = "") {
+				if(!this.isLogin()) return false;
+				this.$emit("on-comment-click", {code: code, commentInfo: commentInfo});
 			}
 		}
 	}
@@ -183,6 +186,7 @@
 	
 	.block-img {
 		@extend %clearfix;
+		padding-bottom: $padding;
 
 		img {
 			float: left;
@@ -214,7 +218,7 @@
 
 	.block-btns {
 		position: absolute;
-		top: -0px;
+		top: 0;
 		right: 0;
 		width: 20px;
 		height: 30px;
@@ -240,7 +244,7 @@
 			position: absolute;
 			top: 50%;
 			right: 26px;
-			width: 120px;
+			width: 142px;
 			height: 100%;
 			line-height: 30px;
 			margin-top: -15px;
@@ -248,16 +252,14 @@
 			color: #fff;
 			border-radius: $borderRadius;
 			text-align: center;
-			
-			&.active {
-				background: red
-			}
-
+		
 			.fa {
 				float: left;
 				line-height: 30px;
 				width: 50%;
-				letter-spacing: .4em;
+				padding: 0 .4em;
+				text-align: center;
+				letter-spacing: .2em;
 			}
 		}
 	}
@@ -271,7 +273,7 @@
 
 	.zan-list {
 		position: relative;
-		padding-bottom: $padding;
+		// padding-bottom: $padding;
 
 		span {
 			line-height: 1.35;

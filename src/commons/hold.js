@@ -1,3 +1,5 @@
+// 只是关于本地缓存的处理
+
 let storage = window.localStorage;
 
 const hold = {

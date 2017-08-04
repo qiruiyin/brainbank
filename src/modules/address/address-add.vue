@@ -11,7 +11,7 @@
       <selector title="区" placeholder="请选择区县" :options="county.list" v-model="county.value"></selector>
       <x-input title="具体地址" placeholder="请输入具体地址" v-model="addressDetail"></x-input>
       <x-input title="姓名" placeholder="请输入姓名" v-model="name"></x-input>
-      <x-input title="联系电话" placeholder="请输入联系电话" type="number" v-model="tel"></x-input>
+      <x-input title="联系电话" placeholder="请输入联系电话" type="tel" v-model="tel"></x-input>
     	<div class="check">
     		<check-icon :value.sync="checkAddress">是否默认</check-icon>
     	</div>

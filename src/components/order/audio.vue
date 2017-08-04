@@ -1,9 +1,9 @@
 <!-- 
-	课程订单
+	视频音频订单
  -->
 
 <template>
-	<div class="order-course">
+	<div class="order-audio">
 		<form-preview header-label="付款金额" :header-value="money" :body-items="list"></form-preview>
 	</div>
 </template>
@@ -12,19 +12,19 @@
 	import { FormPreview } from 'vux'
 	
 	export default {
-		name: "orderCourse",
+		name: "orderAudio",
 		components: { FormPreview },
-		props: ['orderCourseData'],
+		props: ['orderAudioData'],
 		data () {
 			return {
-				value: "",
+				title: "视频音频订单",
 				money: "",
 				list: [
 					{
 		        label: '订单号',
 		        value: '电动打蛋机'
 		      },{
-		        label: '课程名称',
+		        label: '商品名称',
 		        value: '名字名字名字'
 		      },{
 		        label: '时间',
@@ -36,14 +36,13 @@
 		mounted () {
 			let _this = this;
 
-			_this.money = _this.orderCourseData.amount;
-			_this.list[0].value = _this.orderCourseData.code;
-			_this.list[1].value = _this.orderCourseData.name;
-			_this.list[2].value = _this.orderCourseData.time;
+			_this.money = _this.orderAudioData.amount;
+			_this.list[0].value = _this.orderAudioData.code;
+			_this.list[1].value = _this.orderAudioData.name;
+			_this.list[2].value = _this.orderAudioData.time;
 		}
 	}
 </script>
-
 
 <style lang="scss" scoped>
 	@import '~lib/sandal/core';

@@ -5,17 +5,20 @@
 <template>
 	<div class="user-center">
 		<header>
-			<router-link :to="{ name: kefuUrl }">我的客服</router-link>
+			<div class="header-btn" @click="checkLogin({ 'name': 'kefu' })">我的客服</div>
 			<div class="header-msg">
 				<img :src="user.img" alt="">
 				<p>{{ user.name }}<span>{{ user.course }}</span></p>
 			</div>
-			<router-link :to="{ name: 'share' }">分享有奖</router-link>
+			<div class="header-btn" @click="checkLogin({ 'name': 'share' })">分享有奖</div>
 		</header>
 
 		<main>
-			<cell v-for="item in operations" :link="{name: item.url}" :title="item.name" :key="item.value" is-link>
+			<cell v-for="item in operations" @click.native="checkLogin({name: item.url}, item.click)" :title="item.name" :key="item.value" is-link>
         <i slot="icon" :class="['fa', 'fa-' + item.icon ]"></i>
+      </cell>
+      <cell @click.native="clearStorage" :title="clearData.name" >
+        <i slot="icon" :class="['fa', 'fa-' + clearData.icon ]"></i>
       </cell>
 		</main>	
 	</div>
@@ -46,45 +49,59 @@
 						name: '修改个人资料',
 						url: 'personalEdit',
 						img: imgIcon01,
-						icon: 'address-card-o'
+						icon: 'address-card-o',
+						click: false // 不绑定是否可点击
 					},{
 						value: '',
 						name: '我的推广积分',
 						url: 'integral',
 						img: imgIcon02,
-						icon: 'diamond'
+						icon: 'diamond',
+						click: false 
 					},{
 						value: '',
 						name: '我的商城订单',
 						url: 'orderMallList',
 						img: imgIcon04,
-						icon: 'shopping-cart'
+						icon: 'shopping-cart',
+						click: false 
 					},{
 						value: '',
 						name: '我的课程订单',
 						url: 'orderCourseList',
 						img: imgIcon04,
-						icon: 'shopping-cart'
+						icon: 'shopping-cart',
+						click: false 
 					},{
 						value: '',
 						name: '我的学习',
 						url: 'orderSourceList',
 						img: imgIcon04,
-						icon: 'shopping-cart'
+						icon: 'shopping-cart',
+						click: false 
 					},{
 						value: '',
 						name: '地址管理',
 						url: 'address',
 						img: imgIcon04,
-						icon: 'bookmark-o'
+						icon: 'bookmark-o',
+						click: false 
 					},{
 						value: '',
 						name: '意见反馈',
 						url: 'feedback',
 						img: imgIcon05,
-						icon: 'info-circle'
+						icon: 'info-circle',
+						click: true
 					}
-				]
+				],
+				clearData: {
+					value: '',
+					name: '清空缓存',
+					url: '',
+					img: imgIcon05,
+					icon: 'info-circle'
+				}
 			}
 		},
 		computed: {
@@ -123,6 +140,19 @@
 		  				_this.$store.commit('updateUserLevel', {level: 1 });
 		  			}
 	  			});
+			},
+			clearStorage () {
+				window.localStorage.clear();
+				this.$router.push({name: 'index'})
+			},
+			checkLogin (url, data) {
+				if(data) {
+					this.$router.push(url); 
+				} else {
+					if(!this.isLogin()) return false
+
+					this.$router.push(url);
+				}
 			}
 		}
 	}
@@ -158,7 +188,7 @@
 			background: $colorBlue;
 		}
 
-		a {
+		.header-btn {
 			// @include halfpxline($borderRadius, #fff, 1px, 1px, 1px, 1px);
 			position: absolute;
 			top: $headerPadding;

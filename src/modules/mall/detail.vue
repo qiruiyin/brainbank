@@ -116,7 +116,7 @@
 		},
 		mounted () {
 			this.fetchData();
-			this.addRecode();
+			this.visitCount(this.$route.params.goodsCode);
 		},
 		methods: {
 			fetchData () {
@@ -170,16 +170,6 @@
 							}
 						}
 				});	
-			},
-			addRecode () {
-				let _this = this;
-				this.$http.post('/wechat/discover/addProductViewCount',
-						{
-							"code": _this.$route.params.goodsCode
-						}
-					).then(function(e) {
-
-					});
 			}
 		}
 	}

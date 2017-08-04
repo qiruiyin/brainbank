@@ -3,16 +3,20 @@
  -->
 
 <template>
-	<div class="cart cart-pay" v-transfer-dom>
-		<p>共<span>{{ orderInfo.num }}</span>件，总金额 <span><i>￥</i>{{ orderInfo.money }}</span></p>
-		<div @click="payOrder" class="pay-order">支付</div>
-	</div>	
+	<div v-transfer-dom>
+		<div class="cart cart-pay">
+			<p>共<span>{{ orderInfo.num }}</span>件，总金额 <span><i>￥</i>{{ orderInfo.money }}</span></p>
+			<div @click="payOrder" :class="['pay-order', { 'disabled': !isActive }]">支付</div>
+		</div>	
+	</div>
 </template>
 
 <script type="text/babel">
 	import { TransferDom } from 'vux'
+  import { mapState } from 'vuex'
 	
 	export default {
+		name: 'cartPay',
 		directives: {
 	    TransferDom
 	  },
@@ -27,40 +31,35 @@
 				}
 			}
 		},
+		computed: {
+      ...mapState({
+        user: state => state.user
+      }),
+      isActive () {
+      	return this.orderInfo.isActive && this.user.pay
+      }
+    },
 		methods: {
 			payOrder () {
+				console.log(2222)
 				let _this = this;
-
-				// if(_this.orderInfo.address)
-				if(_this.orderInfo.type == 2 && _this.orderInfo.address.name) {
-
-				} else {
-					this.$http.post('/wechat/order/pay/prepare',
-							{
-								"openId": _this.$store.state.user.openId,
-								"orderCode": _this.orderInfo.code,
-							}
-						).then(function(e) {
-							let responseData = e.data.data,
-									weixinConfig = {
-										"appId": responseData.payment.appId,     //公众号名称，由商户传入     
-				           	"timeStamp": responseData.payment.timeStamp,         //时间戳，自1970年以来的秒数     
-				            "nonceStr": responseData.payment.nonceStr, //随机串     
-				            "package": responseData.payment.packageValue,     
-				            "signType": "MD5",         //微信签名方式：     
-				            "paySign": responseData.payment.paySign //微信签名 
-									};
-							WeixinJSBridge.invoke(
-				       'getBrandWCPayRequest', weixinConfig,
-				       function(res){
-				       		alert(res.err_msg)
-				          if(res.err_msg == "get_brand_wcpay_request:ok" ) {
-				          	// alert("")
-				          }
-				           // 使用以上方式判断前端返回,微信团队郑重提示：res.err_msg将在用户支付成功后返回    ok，但并不保证它绝对可靠。 
-				       })
-					});
+				if(_this.isActive) {
+					if(_this.orderInfo.isActive) {
+						this.pay();
+					} else {
+						this.$vux.alert.show({
+							content: "请选择收货地址"
+						})
+					}
 				}
+			},
+			pay () {
+				let _this = this;
+				if(_this.orderInfo.type == 1) {
+					this.payWeixinOrder(_this.orderInfo.code, {name: "orderDone", query: { type: 1 }});
+      	} else {
+					this.payWeixinOrder(_this.orderInfo.code, {name: "orderDone"});
+      	}
 			}
 		}
 	}
@@ -110,6 +109,10 @@
 		.pay-order {
 			width: 100px;
 			background: $cartColorYellow;
+	
+			&.disabled {
+				background: $disabledPay;
+			}
 		}
 	}
 

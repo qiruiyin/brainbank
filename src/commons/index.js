@@ -3,6 +3,8 @@ import router from '../router'
 import store from '../store'
 import hold from './hold'
 
+import wordBook from './wordBook'
+
 import { AjaxPlugin } from 'vux'
 Vue.use(AjaxPlugin)
 
@@ -15,11 +17,47 @@ Vue.use(WechatPlugin)
 import  { ToastPlugin } from 'vux'
 Vue.use(ToastPlugin)
 
+// 获取用户信息
+Vue.prototype.getUserInfo = (userCode, openId) => {
+	hold.storage.set("openId", openId);
+	hold.storage.set("userCode", code);
+	store.commit("updateUserUserCode", { userCode: userCode });
+	store.commit("updateUserOpenId", { openId: openId });
+
+	if(code) {
+		_this.$store.commit('updateUserBangdingStatus', {bangdingStatus: true});
+	}
+
+  Vue.http.post('/wechat/discover/userinfo/get',
+			{
+				"userCode": userCode,
+				"openId": openId
+			}
+		).then(function(e) {
+			let responseData = e.data.data,
+					headerUrl;
+
+			// headerUrl = Vue.prototype.resolveImg(responseData.headerUrl) ;
+
+			// store.commit('updateUserImg', {img: headerUrl});
+			// store.commit('updateUserName', {name: responseData.name ? responseData.name : '普通用户'})
+
+			// if(responseData.userLevelMap) {
+			// 	store.commit('updateUserLevel', {level: responseData.userLevelMap.categoryLevel });
+			// 	store.commit('updateUserBtns', {btns:  Vue.prototype.wordBook.headerBtns['level' + responseData.userLevelMap.categoryLevel].btns})
+			// 	store.commit('updateUserCourse', {course: responseData.userLevelMap.categoryName})
+			// } else {
+			// 	store.commit('updateUserBtns', {btns:  Vue.prototype.wordBook.headerBtns.level1.btns})
+			// 	store.commit('updateUserCourse', {course:  Vue.prototype.wordBook.headerBtns.level1.course})
+			// 	store.commit('updateUserLevel', {level: 1 });
+			// }
+		}); 
+}
 
 // 图片链接拼接
 Vue.prototype.resolveImg =  function(img) {
-	// let imgUrl = 'http://glyh.qibeisoft.com/';
-	let imgUrl = 'http://test.yoao.com/';
+	let imgUrl = 'http://glyh.qibeisoft.com/';
+	// let imgUrl = 'http://test.yoao.com/';
 
 	// let imgUrl = 'http://192.168.1.170:8080/csm/';
 	if(!img || img.substr(0, 4) == "http") {
@@ -31,8 +69,8 @@ Vue.prototype.resolveImg =  function(img) {
 
 // 富文本图片链接地址处理
 Vue.prototype.resolveRichTextImg = function(text) {
-	// let textUrl = 'http://glyh.qibeisoft.com';
-	let textUrl = 'http://test.yoao.com';
+	let textUrl = 'http://glyh.qibeisoft.com';
+	// let textUrl = 'http://test.yoao.com';
 	if(!text) return text;
 	text = text.replace(/<img\ssrc=\"http/g, '-CC309AB4-89E6-44D2-9A7C-A8F33F40F3BB-');
 	text = text.replace(/<img\ssrc=\"/g, "<img src=\""+ textUrl);
@@ -42,9 +80,9 @@ Vue.prototype.resolveRichTextImg = function(text) {
 
 // 视频链接拼接
 Vue.prototype.resolveVideo =  function(video) {
-	// let imgUrl = 'http://glyh.qibeisoft.com/';
-	let imgUrl = 'http://test.yoao.com/';
-	// let videoUrl = 'http://192.168.1.170:8080/csm/';
+	let imgUrl = 'http://glyh.qibeisoft.com/';
+	// let imgUrl = 'http://test.yoao.com/';
+
 	if(!video) {
 		return video
 	} else {
@@ -93,36 +131,6 @@ Vue.prototype.arrContain = function(arr, obj) {
 	return status;
 }
 
-// 支付订单
-
-// Vue.prototype.payOrder = (_this) => {
-// 	_this.$http.post('/wechat/order/pay/prepare',
-// 			{
-// 				"openId": _this.$store.state.user.openId,
-// 				"orderCode": _this.pay.list[0].value,
-// 			}
-// 		).then(function(e) {
-// 			// let responseData = e.data.data,
-// 			// 		weixinConfig = {
-// 			// 			"appId": responseData.payment.appId,     //公众号名称，由商户传入     
-//    //         	"timeStamp": responseData.payment.timeStamp,         //时间戳，自1970年以来的秒数     
-//    //          "nonceStr": responseData.payment.nonceStr, //随机串     
-//    //          "package": responseData.payment.packageValue,     
-//    //          "signType": "MD5",         //微信签名方式：     
-//    //          "paySign": responseData.payment.paySign //微信签名 
-// 			// 		};
-// 			// WeixinJSBridge.invoke(
-//    //     'getBrandWCPayRequest', weixinConfig,
-//    //     function(res){
-//    //     		alert(res.err_msg)
-//    //        if(res.err_msg == "get_brand_wcpay_request:ok" ) {
-//    //        	// alert("")
-//    //        }
-//    //         // 使用以上方式判断前端返回,微信团队郑重提示：res.err_msg将在用户支付成功后返回    ok，但并不保证它绝对可靠。 
-//    //     })
-// 	});
-// }
-
 // 是否登录
 Vue.prototype.isLogin = () => {
   if(store.state.user.userCode == '') {
@@ -154,116 +162,53 @@ Vue.prototype.goBeforeLoginUrl = () => {
   }
 }
 
-// 分享到微信朋友圈
-let weChatMoments = (title, desc, promoteUrl, imgUrl) => {
-	Vue.wechat.onMenuShareTimeline({
-		title : title,
-		desc : desc,
-		link : promoteUrl,
-		imgUrl : imgUrl,
-		success : function() {},
-		cancel : function() {}
-	});
-}
-
-// 分享到微信好友
-let weChatFriend = (title, desc, promoteUrl, imgUrl) => {
-	Vue.wechat.onMenuShareAppMessage({
-		title : title,
-		desc : desc,
-		link : promoteUrl,
-		imgUrl : imgUrl,
-		success : function() {},
-		cancel : function() {}
-	});
-}
-
-// 分享到qq好友
-let tencentQFriend = (title, desc, promoteUrl, imgUrl) => {
-	Vue.wechat.onMenuShareQQ({
-		title : title,
-		desc : desc,
-		link : promoteUrl,
-		imgUrl : imgUrl,
-		success : function() {},
-		cancel : function() {}
-	});
-}
-
-// 分享到腾讯微博
-let tencentWeiBo = (title, desc, promoteUrl, imgUrl) => {
-	Vue.wechat.onMenuShareWeibo({
-		title : title,
-		desc : desc,
-		link : promoteUrl,
-		imgUrl : imgUrl,
-		success : function() {},
-		cancel : function() {}
-	});
-}
-
-
-let setShareProductUrl = (title, desc, promoteUrl, imgUrl) => {
-	// showTopMenu(true);
-	weChatMoments(title, desc, promoteUrl, imgUrl);
-	weChatFriend(title, desc, promoteUrl, imgUrl);
-	tencentQFriend(title, desc, promoteUrl, imgUrl);
-	tencentWeiBo(title, desc, promoteUrl, imgUrl);
-}
-
-let openShare = (baseUrl, title, desc, openId, imgUrl) => {
-	if(!openId || openId == null || openId == ''){
-		// toastr.error("分享码未取到,不能分享!");
-		return false;
-	}
-	//toastr.info("正在获取分享二维码,请稍后...");
-	Vue.http.post("/wechat/wx/qrcode/create",{openId:openId}).then(function(e) {
-		let qrcodePath = e.data.data.qrcodePath;
-		if(qrcodePath && qrcodePath != null && qrcodePath.length > 0){
-			// $("#share-tip").show();
-			store.commit("updateUserQrcode", { 'qrcode': baseUrl+qrcodePath + "?time=" + Date.parse(new Date())})
-			setShareProductUrl(title, desc, baseUrl+qrcodePath, baseUrl+imgUrl);
-		} else {
-			// toastr.error("二维码获取失败,请稍后再试!");
-			// Vue.vux.toast.text('二维码获取失败,请稍后再试!', 'top')
+// 商品访问统计
+Vue.prototype.visitCount = (code) => {
+	Vue.http.post('/wechat/discover/addProductViewCount',
+		{
+			"code": code
 		}
+	).then(function(e) {
+
 	});
-}
+} 
 
-
-// 微信分享
-Vue.prototype.signUrl = (url) => {
-  Vue.http.post("/wechat/wx/sign/url",{url: url}).then(function(e) {
-  	let data = e.data.data.signature;
-  	
-  	if(data.status != 0){
-			return false;
-		}
-
-		Vue.wechat.config({
-			debug : false,
-			appId : data.signature.appId,
-			timestamp : data.signature.timestamp,
-			nonceStr : data.signature.nonceStr,
-			signature : data.signature.signature,
-			jsApiList : [ 'onMenuShareTimeline', 'onMenuShareAppMessage', 'onMenuShareQQ', 'onMenuShareWeibo', 'showMenuItems', 'hideOptionMenu', 'showOptionMenu', 'hideAllNonBaseMenuItem', 'closeWindow' ]
-		});
-		Vue.wechat.ready(function() {
-			Vue.wechat.checkJsApi({
-				jsApiList : [ 'onMenuShareTimeline', 'onMenuShareAppMessage', 'onMenuShareQQ', 'onMenuShareWeibo', 'showMenuItems', 'hideOptionMenu', 'showOptionMenu', 'hideAllNonBaseMenuItem', 'closeWindow' ]
-			});
-		});
-		// showTopMenu(false);
-		
-		Vue.wechat.error(function(res) {
-			if(res.err_msg){
-				alert(res.err_msg);
+// 支付订单
+Vue.prototype.payWeixinOrder = (orderCode, url = "", orderType) => {
+	// orderType : 1 课程 2 音视频 3 奖赏 4 商城
+	Vue.http.post('/wechat/order/pay/prepare',
+			{
+				"openId": store.state.user.openId,
+				"orderCode": orderCode,
 			}
-		});
-
-		openShare("http://test.yoao.com/", "分享", "分享二维码", window.localStorage.getItem("openId"), "");
-		// openShare("http://glyh.qibeisoft.com/", "分享", "分享二维码", window.localStorage.getItem("openId"), "");
-  });
+		).then(function(e) {
+			let responseData = e.data.data,
+					weixinConfig = {
+						"appId": responseData.payment.appId,     //公众号名称，由商户传入     
+           	"timeStamp": responseData.payment.timeStamp,         //时间戳，自1970年以来的秒数     
+            "nonceStr": responseData.payment.nonceStr, //随机串     
+            "package": responseData.payment.packageValue,     
+            "signType": "MD5",         //微信签名方式：     
+            "paySign": responseData.payment.paySign //微信签名 
+					};
+			WeixinJSBridge.invoke(
+       'getBrandWCPayRequest', weixinConfig,
+       function(res){
+          if(res.err_msg == "get_brand_wcpay_request:ok" ) {
+	       		if(url != "") {
+	       			router.push(url);
+	       		} else {
+	       			router.go(0);
+	       		}
+          } else if(res.err_msg == "get_brand_wcpay_request:cancel" ) {
+	       		router.go(0);
+          } else if(res.err_msg == "get_brand_wcpay_request:fail" ) {
+          	// Vue.
+          	Vue.$vux.alert.show({
+          		content: "调取微信接口失败"
+          	})
+          } 
+           // 使用以上方式判断前端返回,微信团队郑重提示：res.err_msg将在用户支付成功后返回    ok，但并不保证它绝对可靠。 
+       })
+	});
 }
-
-

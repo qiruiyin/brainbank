@@ -12,7 +12,7 @@
 			<h5 class="title">{{ imgTextData.title }}</h5>
 			<p class="type">{{ imgTextData.type }}</p>
 			<p v-if="imgTextData.like">
-				<rater v-model="imgTextData.like.percent" :margin="0" slot="value" :max="5" :font-size="15" active-color="#04BE02"></rater>
+				<rater v-model="imgTextData.like.percent" :margin="0" slot="value" :max="5" :font-size="15" active-color="#04BE02" disabled></rater>
 				（{{ imgTextData.like.num | numToCash }}）
 			</p>
 			<p v-if="imgTextData.download || imgTextData.download == 0">下载次数：{{ imgTextData.download }}</p>
@@ -78,15 +78,26 @@
 		},
 		methods: {
 			goPage (url, params) {
+				if(this.imgTextData.pay != 0 && !this.isLogin())
+					return false;
+				
 				if(url) {
-					this.$emit('on-card-click', { url: url, params: params, status: this.isClick })
+					if(this.isClick) {
+						this.$router.push({name: url, params: params });
+					} else {
+						this.$vux.alert.show({
+						  content: '请先购买！'
+						})
+					}
 				}
 			},
 			download (val) {
-				this.$emit('on-btn-click', val, )
+				if(this.imgTextData.pay != 0 && !this.isLogin())
+					return false;
+				this.$emit('on-btn-click', val)
 			},
 			downloadFile () {
-
+				
 			}
 		}
 	}

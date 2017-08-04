@@ -136,7 +136,7 @@
 		.title {
 			font-size: 18px;
 			color: $fontColorBlack;
-		}
+		}courseList
 
 		.btn {
 			@include halfpxline($borderRadius, $borderColor, 1px, 1px, 1px, 1px);

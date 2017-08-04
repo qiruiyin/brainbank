@@ -128,6 +128,7 @@
 	      console.log('on', event)
 	    },
 	    commentClick () {
+				if(!this.isLogin()) return false;
 	    	this.commentStatus = true;
 	    },
 	    btnClick () {

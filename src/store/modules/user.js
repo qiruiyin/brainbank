@@ -11,7 +11,8 @@ export default {
     openId: '',
     btns: [],
     bangdingStatus: false,
-    qrcode: ""
+    qrcode: "",
+    pay: false // 是否可支付
   },
   mutations: {
     updateUserImg (state, payload) {
@@ -40,6 +41,9 @@ export default {
     },
     updateUserQrcode (state, payload) {
       state.qrcode = payload.qrcode
+    },
+    updateUserPay (state, payload) {
+      state.pay = payload.pay
     }
   }
 }

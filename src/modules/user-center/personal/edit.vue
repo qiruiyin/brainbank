@@ -6,10 +6,11 @@
 	<div class="personal-edit">
 		<group>
 			<template v-for="item in formDatas">
-    		<template v-if="item.key == 'phone'">
-    			<x-input :title="item.title" :placeholder="item.placeholder" v-model="item.value">
+    		<template v-if="item.key == 'phone' || item.key == 'qrcode'">
+    			<x-input v-if="item.key == 'phone'" :title="item.title" :placeholder="item.placeholder" v-model="item.value">
     				<el-verification-code :tel="item.value" slot="right"></el-verification-code>
     			</x-input>
+	    		<x-input v-else type="tel" :title="item.title" :placeholder="item.placeholder" v-model="item.value"></x-input>
     		</template>
     		<template v-else>
 	    		<x-input v-if="item.isReadonly" :title="item.title" :placeholder="item.placeholder" v-model="item.value" readonly></x-input>

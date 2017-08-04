@@ -68,6 +68,15 @@ const routes = [
 			title: '信息补充'
 		}
 	},{
+		path: '/questionnaire',
+		name: 'questionnaire',
+		component:  loadView(loaded => {
+			require(['../modules/index/questionnaire.vue'], loaded)
+		}),
+		meta: {
+			title: '问卷调查'
+		}
+	},{
 		path: '/confirm-order/:payType',
 		name: 'courseOrder',
 		component:  loadView(loaded => {
@@ -75,6 +84,15 @@ const routes = [
 		}),
 		meta: {
 			title: '大脑银行'
+		}
+	},{
+		path: '/order-done',
+		name: 'orderDone',
+		component:  loadView(loaded => {
+			require(['../modules/order/order-done.vue'], loaded)
+		}),
+		meta: {
+			title: '订单完成'
 		}
 	},{
 		path: '/pay',
@@ -298,7 +316,7 @@ const routes = [
 		path: '/order/list/course',
 		name: 'orderCourseList',
 		component:  loadView(loaded => {
-			require(['../modules/order/list.vue'], loaded)
+			require(['../modules/order/course.vue'], loaded)
 		}),
 		meta: {
 			title: '订单列表'

@@ -37,7 +37,7 @@
 					</a>
 				</div>
 			</div>
-			
+
 			<el-mall-card :mall-card-data="item" v-for="(item, index) in tuijianList" :key="index"></el-mall-card>
 			
 			<el-cart-frame></el-cart-frame>
@@ -71,7 +71,12 @@
       	value: 'test',
       	tuijianImgLeft: {},
       	tuijianImgRight: {},
-      	tuijianList: []
+      	tuijianList: [{
+      		desc: "",
+  				type: "",
+  				title: "",
+  				list: []
+      	}]
 			}
 		},
 		mounted ()  {

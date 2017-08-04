@@ -126,10 +126,8 @@
 			}
 		},
 		mounted () {
-			let _this = this;
-	  	// this.signUrl(location.href);
 			this.fetchData();
-			this.addRecode();
+			this.visitCount(this.$route.params.code);
 		},
 		methods: {
 			fetchData () {
@@ -161,7 +159,7 @@
 								id: item.id,
 								title: item.name,
 								type: item.DESCRIPTION,
-								pay: item.price,
+								pay: item.PRICE,
 								like: {
 									num: item.commentAmount,
 									percent: item.rank | 3.2
@@ -176,16 +174,6 @@
 						_this.relateData = relateData;
 					}
 				);
-			},
-			addRecode () {
-				let _this = this;
-				this.$http.post('/wechat/discover/addProductViewCount',
-						{
-							"code": _this.$route.params.code
-						}
-					).then(function(e) {
-
-					});
 			},
 			playBtnClick () {
 				if(this.playBtn.status) {

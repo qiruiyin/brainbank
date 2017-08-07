@@ -36,66 +36,16 @@
       })
     },
     mounted () {
-      let userCode = this.$store.state.user.userCode,
+      let userCode = this.$store.state.user.userCode || hold.storage.get("userCode"),
           storageOpenId = hold.storage.get("openId"),
           storeOpenId = this.$store.state.user.openId,
           openId = storageOpenId || storeOpenId;
 
-      if(userCode && userCode != "undefined" && userCode != "") {
-        this.fetchData(hold.storage.get("openId"), userCode);
-      } else if(openId && openId != "undefined" && openId != "") {
+      if(userCode && userCode != 'undefined' && userCode != '') {
+        this.getUserInfo(openId, userCode);
+      } else if(openId && openId != 'undefined' && openId != '') {
         this.getUserCode(openId);
       }
-    },
-    methods: {
-      getUserCode (openId) {
-        let _this = this;
-
-        _this.$http.post('/wechat/discover/usercode/get',
-            {
-              "openId": openId
-            }
-          ).then(function(e) {
-            _this.fetchData(openId, e.data.data.userCode);
-        });
-      },
-      fetchData (openId, code) {
-        let _this = this;
-
-        hold.storage.set("openId", openId);
-        hold.storage.set("userCode", code);
-        _this.$store.commit("updateUserUserCode", { userCode: code });
-        _this.$store.commit("updateUserOpenId", { openId: openId });
-
-        if(code) {
-          _this.$store.commit('updateUserBangdingStatus', {bangdingStatus: true});
-        }
-
-        _this.$http.post('/wechat/discover/userinfo/get',
-            {
-              "userCode": code,
-              "openId": openId
-            }
-          ).then(function(e) {
-            let responseData = e.data.data,
-                headerUrl;
-
-            headerUrl = _this.resolveImg(responseData.headerUrl) ;
-
-            _this.$store.commit('updateUserImg', {img: headerUrl});
-            _this.$store.commit('updateUserName', {name: responseData.name ? responseData.name : '普通学员'})
-
-            if(responseData.userLevelMap) {
-              _this.$store.commit('updateUserLevel', {level: responseData.userLevelMap.categoryLevel });
-              _this.$store.commit('updateUserBtns', {btns: _this.wordBook.headerBtns['level' + responseData.userLevelMap.categoryLevel].btns})
-              _this.$store.commit('updateUserCourse', {course: responseData.userLevelMap.categoryName})
-            } else {
-              _this.$store.commit('updateUserBtns', {btns: _this.wordBook.headerBtns.level1.btns})
-              _this.$store.commit('updateUserCourse', {course: _this.wordBook.headerBtns.level1.course})
-              _this.$store.commit('updateUserLevel', {level: 1 });
-            }
-          });
-      },
     }
   }
 </script>

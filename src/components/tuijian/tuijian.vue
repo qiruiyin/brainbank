@@ -5,7 +5,7 @@
 <template>
 	<div class="tuijian">
 		<div class="tuijian-left">
-			<div :class="{'active': tuijianStatus == index}"  v-for="(item, index) in tuijianData" :key="index">
+			<div :class="{ 'tuijian-img': item.src, 'active': tuijianStatus == index }"  v-for="(item, index) in tuijianData" :key="index">
 				<div v-if="item.src" @click="goPage('courseTypeDetail', { type: 'audio', code: item.code})" >{{ item.name }}</div>
 				<div v-else @click="goPage('quotation')" >{{ item.name }}</div>
 			</div>
@@ -58,6 +58,8 @@
 	@import '~lib/sandal/core';
 	@import '~assets/css/core/functions', '~assets/css/core/mixins', '~assets/css/core/vars';
 	
+	$tuijianImg: 30px;
+
 	.tuijian {
 		padding: $padding;
 		@include halfpxline(0, $borderColor, 0 , 0, 1px, 0);
@@ -66,7 +68,7 @@
 	
 	.tuijian-left {
 		flex: 1;
-		line-height: 2;
+		line-height: $tuijianImg;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -74,26 +76,31 @@
 		& > div {
 			position: relative;
 			width: 100%;
-			padding-left: 20px;
+			padding-left: $tuijianImg;
 			
 			&:before {
 				content: "";
 				position: absolute;
-				top: 50%;
+				top: 0;
 				left: 0;
-				width: 0;
-    		height: 0;
-    		margin-top: -5px;
-    		border-bottom: 10px solid $borderColor;
-    		border-left: 10px solid transparent;
-    		transform: rotate(-45deg);
+				width: $tuijianImg;
+    		height: $tuijianImg;
+    		background: url("~assets/img/index/tuijian-quotation.png") no-repeat;
+    		background-size: 80%;
+    		background-position: left center;
+			}
+
+			&.tuijian-img {
+				&:before {
+    			background-image: url("~assets/img/index/tuijian.png");
+				}
 			}
 
 			&.active {
 				color: red;
 
 				&:before {
-					border-bottom-color: red;
+    			background-image: url("~assets/img/index/tuijian-active.png");
 				}
 			}
 

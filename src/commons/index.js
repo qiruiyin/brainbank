@@ -17,15 +17,26 @@ Vue.use(WechatPlugin)
 import  { ToastPlugin } from 'vux'
 Vue.use(ToastPlugin)
 
+// 获取userCode
+Vue.prototype.getUserCode = (openId,url = "") => {
+	Vue.http.post('/wechat/discover/usercode/get',
+			{
+				"openId": openId
+			}
+		).then(function(e) {
+			Vue.prototype.getUserInfo(openId, e.data.data.userCode, url);
+	});
+};
+
 // 获取用户信息
-Vue.prototype.getUserInfo = (userCode, openId) => {
+Vue.prototype.getUserInfo = (openId, userCode = "", url = "") => {
 	hold.storage.set("openId", openId);
-	hold.storage.set("userCode", code);
+	hold.storage.set("userCode", userCode);
 	store.commit("updateUserUserCode", { userCode: userCode });
 	store.commit("updateUserOpenId", { openId: openId });
 
-	if(code) {
-		_this.$store.commit('updateUserBangdingStatus', {bangdingStatus: true});
+	if(userCode) {
+		store.commit('updateUserBangdingStatus', {bangdingStatus: true});
 	}
 
   Vue.http.post('/wechat/discover/userinfo/get',
@@ -37,20 +48,24 @@ Vue.prototype.getUserInfo = (userCode, openId) => {
 			let responseData = e.data.data,
 					headerUrl;
 
-			// headerUrl = Vue.prototype.resolveImg(responseData.headerUrl) ;
+			headerUrl = Vue.prototype.resolveImg(responseData.headerUrl) ;
 
-			// store.commit('updateUserImg', {img: headerUrl});
-			// store.commit('updateUserName', {name: responseData.name ? responseData.name : '普通用户'})
+			store.commit('updateUserImg', {img: headerUrl});
+			store.commit('updateUserName', {name: responseData.name ? responseData.name : '普通用户'})
 
-			// if(responseData.userLevelMap) {
-			// 	store.commit('updateUserLevel', {level: responseData.userLevelMap.categoryLevel });
-			// 	store.commit('updateUserBtns', {btns:  Vue.prototype.wordBook.headerBtns['level' + responseData.userLevelMap.categoryLevel].btns})
-			// 	store.commit('updateUserCourse', {course: responseData.userLevelMap.categoryName})
-			// } else {
-			// 	store.commit('updateUserBtns', {btns:  Vue.prototype.wordBook.headerBtns.level1.btns})
-			// 	store.commit('updateUserCourse', {course:  Vue.prototype.wordBook.headerBtns.level1.course})
-			// 	store.commit('updateUserLevel', {level: 1 });
-			// }
+			if(responseData.userLevelMap) {
+				store.commit('updateUserLevel', {level: responseData.userLevelMap.categoryLevel });
+				store.commit('updateUserBtns', {btns:  Vue.prototype.wordBook.headerBtns['level' + responseData.userLevelMap.categoryLevel].btns})
+				store.commit('updateUserCourse', {course: responseData.userLevelMap.categoryName})
+			} else {
+				store.commit('updateUserBtns', {btns:  Vue.prototype.wordBook.headerBtns.level1.btns})
+				store.commit('updateUserCourse', {course:  Vue.prototype.wordBook.headerBtns.level1.course})
+				store.commit('updateUserLevel', {level: 1 });
+			}
+
+			if(url) {
+				router.push(url);
+			}
 		}); 
 }
 

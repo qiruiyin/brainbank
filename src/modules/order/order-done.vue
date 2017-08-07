@@ -27,37 +27,10 @@
 		},
 		mounted () {
 			if(this.isCourse) {
-				this.fetchData();
+				this.getUserInfo(this.$store.state.user.openId, this.$store.state.user.userCode);
 			}
 		},
 		methods: {
-			fetchData () {
-				let _this = this;
-				_this.$http.post('/wechat/discover/userinfo/get',
-            {
-              "userCode": _this.$store.state.user.userCode,
-              "openId": _this.$store.state.user.openId
-            }
-          ).then(function(e) {
-            let responseData = e.data.data,
-                headerUrl;
-
-            headerUrl = _this.resolveImg(responseData.headerUrl) ;
-
-            _this.$store.commit('updateUserImg', {img: headerUrl});
-            _this.$store.commit('updateUserName', {name: responseData.name ? responseData.name : '普通学员'})
-
-            if(responseData.userLevelMap) {
-              _this.$store.commit('updateUserLevel', {level: responseData.userLevelMap.categoryLevel });
-              _this.$store.commit('updateUserBtns', {btns: _this.wordBook.headerBtns['level' + responseData.userLevelMap.categoryLevel].btns})
-              _this.$store.commit('updateUserCourse', {course: responseData.userLevelMap.categoryName})
-            } else {
-              _this.$store.commit('updateUserBtns', {btns: _this.wordBook.headerBtns.level1.btns})
-              _this.$store.commit('updateUserCourse', {course: _this.wordBook.headerBtns.level1.course})
-              _this.$store.commit('updateUserLevel', {level: 1 });
-            }
-          });
-			},
 			goPage (url) {
 				this.$router.push({name: url});
 			}

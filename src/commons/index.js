@@ -46,22 +46,11 @@ Vue.prototype.getUserInfo = (openId, userCode = "", url = "") => {
 			}
 		).then(function(e) {
 			let responseData = e.data.data,
-					headerUrl;
-
-			headerUrl = Vue.prototype.resolveImg(responseData.headerUrl) ;
+					headerUrl = Vue.prototype.resolveImg(responseData.headerUrl);
 
 			store.commit('updateUserImg', {img: headerUrl});
-			store.commit('updateUserName', {name: responseData.name ? responseData.name : '普通用户'})
-
-			if(responseData.userLevelMap) {
-				store.commit('updateUserLevel', {level: responseData.userLevelMap.categoryLevel });
-				store.commit('updateUserBtns', {btns:  Vue.prototype.wordBook.headerBtns['level' + responseData.userLevelMap.categoryLevel].btns})
-				store.commit('updateUserCourse', {course: responseData.userLevelMap.categoryName})
-			} else {
-				store.commit('updateUserBtns', {btns:  Vue.prototype.wordBook.headerBtns.level1.btns})
-				store.commit('updateUserCourse', {course:  Vue.prototype.wordBook.headerBtns.level1.course})
-				store.commit('updateUserLevel', {level: 1 });
-			}
+			store.commit('updateUserName', {name: responseData.name})
+			store.commit('updateUserCourse', {course: responseData.levelName})
 
 			if(url) {
 				router.push(url);
@@ -74,7 +63,6 @@ Vue.prototype.resolveImg =  function(img) {
 	let imgUrl = 'http://glyh.qibeisoft.com/';
 	// let imgUrl = 'http://test.yoao.com/';
 
-	// let imgUrl = 'http://192.168.1.170:8080/csm/';
 	if(!img || img.substr(0, 4) == "http") {
 		return img
 	} else {

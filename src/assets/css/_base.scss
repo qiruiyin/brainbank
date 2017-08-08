@@ -1,6 +1,6 @@
 @import '~lib/sandal/core';
 @import '~assets/css/core/functions', '~assets/css/core/mixins', '~assets/css/core/vars';
-
+@import '~assets/css/vux/index';
 @import '~assets/fonts/css/font-awesome.min.css';
 
 *, *:before, *:after {
@@ -16,7 +16,6 @@ html, body {
 	height: 100%;
 	margin: 0 auto;
 	background-color: #eee;
-
 }
 
 body {
@@ -40,6 +39,7 @@ a {
 ul, li {
 	list-style: none;
 	margin: 0 auto;
+  padding: 0;
 }
 
 img {

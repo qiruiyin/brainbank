@@ -20,27 +20,34 @@ $borderRadius: 6px;
 $inputH: 44px;
 
 // 基础字体大小
-$fontSize: 14px;
+$fontSize: 12px;
 
 // 颜色
+// 新设计
 $colorBlue: #016aca;
 $colorOrange: #ff8501;
-
-$colorRed: red;
-$colorYellow: #fe6e12;
-$colorGreen: #09BB07;
-$colorBlue: #0065bd;
+// $colorYellow: #fe6e12;
+$colorYellow: #f2c138;
+// $colorGreen: #09BB07;
+$colorGreen: #13ce66;
+$colorGray: #ccc;
 
 $fontColorBlack: #333;
 $fontColor: #666;
-$fontColorGray: #999;
+$fontColorGray: #888;
+// end
+
+$colorRed: red;
+$colorBlue: #0065bd;
+
 $fontColorBlue: #0065bd;
-$borderColor: #ddd;
+$borderColor: #eee;
+// $borderColor: #ddd;
 
 $bgGray: #f1f1f1;
+
 // 推荐组件
 $tuijianImgW: 60px;
-
 
 //购物车模块
 $cartH: 50px;
@@ -48,36 +55,3 @@ $cartColorYellow: #FF9500;
 $cartColorRed: #DD2727;
 
 $disabledPay: rgba(0, 0, 0, .2);
-
-
-
-// 其他项目
-
-// // 页面大小
-// // 最大大小
-// $maxW: 414px;
-// $inputH: 44px;
-// $loadmoreH: $inputH;
-// // 最小大小
-// $minW: 320px;
-
-// // 页面左右间距
-// $padding: 20px;
-
-// // 上下间距
-// $marginBottom: 20px;
-
-// // 网页背景色
-// $bg: #eee;
-
-// // 字体大小
-// // 基础字体大小
-// $font: 16px;
-// // 标题大小
-// $fontTitle: 20px;
-
-// // 颜色
-// $fontColorBlack: #333;
-// $fontColorGray: #666;
-// $fontColorTips: #999;
-// $borderColor: #ddd;

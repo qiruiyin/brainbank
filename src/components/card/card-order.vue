@@ -55,7 +55,7 @@
 				<!-- 支付状态 -->
 				<template v-if="item.paymentType == 1">
 					<!-- 快递状态 -->
-					<template v-if="item.expressType == 1">
+					<template v-if="item.expressType == 1 || item.expressType == 0">
 						<x-button class="btn" type="primary" @click.native="payment(item.code)" mini>确认收货</x-button>
 					</template>
 
@@ -75,7 +75,7 @@
 
 				<template v-else>
 					<x-button class="btn" type="primary" @click.native="payment(item.code)" mini>立即支付</x-button>
-					<x-button class="btn" type="warn" @click.native="deleteOrder(item.code, index)" mini>删除</x-button>
+					<x-button class="btn" type="warn" @click.native="deleteOrder(item.code, index)" mini>取消</x-button>
 				</template>
 				
 			</div>

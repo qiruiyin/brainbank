@@ -97,7 +97,8 @@
 			}
 
 			&.active {
-				color: red;
+				color: $colorOrange;
+				transition: 1s;
 
 				&:before {
     			background-image: url("~assets/img/index/tuijian-active.png");
@@ -116,7 +117,8 @@
 		width: $tuijianImgW + 10px;
 		text-align: center;
 		line-height: 30px;
-
+		color: $colorOrange;
+		
 		img {
 			width: $tuijianImgW;
 			height: $tuijianImgW;

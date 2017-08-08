@@ -12,7 +12,8 @@
 			<div v-if="imgTextData.date" class="date">{{ imgTextData.date }}</div>
 		</div>
 		<div class="text">
-			<h5 class="title">{{ imgTextData.title }}
+			<h5 class="title">
+				<p>{{ imgTextData.title }}</p>
 				<span>￥{{ imgTextData.price }}</span>	
 				<!-- <span>{{ imgTextData.priceCurrency }}{{ imgTextData.price }}/{{ imgTextData.priceUnit }}</span>	 -->
 			</h5>

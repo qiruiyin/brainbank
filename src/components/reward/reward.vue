@@ -7,28 +7,22 @@
 		<div @click="btnClick" class="reward-btn">打赏</div>
 		<div v-transfer-dom>
 	    <popup v-model="reward.status" position="bottom" :hide-on-blur=false>
-	      <group>
+	      <checker class="check"
+		    	v-model="reward.value"
+		    	default-item-class="check-item"
+		    	selected-item-class="check-item-selected"
+		    >
+		      <checker-item v-for="(item, index) in reward.list" :key="index" :value="item">￥{{ item }}</checker-item>
+		    </checker>
+	      <!-- <group>
 	      	<selector title="打赏金额" :options="reward.list" v-model="reward.value"></selector>
-	      </group>
+	      </group> -->
 	      <div class="btns">
 	        <x-button @click.native="btnSubmit" type="primary">确定</x-button>
 	        <x-button @click.native="btnCancel('reward')" type="default">取消</x-button>
 	      </div>
 	    </popup>
 	 	</div>
-<!-- 
-		<div v-transfer-dom>
-			<popup v-model="pay.status" position="bottom" :hide-on-blur=false>
-				<div class="pay">
-					<form-preview header-label="赞赏金额" :header-value="pay.allPrice" :body-items="pay.list"></form-preview>	
-	      	
-	      	<div class="btns">
-						<x-button type="primary" :class="{'disabled': !user.pay}" @click.native="payReward">支付</x-button>
-	        	<x-button @click.native="btnCancel('pay')" type="default">取消</x-button>
-	      	</div>
-	    	</div>
-			</popup>
-	  </div>-->
 	</div> 
 	
 </template>
@@ -36,7 +30,7 @@
 <script type="text/babel">
 	import hold from 'src/commons/hold'
   import { mapState } from 'vuex'
-	import { TransferDom, Popup, Group, XInput, XButton, FormPreview, Selector} from 'vux'
+	import { TransferDom, Popup, Group, XInput, XButton, FormPreview, Selector, Checker, CheckerItem } from 'vux'
 
 	export default {
 		name: "reward",
@@ -44,7 +38,7 @@
 	    TransferDom
 	  },
 		components: {
-			Popup, Group, XInput, XButton, FormPreview, Selector
+			Popup, Group, XInput, XButton, FormPreview, Selector, Checker, CheckerItem
 		},
 		props: ['rewardData'],
 		data () {
@@ -52,29 +46,8 @@
 				title: "打赏",
 				reward: {
 					status: false,
-					value: "",
-					list: [
-						{
-							key: 5,
-							value: '5'
-						},
-						{
-							key: 10,
-							value: '10'
-						},
-						{
-							key: 20,
-							value: '20'
-						},
-						{
-							key: 50,
-							value: '50'
-						},
-						{
-							key: 100,
-							value: '100'
-						},
-					]
+					value: 5,
+					list: [ 5, 10, 20, 30, 50, 100 ],
 				},
 				pay: {
 					status: false,
@@ -103,6 +76,13 @@
 			btnSubmit () {
 				let _this = this;
 
+				if(!_this.reward.value) {
+					this.$vux.alert.show({
+						content: "请选择金额"
+					})
+					return false;
+				}
+
 				this.$http.post('/wechat/orderSpare/create',
 						{
 							"openId": _this.$store.state.user.openId,
@@ -119,10 +99,6 @@
 						} else {
 							_this.pay.status = true;
 							_this.payReward(responseData.data.orderCode)
-							// _this.reward.status = false;
-							// _this.pay.allPrice = responseData.data.money;
-							// _this.pay.list[0].value = responseData.data.orderCode;
-							// _this.pay.list[1].value = _this.rewardData.name;
 						}
 					})
 			},
@@ -176,18 +152,42 @@
 <style lang="scss" scoped>
 	@import '~lib/sandal/core';
   @import '~assets/css/core/functions', '~assets/css/core/mixins', '~assets/css/core/vars';
+	
+	.check {
+		padding: $padding 0;
+		text-align: center;
+	}
+
+	// check
+	.check-item {
+	  width: 25%;
+	  height: 40px;
+	  margin: $padding;
+	  line-height: 40px;
+	  text-align: center;
+	  border-radius: 3px;
+	  border: 1px solid #ccc;
+	  background-color: #fff;
+	  // margin: $padding;
+	}
+	.check-item-selected {
+	  background: #ffffff url(~assets/img/icon/active.png) no-repeat right bottom;
+	  border-color: #ff4a00;
+	}
 
 	.reward-btn {
 		width: 5em;
 		margin: 0  auto;
 		margin-top: $padding;
 		line-height: $inputH;
-		background: $colorRed;
+		background: $colorOrange;
 		color: #fff;
 		font-size: 20px;
 		letter-spacing: .5em;
 		text-indent: .5em;
+		border-radius: $borderRadius;
 	}
+
 	.btns {
 		padding: $padding;
 

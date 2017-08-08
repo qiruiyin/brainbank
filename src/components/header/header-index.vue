@@ -12,7 +12,7 @@
 				</p>
 			</div>
 			<div class="link">
-				<div class="btn" @click="goPage(item.link)" v-for="item in user.btns" :key="item.value">{{ item.name }}</div>
+				<div class="btn" @click="goPage(btns.link)">{{ btns.name }}</div>
 			</div>
 		</header>
 	</sticky>
@@ -33,17 +33,11 @@
 				img: '',
 				name: "",
 				course: "",
-				btns: [
-					// {
-					// 	value: 'retrain',
-					// 	name: "复训",
-					// 	link: 'retrain'
-					// },{
-					// 	value: 'upgrade',
-					// 	name: "升级",
-					// 	link: 'upgrade'
-					// }
-				]
+				btns: {
+					value: 'enlist',
+					name: "我要报名",
+					link: 'course'
+				}
 			}
 		},
 	  computed: {
@@ -56,15 +50,7 @@
 				let _this = this;
 				if(!this.isLogin()) return false;
 
-				if (link == "enlist") {
-					_this.$router.push({ name: 'courseOrder', params: { payType: 'enlist' }})
-				} else if (link == "retrain") {
-					_this.$router.push({ name: 'intro', params: { introType: "retrain" }})
-				} else if (link == "upgrade") {
-					_this.$router.push({ name: 'intro', params: { introType: "upgrade" }})
-				} else {
-					_this.$router.push({ name: 'courseOrder', params: { payType: 'retrain' } })
-				}
+				this.$router.push({ name: link, query: { type: 1 }});
 			}
 		}
 	}

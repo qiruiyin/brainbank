@@ -70,3 +70,17 @@ $ie6-7: false;
     box-sizing: border-box;
   }
 }
+
+// 省略号
+@mixin ellipsisOne () {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@mixin ellipsisMore ($num: 3) {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: $num;
+  overflow: hidden;
+}

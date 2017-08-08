@@ -44,14 +44,14 @@
 					// 	expressStatus: 0,
 					// 	pageSize: 1,
 					// 	list: []
-					},{
-						value: 'delivered',
-						name: '已发货',
-						status: 'delivered',
-						paymentStatus: "1",
-						expressStatus: "1",
-						pageSize: 1,
-						list: []
+					// },{
+					// 	value: 'delivered',
+					// 	name: '已发货',
+					// 	status: 'delivered',
+					// 	paymentStatus: "1",
+					// 	expressStatus: "1",
+					// 	pageSize: 1,
+					// 	list: []
 					},{
 						value: 'unreceive',
 						name: '待收货',
@@ -62,7 +62,7 @@
 						list: []
 					},{
 						value: 'receive',
-						name: '已收货',
+						name: '待评价',
 						status: 'receive',
 						paymentStatus: "1",
 						expressStatus: "2",

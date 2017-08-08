@@ -14,11 +14,7 @@
 		    <swiper v-model="tabSelected" height="100%" :show-dots="false">
 		      <swiper-item v-for="(tabItem, ind) in tabData" :key="ind">
 		    		<template v-if="tabItem.value == 'recent'">
-							<timeline>
-								<timeline-item v-for="(item, index) in courseList" :key="index">
-									<p @click="goPage(item.code, '1')">{{ item.name }}</p>
-								</timeline-item>
-							</timeline>
+							<el-course-recent :course-list-data="courseList"></el-course-recent>
 		    		</template>
 
 		    		<template v-if="tabItem.value == 'all'">
@@ -48,13 +44,11 @@
 	import elHeaderIndex from 'components/header/header-index'
 	import elCard from 'components/card/card'
 	import elImgText from 'components/img-text/img-text'
-
-	import imgBanner from 'assets/img/course/banner.png'
-	import imgHeader from 'assets/img/icon/icon.png'
+	import elCourseRecent from 'components/course/recent'
 
 	export default {
 		name: 'courseTypeDetail',
-		components: { XTable, Card, Timeline, TimelineItem, Tab, TabItem, Swiper, SwiperItem, elHeaderIndex, elCard, elImgText },
+		components: { XTable, Card, Timeline, TimelineItem, Tab, TabItem, Swiper, SwiperItem, elHeaderIndex, elCard, elImgText, elCourseRecent },
 		data () {
 			return {
 				title: '课程列表',
@@ -69,7 +63,7 @@
 						list: []
 					}
 				],
-				tabSelected: 0,
+				tabSelected: this.$route.query.type == 1 ? 1 : 0,
 				courseTitle: [ '日期', '课程', '讲师', '时间', '地点' ],
 				courseList: [],
 				banner: [],
@@ -84,10 +78,41 @@
 	  		// 获取所有数据
 	  		let _this = this;
 	  		_this.$http.post('/wechat/course/index',{
-	  			// ""	
+	  			"customerCode": _this.$store.state.user.userCode	
 	  		}).then(function(e) {
 					let responseData = e.data.data;
-	  			_this.courseList = responseData.lessonList;
+	  			_this.courseList = responseData.lessonList.map(function(item, index){
+	  				let btn = {
+	  					name: "报名",
+  						link: "courseOrder",
+	  					type: "enlist",
+	  					value: "enlist"
+	  				};
+
+	  				if(item.customerLessonType == 1) {
+	  					btn = {
+	  						name: "已报名",
+	  						link: "",
+	  						type: "",
+	  						value: "disabled"
+	  					}
+	  				} else if (item.customerLessonType == 2) {
+	  					btn = {
+	  						name: "复训",
+  							link: "courseOrder",
+		  					type: "retain",
+	  						value: "retain"
+	  					}
+	  				}
+
+	  				return {
+	  					lessonType: item.lessonType,
+	  					code: item.code,
+	  					name: item.name,
+	  					balance_count: item.balance_count,
+	  					btn: btn
+	  				}
+	  			});
 	  			_this.banner = responseData.adLessonList.map(function(item, index){
 	  				return {
 	  					img: _this.resolveImg(item.ad_code),
@@ -160,6 +185,7 @@
 	.banner {
   	margin-bottom: $padding;
 	}
+	
 	
 
 </style>

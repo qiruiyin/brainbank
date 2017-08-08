@@ -51,8 +51,8 @@ Vue.http.defaults.headers.post['Content-Type'] = 'application/raw';           //
 // window.localStorage.setItem("userCode", "20170719115339110483535886346825");
 
 // 马一鸣
-// window.localStorage.setItem("openId", "oOVVesw9m3Q8SQbYebfQ05u53BqE");
-// window.localStorage.setItem("userCode", "20170721160758734671595511675408");
+window.localStorage.setItem("openId", "oOVVesw9m3Q8SQbYebfQ05u53BqE");
+window.localStorage.setItem("userCode", "20170721160758734671595511675408");
 
 // ceshi
 // window.localStorage.setItem("openId", "oOVVes2x6v6Iv4wHuDv6dUwvfNTM");

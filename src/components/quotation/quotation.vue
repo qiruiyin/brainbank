@@ -20,8 +20,8 @@
 					<div :class="['block-btns', {'active': btnStatus}]" @click="showBtns">
 						<div class="show-btn fa fa-commenting-o"></div>
 						<div class="block-btns-content">
-							<div @click="btnZan" v-if="quotationData.qulikes == 1" class="fa fa-heart-o">赞</div>
-							<div @click="btnZan" v-else class="fa fa-heart">取消赞</div>
+							<div @click="btnZan" v-if="quotationData.qulikes != 1" class="fa fa-heart-o">赞</div>
+							<div @click="btnZan" v-else class="fa fa-heart">取消</div>
 							<div @click="btnComment(quotationData.code)" class="fa fa-commenting-o">评论</div>
 						</div>
 					</div>
@@ -161,9 +161,9 @@
 	}
 
 	.user-img {
-		width: 60px;
-		height: 60px;
-		border-radius: 60px;
+		width: 40px;
+		height: 40px;
+		border-radius: 40px;
 	}
 
 	.block {

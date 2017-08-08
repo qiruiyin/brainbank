@@ -249,30 +249,12 @@
 
 	.play {
 		position: relative;
-		width: $tuijianImgW;
-    // overflow: hidden;
+		// width: $tuijianImgW;
 
     .play-audio {
     	position: absolute;
     	opacity: 0;
     }
-
-		.play-prev, .play-next {
-			position: absolute;
-			top: ($playImgW - $playBtnW);
-			left: 50%;
-			width: $playBtnW;
-			height: $playBtnW;
-			margin-left: - ($playBtnW + 10px);
-			background: url("~assets/img/index/play-prev.png") no-repeat;
-			background-size: 100%;
-			z-index: 2;
-		}
-
-		.play-next {
-			margin-left: 10px;
-			background-image: url("~assets/img/index/play-next.png");
-		}
 		
 		.play-img {
 			position: relative;
@@ -285,7 +267,7 @@
 
 			&.active {
 				background-image: url("~assets/img/index/play.png");
-				// animation: rotate 1s linear infinite;
+				// animation: rotate 2s linear infinite;
 			}
 		}
 
@@ -319,7 +301,6 @@
 	.course-others {
 		@extend %clearfix;
 		padding: $padding;
-		// display: flex;
 
 		a {
 			float: left;

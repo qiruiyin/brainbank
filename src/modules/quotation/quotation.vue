@@ -7,21 +7,17 @@
 		<el-headerIndex></el-headerIndex>
 		
 		<div class="container">
-			<!-- <section class="quotation-list" > -->
 			<el-quotation @on-comment-click="commetClick" :quotation-data="item" v-for="(item, index) in quotationData" :key="index"></el-quotation>
-			<!-- </section> -->
 		</div>
 
 		<div v-transfer-dom>
-			<popup v-model="commentShow" position="bottom">
+			<popup class="quotation-send" v-model="commentShow" position="bottom">
 	      <group label-width="4em" label-margin-right="2em" label-align="right">
-		      <x-input placeholder="评论" v-model="commentValue"></x-input>
+		      <x-input placeholder="评论" v-model="commentValue">
+		      	<x-button v-if="sendBtn.status" @click.native="submitComment" type="primary" class="send" slot="right" mini>{{ sendBtn.sendStatus ? '发送中' : '发送' }}</x-button>
+		      	<x-button v-else type="primary" class="send" slot="right" mini disabled>{{ sendBtn.sendStatus ? '发送中' : '发送' }}</x-button>
+		      </x-input>
 		    </group>
-				
-				<div class="btns">
-					<x-button type="primary" @click.native="submitComment">确定</x-button>
-					<x-button @click.native="cancelComment">取消</x-button>
-				</div>
 	    </popup>
 	   </div>
 	</div>
@@ -43,38 +39,42 @@
 				count: this.wordBook.pageCount,
 				quotationData: [
 					{
-						title: '苏引华',
-						content: '以帮助学员实现梦想，突破发展瓶颈为己任，直指核心？',
+						title: '',
+						content: '',
 						img: [],
-						time: '4小时前',
+						time: '',
 						qulikes: 0,
 						comments: [
 							{
-								receiveCode: "qeqw",
-								receiveName: "赵龙",
-								sendCode: "111",
-								sendName: "张飞",
-								content: "汉武帝偶尔玩哈佛我佛好好玩覅偶和服务我购房户我哦和我"
-							},{
-								receiveCode: "qeqw",
-								receiveName: "赵龙",
-								sendCode: "111",
-								sendName: "张飞",
-								content: "汉武帝偶尔玩哈佛我佛好好玩覅偶和服务我购房户我哦和我"
-							},{
-								receiveCode: "qeqw",
-								receiveName: "赵龙",
-								sendCode: "111",
-								sendName: "张飞",
-								content: "汉武帝偶尔玩哈佛我佛好好玩覅偶和服务我购房户我哦和我"
+								receiveCode: "",
+								receiveName: "",
+								sendCode: "",
+								sendName: "",
+								content: ""
 							}
 						],
-						zans: ["球球", "找零", "神奇的人", "找零", "神奇的人", "找零", "神奇的人", "找零", "神奇的人"]
+						zans: []
 					}
 				],
 				commentShow: false,
 				commentValue: "",
-				commentCurrentClick: ""
+				commentCurrentClick: "",
+				sendBtn: {
+					status: false,
+					value: "default",
+					sendStatus: false // 是否在调用接口
+				}
+			}
+		},
+		watch: {
+			commentValue (newValue, oldValue) {
+				if(newValue == "") {
+					this.sendBtn.status = false;
+					this.sendBtn.value = 'default';
+				} else {
+					this.sendBtn.status = true;
+					this.sendBtn.value = 'primary';
+				}
 			}
 		},
 		mounted () {
@@ -125,26 +125,35 @@
 			},
 			submitComment () {
 				let _this = this;
+				if(!_this.sendBtn.status) return false;
+				if(_this.sendBtn.sendStatus) return false;
+				_this.sendBtn.sendStatus = true;
+
+				console.log(_this.commentCurrentClick);
 				
 				_this.$http.post('/wechat/quotationsmobile/addComment',
 					{
 						userCode: _this.$store.state.user.userCode, //用户code
 						code: _this.commentCurrentClick.code, // 语录code
-						parentCode: _this.commentCurrentClick.commentInfo.code && _this.commentCurrentClick.commentInfo.code, // 评论code
+						parentCode: _this.commentCurrentClick.commentInfo.code, // 评论code
 						content: _this.commentValue
 					}).then(function(e) {
 						_this.commentValue = "";
 						let responseData = e.data.data;
 						
+						_this.sendBtn.sendStatus = false;
 						_this.commentShow = false;
 
 						if(responseData.tag == 1) {
 							_this.$vux.toast.show({
-								text: "评论成功"
+								text: "评论成功",
+								onHide () {
+									// _this.$router.go(0)
+								}
 							});
 						} else {
 							_this.$vux.toast.show({
-								text: "评论失败"
+								text: e.data.errmsg
 							});
 						}
 					})
@@ -156,19 +165,37 @@
 	}
 </script>
 
+<style lang="scss">
+	@import '~lib/sandal/core';
+	@import '~assets/css/core/functions', '~assets/css/core/mixins', '~assets/css/core/vars';
+	
+	.quotation-send {
+		.weui-cells {
+			margin-top: 0;
+		}
+
+		.weui-cell__bd {
+			@include halfpxline(0, $colorGreen, 0 , 0, 1px, 0);
+			margin-right: $padding;
+		}
+	}	
+</style>
+
 <style lang="scss" scoped>
 	@import '~lib/sandal/core';
 	@import '~assets/css/core/functions', '~assets/css/core/mixins', '~assets/css/core/vars';
 	
+	$userImgW: $headerContentH;
+
 	.quotation-list {
 		padding: $padding;
 		display: flex;
 	}
 
 	.user-img {
-		width: 60px;
-		height: 60px;
-		border-radius: 60px;
+		width: $userImgW;
+		height: $userImgW;
+		border-radius: $userImgW;
 	}
 
 	.block {
@@ -255,4 +282,5 @@
 	.btns {
 		padding: $padding;
 	}
+
 </style>

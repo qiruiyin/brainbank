@@ -29,10 +29,10 @@
 				</div>
 			</card>
 			
-			<card :header="{title:'我的服务人员'}">
+			<card :header="{title:'我参加过的课程'}">
 				<div slot="content" class="kefu-course-read">
 					<div class="kefu-course-read-block" v-for="item in courseAll" :key="item.code">
-						<div :class="['kefu-icon', { 'disabled': item.owner }]">{{ item.name }}</div>
+						<div @click="goPage('courseDetail', item.code)" :class="['kefu-icon', { 'disabled': !item.owner }]">{{ item.name }}</div>
 					</div>
 				</div>
 			</card>
@@ -125,8 +125,8 @@
 
 				this[name] = arr;
 			},
-			goPage () {
-	  		this.$router.push({ name: 'index' })
+			goPage (url, code) {
+	  		this.$router.push({ name: url, params: { courseCode: code }})
 			}
 		}
 	}

@@ -138,7 +138,7 @@ Vue.prototype.arrContain = function(arr, obj) {
 Vue.prototype.isLogin = () => {
   if(store.state.user.userCode == '') {
 		Vue.$vux.confirm.show({
-	    content: '您还没有绑定信息, 确定去绑定信息',
+	    content: '为倡导绿色、安全的网络学习环境，敬请您进行身份证实名认证，认证成功即可获得1000积分！',
 	    onCancel () {
 	    	return false
 	    },
@@ -176,42 +176,69 @@ Vue.prototype.visitCount = (code) => {
 	});
 } 
 
+Vue.prototype.invokePay = (data, url) => {
+	let weixinConfig = {
+			"appId": data.payment.appId,     //公众号名称，由商户传入     
+     	"timeStamp": data.payment.timeStamp,         //时间戳，自1970年以来的秒数     
+      "nonceStr": data.payment.nonceStr, //随机串     
+      "package": data.payment.packageValue,     
+      "signType": "MD5",         //微信签名方式：     
+      "paySign": data.payment.paySign //微信签名 
+		};
+	WeixinJSBridge.invoke(
+   'getBrandWCPayRequest', weixinConfig,
+   function(res){
+      if(res.err_msg == "get_brand_wcpay_request:ok" ) {
+     		if(url != "") {
+     			router.push(url);
+     		} else {
+     			router.go(0);
+     		}
+      } else if(res.err_msg == "get_brand_wcpay_request:cancel" ) {
+     		router.go(0);
+      } else if(res.err_msg == "get_brand_wcpay_request:fail" ) {
+      	// Vue.
+      	Vue.$vux.alert.show({
+      		content: "调取微信接口失败"
+      	})
+      } 
+       // 使用以上方式判断前端返回,微信团队郑重提示：res.err_msg将在用户支付成功后返回    ok，但并不保证它绝对可靠。 
+   })
+}
+
 // 支付订单
-Vue.prototype.payWeixinOrder = (orderCode, url = "", orderType) => {
+Vue.prototype.payWeixinOrder = (orderCode, url = "", orderType = "4", type) => {
 	// orderType : 1 课程 2 音视频 3 奖赏 4 商城
-	Vue.http.post('/wechat/order/pay/prepare',
+	// type 
+
+	if(type == 1) {
+		Vue.http.post('/wechat/order/pay/enroll/prepare',
 			{
 				"openId": store.state.user.openId,
-				"orderCode": orderCode,
-			}
-		).then(function(e) {
-			let responseData = e.data.data,
-					weixinConfig = {
-						"appId": responseData.payment.appId,     //公众号名称，由商户传入     
-           	"timeStamp": responseData.payment.timeStamp,         //时间戳，自1970年以来的秒数     
-            "nonceStr": responseData.payment.nonceStr, //随机串     
-            "package": responseData.payment.packageValue,     
-            "signType": "MD5",         //微信签名方式：     
-            "paySign": responseData.payment.paySign //微信签名 
-					};
-			WeixinJSBridge.invoke(
-       'getBrandWCPayRequest', weixinConfig,
-       function(res){
-          if(res.err_msg == "get_brand_wcpay_request:ok" ) {
-	       		if(url != "") {
-	       			router.push(url);
-	       		} else {
-	       			router.go(0);
-	       		}
-          } else if(res.err_msg == "get_brand_wcpay_request:cancel" ) {
-	       		router.go(0);
-          } else if(res.err_msg == "get_brand_wcpay_request:fail" ) {
-          	// Vue.
-          	Vue.$vux.alert.show({
-          		content: "调取微信接口失败"
-          	})
-          } 
-           // 使用以上方式判断前端返回,微信团队郑重提示：res.err_msg将在用户支付成功后返回    ok，但并不保证它绝对可靠。 
-       })
-	});
+				"groupCode": orderCode,
+			}).then(function(e) {
+				if(e.data.errcode == 1) {
+					Vue.prototype.invokePay(e.data.data, url)
+				} else {
+					Vue.$vux.alert.show({
+						content: e.data.errmsg
+					})
+				}
+		})
+	} else {
+		Vue.http.post('/wechat/order/pay/prepare',
+				{
+					"openId": store.state.user.openId,
+					"orderCode": orderCode,
+				}
+			).then(function(e) {
+				if(e.data.errcode == 1) {
+					Vue.prototype.invokePay(e.data.data, url)
+				} else {
+					Vue.$vux.alert.show({
+						content: e.data.errmsg
+					})
+				}
+		});
+	}
 }

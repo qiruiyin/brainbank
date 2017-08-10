@@ -30,8 +30,8 @@
 		methods: {
 			getCode () {
 				let _this = this;
-				_this.status = true;
 				if(_this.tel.length == 11) {
+					_this.status = true;
 					_this.$http.post("/wechat/aliyunMsg/reginfo", {
 							"mobile": _this.tel
 						}).then(function(e) {
@@ -46,7 +46,7 @@
 					_this.$vux.toast.show({
 	          text: "请输入正确的手机号码",
 	          width: "10rem",
-	          type: "text",
+	          type: "text"
 	        })
 				}
 			},
@@ -58,8 +58,23 @@
 	}
 </script>
 
+<style lang="scss">
+	@import '~lib/sandal/core';
+	@import '~assets/css/core/functions', '~assets/css/core/mixins', '~assets/css/core/vars';
+	
+	.weui-btn_disabled.weui-btn_primary.verification-code {
+		background-color: $colorOrange;
+	}
+</style>
+
 <style lang="scss" scoped>
 	@import '~lib/sandal/core';
 	@import '~assets/css/core/functions', '~assets/css/core/mixins', '~assets/css/core/vars';
 	
+	.verification-code {
+		padding: 0 .5em;
+		line-height: 2.6em;
+		background-color: $colorOrange;
+	}
+
 </style>

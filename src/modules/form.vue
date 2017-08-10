@@ -4,8 +4,9 @@
 
 <template>
 	<div class="dn-form">
+	adkhlj
 		<div class="dn-form-group">
-			
+			{{ title }}
 		</div>
 	</div>
 </template>

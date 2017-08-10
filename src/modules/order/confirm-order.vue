@@ -129,6 +129,7 @@
 <style lang="scss" scoped>
 	@import '~lib/sandal/core';
 	@import '~assets/css/core/functions', '~assets/css/core/mixins', '~assets/css/core/vars';
+	@import '~assets/css/icon';
 	
 	.address {
 		.block {

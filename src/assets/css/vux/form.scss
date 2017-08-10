@@ -1,0 +1,33 @@
+// form 表单
+@import '~lib/sandal/core';
+@import '~assets/css/core/functions', '~assets/css/core/mixins', '~assets/css/core/vars';
+
+.dn-form {
+	// background-color: $bgGray;
+	.weui-cell__hd {
+		width: 6em;
+	}
+
+	.weui-input {
+		vertical-align: sub;
+	}
+
+	.group-noTop {
+		.weui-cells {
+			margin-top: 0;
+		}
+	}
+
+	.weui-cells {
+		margin-top: 0;
+
+		&:before {
+			border-top: 0;
+		}
+
+		&:after {
+			border-bottom: 0;
+		}
+	}
+}
+

@@ -7,9 +7,9 @@
       <nav>
     	<tabbar icon-class="vux-center" slot="bottom">
           <tabbar-item v-for="item in navDatas" :link="{name: item.link}" :selected="item.value == navSelected" :key="item.value">
-            <img v-if="item.value == 'mall'" :class="{'icon-big': item.value == 'mall'}" slot="icon" :src="item.img">
+            <img v-if="item.value == 'mall'" :class="{'nav-icon-big': item.value == 'mall'}" slot="icon" :src="item.img">
             <i v-else :class="['fa', 'fa-' + item.value ]" slot="icon"></i>
-            <span slot="label" class="icon">{{ item.name }}</span>
+            <span slot="label" class="nav-icon">{{ item.name }}</span>
           </tabbar-item>
         </tabbar>
       </nav>
@@ -86,7 +86,7 @@
 	@import '~assets/css/core/functions', '~assets/css/core/mixins', '~assets/css/core/vars';
 
 	// 这里的大小取自vux组件的
-	.icon-big {
+	.nav-icon-big {
 		width: 68px;
         height: 69px;
         position: absolute;

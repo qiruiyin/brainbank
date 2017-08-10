@@ -26,7 +26,7 @@
 				<div slot="content" class="table">
 					<timeline>
 						<timeline-item v-for="(item, index) in courseList" :key="index">
-							<p @click="goCourse(item.code, '0')">{{ item.name }}</p>
+							<p @click="goCourse(item.code)">{{ item.name }}</p>
 						</timeline-item>
 					</timeline>
 				</div>
@@ -105,7 +105,7 @@
 			},
 	  	goCourse(code, status) {
 	  		console.log(code, status)
-	  		this.$router.push({name: "courseDetail", params: { courseCode: code, courseStatus: status }})
+	  		this.$router.push({name: "courseDetail", params: { courseCode: code }})
 	  	}
 		}
 	}

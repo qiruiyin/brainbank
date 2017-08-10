@@ -19,7 +19,7 @@
 
 		    		<template v-if="tabItem.value == 'all'">
 							<div class="banner">
-								<router-link v-for="(item, index) in banner" :key="index" :to="{ name: 'courseDetail', params: { courseCode: item.code , courseStatus: '0'} }">
+								<router-link v-for="(item, index) in banner" :key="index" :to="{ name: 'courseDetail', params: { courseCode: item.code } }">
 									<img class="img" :src="item.img" alt="">
 								</router-link>
 							</div>
@@ -82,6 +82,8 @@
 	  		}).then(function(e) {
 					let responseData = e.data.data;
 	  			_this.courseList = responseData.lessonList.map(function(item, index){
+	  				// customerLessonType 用户可操作性的状态 0 可报名 1 已报名 2 复训 3 已生成订单未支付
+	  				// lessonType 1 思维商学院 2总裁商业思维 3 企业自动化运转 0其他课程
 	  				let btn = {
 	  					name: "报名",
   						link: "courseOrder",
@@ -100,8 +102,15 @@
 	  					btn = {
 	  						name: "复训",
   							link: "courseOrder",
-		  					type: "retain",
-	  						value: "retain"
+		  					type: "retrain",
+	  						value: "retrain"
+	  					}
+	  				} else if (item.customerLessonType == 3) {
+	  					btn = {
+	  						name: "报名",
+  							link: "已生成订单未支付",
+		  					type: "3",
+	  						value: "disabled"
 	  					}
 	  				}
 

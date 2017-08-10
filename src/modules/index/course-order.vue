@@ -3,64 +3,88 @@
  -->
 
 <template>
-	<div class="enlist">
-		<group>
-      <x-input :title='course.title' v-model="course.value" readonly></x-input>
-      <selector v-model="period.value" :title="period.title" :name="period.name" :options="period.list" @on-change="onPeriodChange"></selector>
-      
-      <template v-if="userStatus == 0">
-      	<x-input type="tel" :title="tel.title" v-model="tel.value" :placeholder="tel.placeholder" class="weui-vcode">
-	        <el-verification-code :tel="tel.value" slot="right"></el-verification-code>
+	<div class="dn-form enlist">
+		<h5 class="enlist-title">{{ courseInfo.course }}
+			<span class="price" v-if="courseInfo.type == 3">￥{{ count.value == 0 ? courseInfo.price : courseInfo.price * count.value | numToCash }}</span>
+			<span class="price" v-else>￥{{ courseInfo.price * (1+addManInfo.length) | numToCash }}</span>
+		</h5>
+
+		<group class="group-noTop">
+			<div class="dn-tips icon icon-horn">
+				您正在报名<span>{{ courseInfo.date }}</span>日在<span>{{ courseInfo.address }}</span>开课的<span>{{ courseInfo.name }}</span>还剩<span>{{ courseInfo.count }}</span>人！
+			</div>
+			<x-input type="tel" v-model="tel.value" :placeholder="tel.placeholder" required>
+      	<label slot="label" class="label icon icon-tel">{{ tel.title }}</label>
+        <el-verification-code :tel="tel.value" slot="right"></el-verification-code>
+      </x-input>
+      <x-input type="number" :title="code.title" v-model="code.value" :placeholder="code.placeholder" required>
+      	<label slot="label" class="label icon icon-qrcode">{{ code.title }}</label>
+      </x-input>
+    </group>
+
+    <group class="add-man" v-if="courseInfo.type == 2">
+    	<template v-if="payType == 1">
+	    	<x-input v-model="userInfo.name.value" :placeholder="userInfo.name.placeholder" readonly required>
+	      	<label slot="label" class="label icon icon-user">{{ userInfo.name.title }}</label>
 	      </x-input>
-	      <x-input type="tel" :title="code.title" v-model="code.value" :placeholder="code.placeholder"></x-input>
-      </template>
-      
-      <x-input :title='count.title' v-model="count.value" readonly></x-input>
-      <x-input :title='price.title' v-model="price.value" readonly></x-input>
-      <x-input :title='date.title' v-model="date.value" readonly></x-input>
-      <x-input :title='address.title' v-model="address.value" readonly></x-input>
-			
-			<template v-if="userStatus == 0">
-				<div class="add-man" v-for="(item, index) in addMan.list" :key="index">
-					<p class="add-name">{{ item.name }} <span>{{ item.tel }}</span></p>
-					<p>{{ item.idCard }}</p>
-				</div>
+	    	<x-input v-model="userInfo.idCard.value" :placeholder="userInfo.idCard.placeholder" readonly required>
+	      	<label slot="label" class="label icon icon-idCard">{{ userInfo.idCard.title }}</label>
+	      </x-input>
+	    	<x-input v-model="userInfo.tel.value" :placeholder="userInfo.tel.placeholder" readonly required>
+	      	<label slot="label" class="label icon icon-tel">{{ userInfo.tel.title }}</label>
+	      </x-input>
+    	</template>
+    	<template v-else>
+	    	<x-input v-model="userInfo.name.value" :placeholder="userInfo.name.placeholder" required>
+	      	<label slot="label" class="label icon icon-user">{{ userInfo.name.title }}</label>
+	      </x-input>
+	    	<x-input v-model="userInfo.idCard.value" :placeholder="userInfo.idCard.placeholder" required>
+	      	<label slot="label" class="label icon icon-idCard">{{ userInfo.idCard.title }}</label>
+	      </x-input>
+	    	<x-input v-model="userInfo.tel.value" :placeholder="userInfo.tel.placeholder" required>
+	      	<label slot="label" class="label icon icon-tel">{{ userInfo.tel.title }}</label>
+	      </x-input>
     	</template>
     </group>
-		
-		<div class="btns" >
-			<x-button v-if="userStatus == 0" type="primary" @click.native="add">添加报名人员</x-button>
-			<x-button type="primary" @click.native="submit">提交</x-button>
-		</div>
-		
-		<div v-transfer-dom>
-			<popup v-model="addMan.show" position="bottom" :hide-on-blur=false>
-	      <div class="pay">
-					<group>
-    				<x-input title='姓名' v-model="addMan.name" placeholder="请输入报名人员姓名"></x-input>
-    				<x-input title='身份证' v-model="addMan.idCard" placeholder="请输入身份证号码"></x-input>
-    				<x-input title='手机号' v-model="addMan.tel" placeholder="请输入手机号码"></x-input>
-					</group>
-	      	<div class="pay-btn">
-						<x-button type="primary" @click.native="addManFun">确定</x-button>
-						<x-button @click.native="cancelManFun">取消</x-button>
-	      	</div>
-	    	</div>
-	    </popup>
-    </div>
 
-		<div v-transfer-dom>
-			<popup v-model="pay.show" position="bottom" :hide-on-blur=false>
-	      <div class="pay">
-					<form-preview header-label="付款金额" :header-value="pay.allPrice" :body-items="pay.list"></form-preview>	
-	      	
-	      	<div class="pay-btn">
-						<x-button :class="{'disabled': !user.pay}" type="primary" @click.native="payOrder">支付</x-button>
-						<x-button @click.native="cancelPayOrder">取消</x-button>
-	      	</div>
-	    	</div>
-	    </popup>
-    </div>
+    <group class="add-man" v-else>
+    	<x-input v-model="userInfo.name.value" :placeholder="userInfo.name.placeholder" readonly required>
+      	<label slot="label" class="label icon icon-user">{{ userInfo.name.title }}</label>
+      </x-input>
+    	<x-input v-model="userInfo.idCard.value" :placeholder="userInfo.idCard.placeholder" readonly required>
+      	<label slot="label" class="label icon icon-idCard">{{ userInfo.idCard.title }}</label>
+      </x-input>
+    	<x-input v-model="userInfo.tel.value" :placeholder="userInfo.tel.placeholder" readonly required>
+      	<label slot="label" class="label icon icon-tel">{{ userInfo.tel.title }}</label>
+      </x-input>
+    	<x-input v-if="courseInfo.type == 3" :max='3' type="tel" :title="count.title" v-model="count.value" :placeholder="count.placeholder" required>
+      	<label slot="label" class="label icon icon-tel">{{ count.title }}</label>
+      </x-input>
+    </group>
+
+		<group v-if="courseInfo.type == 2 && payType != 1">
+			<div @click="add" class="add-btn icon icon-add">添加报名人员
+				<div class="add-btn-click fa fa-plus"></div>
+			</div>
+		</group>
+
+	  <group class="add-man" v-for="(item, index) in addManInfo" :key="index">
+    	<x-input v-model="item.name.value" :placeholder="item.name.placeholder" required>
+      	<label slot="label" class="label icon icon-user">{{ item.name.title }}</label>
+				<div slot="right" @click="remove(index)" class="add-btn-click fa fa-minus delete"></div>
+      </x-input>
+    	<x-input v-model="item.idCard.value" :placeholder="item.idCard.placeholder" required>
+      	<label slot="label" class="label icon icon-idCard">{{ item.idCard.title }}</label>
+      </x-input>
+    	<x-input v-model="item.tel.value" :placeholder="item.tel.placeholder" required>
+      	<label slot="label" class="label icon icon-tel">{{ item.tel.title }}</label>
+      </x-input>
+    </group>
+
+		<div class="btns" >
+			<x-button v-if="!submitBtn" type="primary" @click.native="submit" show-loading>提交</x-button>
+			<x-button v-else type="primary" @click.native="submit">提交</x-button>
+		</div>
 	</div>
 </template>
 
@@ -78,6 +102,22 @@
 		data () {
 			return {
 				title: '报名参加课程，包含复训和升级',
+				orderType: {
+					retrain: 1,
+					upgrade: 2,
+					enlist: 2
+				},
+				courseInfo: {
+					productCode: "",
+					course: "总裁商业思维",
+					code: this.$route.query.code,
+					type: this.$route.query.type || "", // lessonType 1 思维商学院 2总裁商业思维 3 企业自动化运转 0其他课程
+					date: "",
+					address: "",
+					name: "",
+					price: "",
+					count: ""
+				},
 				tel: {
 					value: "",
 					title: "手机号",
@@ -88,128 +128,40 @@
 					title: "验证码",
 					placeholder: "请输入验证码"
 				},
-				addMan: {
-					show: false,
-					name: '',
-					idCard: '',
-					tel: '',
-					list: []
-				},
-				allData: '',
-				course: {
-					value: '',
-					title: '课程',
-					name: 'course',
-					code: '',
-					list: [
-						{
-							key: 'shangsi',
-							value: '商业思维'
-						},{
-							key: 'xitong',
-							value: '系统思维'
-						}
-					]
-				},
-				period: {
-					value: '',
-					productCode: "",
-					title: '期数',
-					name: 'period',
-					placeholder: '请选择期数',
-					list: [
-						// {
-						// 	key: 'shangsi',
-						// 	value: '商业思维'
-						// },{
-						// 	key: 'xitong',
-						// 	value: '系统思维'
-						// }
-					]
-				},
-				periodSelected: 0,
-				num: {
-					value: '',
-					title: '数量',
-					name: 'num',
-					placeholder: '请输入数量'
-				},
-				price: {
-					value: '',
-					title: '金额',
-					name: 'price',
-					placeholder: '金额'
-				},
 				count: {
-					value: '',
-					title: '剩余名额',
-					name: 'count',
-					placeholder: '剩余名额'
+					value: "",
+					title: "数量",
+					placeholder: "请输入数量"
 				},
-				date: {
-					value: '',
-					title: '时间',
-					name: 'date',
-					placeholder: '时间'
+				userInfo: {
+					name: {
+						value: "",
+						title: "姓名",
+						placeholder: "请输入报名人员姓名"
+					},
+					idCard: {
+						value: "",
+						title: "身份证",
+						placeholder: "请输入身份证号码"
+					},
+					tel: {
+						value: "",
+						title: "手机号",
+						placeholder: "请输入手机号码"
+					}
 				},
-				address: {
-					value: '',
-					title: '地址',
-					name: 'address',
-					placeholder: '地址'
-				},
-				orderType: {
-					retrain: 1,
-					upgrade: 2,
-					enlist: 2
-				},
-				pay: {
-					show: false,
-					allPrice: 0,
-					list: [
-						{
-			        label: '订单号',
-			        value: ''
-			      }, {
-			        label: '课程名称',
-			        value: ''
-			      }, {
-			        label: '数量',
-			        value: ''
-			      }, {
-			        label: '地址',
-			        value: ''
-			      }, {
-			        label: '时间',
-			        value: ''
-			      }
-			    ]
-				}
+				addManInfo: [],
+				submitBtn: true
 			}
 		},
 		computed: {
 			...mapState({
-        user: state => state.user
+        user: state => state.user,
+        isLoading: state => state.isLoading,
       }),
-			userStatus () {
-				// 0报名 1升级 2复训
-				let payType = this.$route.params.payType;
-				if(payType == "enlist") {
-					return 0
-				} else if (payType == "upgrade") {
-					return 1;
-				} else {
-					return 2
-				}
-			} 
-		},
-		watch: {
-			periodSelected (newValue, oldValue) {
-				let _this = this;
-				_this.period.productCode = _this.allData.lessonList[newValue].product_code;
-				_this.count.value = _this.allData.lessonList[newValue].balance_count || 0;
-				_this.date.value = _this.allData.lessonList[newValue].start_date;
-				_this.address.value = _this.allData.lessonList[newValue].address;
+      payType () {
+      	//是否复训
+      	return this.$route.params.payType == 'retrain' ? '1' : '0'; 
 			}
 		},
 		mounted () {
@@ -218,279 +170,263 @@
 		},
 		methods: {
 			fetchData () {
-				let _this = this,
-						payType = _this.$route.params.payType;
-
-				if(payType == "enlist" || payType == "upgrade") {
-					this.$http.post('/wechat/discover/upgrade/lesson',
-						{
-							"userCode": _this.$store.state.user.userCode
-						}).then(function(e) {
-							if(e.data.errcode == 1) {
-								_this.allData = e.data.data;
-								_this.assignData(e.data.data)
-							} else {
-								_this.$vux.toast.show({
-									text: e.data.errmsg
-								})
-							}
-					})
-				} else if (payType == "retrain") {
-					this.$http.post('/wechat/discover/retrain/lesson',
-						{
-							"userCode": _this.$store.state.user.userCode
-						}).then(function(e) {
-							if(e.data.errcode == 1) {
-								_this.allData = e.data.data;
-								_this.assignData(e.data.data)
-							} else {
-								_this.$vux.toast.show({
-									text: e.data.errmsg
-								})
-							}
-						})
-				}
-			},
-			assignData (responseData) {
 				let _this = this;
-				_this.course.code = responseData.lessonList[_this.periodSelected].product_code;
-				_this.course.value = responseData.lessonName;
-				_this.period.list = responseData.lessonList.map(function(item, index){
-					return {
-						productCode: item.product_code,
-						key: item.code,
-						value: item.name
-					}
-				});
-				
-				_this.period.productCode = _this.period.list[_this.periodSelected].productCode;
-				_this.period.value = _this.period.list[_this.periodSelected].key;
-				_this.count.value = responseData.lessonList[_this.periodSelected].balance_count || 0;
-				_this.price.value = responseData.lessonList[_this.periodSelected].money;
-				_this.date.value = responseData.lessonList[_this.periodSelected].start_date;
-				_this.address.value = responseData.lessonList[_this.periodSelected].address;
+
+				this.$http.post('/wechat/discover/entered/lesson',
+					{
+						userCode: _this.$store.state.user.userCode,
+						lessonCode: _this.courseInfo.code,
+						retrain: _this.payType
+					}).then(function(e) {
+						let resData = e.data.data;
+
+						if(e.data.errcode == 1) {
+							_this.courseInfo.productCode = resData.lessonInfo.product_code;
+							_this.courseInfo.date = resData.lessonInfo.end_date;
+							_this.courseInfo.course = resData.lessonInfo.productName;
+							_this.courseInfo.address = resData.lessonInfo.address;
+							_this.courseInfo.name = resData.lessonInfo.name;
+							_this.courseInfo.count = resData.lessonInfo.balance_count;
+							_this.courseInfo.price = resData.lessonInfo.price;
+
+							_this.userInfo.name.value = resData.user.NAME;
+							_this.userInfo.idCard.value = resData.user.idcard;
+							_this.userInfo.tel.value = resData.user.mobile;
+						} else {
+							_this.$vux.alert.show({
+								content: e.data.errmsg
+							})
+						}
+				})
 			},
 			add () {
-				this.addMan.show = true
+				this.addManInfo.push({
+					name: {
+						value: "",
+						title: "姓名",
+						placeholder: "请输入报名人员姓名"
+					},
+					idCard: {
+						value: "",
+						title: "身份证",
+						placeholder: "请输入身份证号码"
+					},
+					tel: {
+						value: "",
+						title: "手机号",
+						placeholder: "请输入手机号码"
+					}
+				});
 			},
-			addManFun () {
+			remove (ind) {
+				this.addManInfo.splice(ind, 1);
+			},
+			valEmpty (obj, child) {
 				let _this = this;
-				if(_this.addMan.name == "") {
-					_this.$vux.toast.show({
-						text: "姓名不能为空"
-					})
-				} else if(_this.addMan.idCard == "") {
-					_this.$vux.toast.show({
-						text: "身份证号码不能为空"
-					})
-				} else if(_this.addMan.tel == "") {
-					_this.$vux.toast.show({
-						text: "手机号不能为空不能为空"
-					})
-				} else {
-					_this.addMan.list.push({
-						name: _this.addMan.name,
-						idCard: _this.addMan.idCard,
-						tel: _this.addMan.tel
-					});
-					_this.addMan.name = "";
-					_this.addMan.idCard = "";
-					_this.addMan.tel = "";
-					_this.addMan.show = false;
-				}
+				if(child) {
+					if(_this[obj][child].value == "") {
+	    			this.$vux.alert.show({
+	    				content: _this[obj][child].title + "不能为空"
+	    			})
+	    			return false
+	    		}
+	    	} else {
+	    		if(_this[obj].value == "") {
+	    			this.$vux.alert.show({
+	    				content: _this[obj].title + "不能为空"
+	    			})
+	    			return false
+	    		}
+	    	}
+	    	return true;
 			},
-			cancelManFun () {
-				this.addMan.show = false
-			},
-	    onPeriodChange (val) {
-	    	let ind;
-	    	this.period.list.filter(function(item, index){
-	    		if(item.key == val) {
-	    			ind = index;
+			valManListInfo () {
+	    	let status = false;
+
+	    	_this.addManInfo.map(function(item, index){
+	    		if(!item.name.value && !item.idCard.value && !item.tel.value) {
+	    			status = true;
 	    		}
 	    	});
-	    	this.periodSelected = ind;
-	    },
-	    submit () {
-	    	let _this = this,
-	    		money = _this.price.value.toFixed(2),
+
+	    	if(status) {
+	    		_this.$vux.alert.show({
+	    			content: "请检查报名人员的信息是否完善"
+	    		})
+	    	}
+
+	    	return status
+			},
+			submit () {
+				if(!this.submitBtn) return;
+				this.submitBtn = false;
+
+				let _this = this,
+					count = _this.addManInfo.length + 1,
+	    		price = _this.courseInfo.price.toFixed(2),
 	    		orderType = _this.orderType[_this.$route.params.payType];
 
-	    	if(_this.userStatus == 0) {
-	    		if(_this.addMan.list.length == 0) {
-	    			this.$vux.alert.show({
-	    				content: "请添加人员"
-	    			})
-	    			return
-	    		}
+	    	if(!_this.valEmpty('tel')) return false;
+	    	if(!_this.valEmpty('code')) return false;
+	    	if(!_this.valEmpty('userInfo', 'name')) return false;
+	    	if(!_this.valEmpty('userInfo', 'idCard')) return false;
+	    	if(!_this.valEmpty('userInfo', 'tel')) return false;
 
-	    		if(this.tel.value == "") {
-	    			this.$vux.alert.show({
-	    				content: "电话号码不能为空"
-	    			})
-	    			return
-	    		}
+    		if(count > 1 && !_this.valManListInfo) return false;
 
-	    		if(this.code.value == "") {
-	    			this.$vux.alert.show({
-	    				content: "验证码不能为空"
-	    			})
-	    			return
-	    		}
-	    		let allMoney = (_this.price.value * _this.addMan.list.length).toFixed(2);
-	    		let enrollInfo = "";
-	    		_this.addMan.list.map(function(item, index){
-	    			if(index != 0) {
-	    				enrollInfo += "#"
-	    			}
-	    			enrollInfo += item.name + "," + item.idCard + "," + item.tel;
-	    		});
+    		if(this.courseInfo.type == 3) {
+    			count = this.count.value;
+    		}
+
+	    	if(_this.courseInfo.type == 2) {
+	    		// 商业思维
+	    		let allMoney = (price * count).toFixed(2);
+	    		let enrollInfo = _this.userInfo.name.value + "," + _this.userInfo.idCard.value + "," + _this.userInfo.tel.value;
+
+	    		if(count > 1) {
+		    		_this.addManInfo.map(function(item, index){
+		    			enrollInfo += "#" + item.name.value + "," + item.idCard.value + "," + item.tel.value;
+		    		});
+		    	}
 
 	    		this.$http.post('/wechat/order/enroll/create',
 						{
 							"userCode": _this.$store.state.user.userCode,
-							"productCode":  _this.period.productCode,
-							"amount": _this.addMan.list.length,
-							"money": money,
+							"productCode":  _this.courseInfo.productCode,
+							"amount": count,
+							"money": allMoney,
 							"orderType": orderType,
-							"lessonCode": _this.period.value,
+							"lessonCode": _this.courseInfo.code,
 							"enrollInfo": enrollInfo,
 							"mobileNum": _this.tel.value,
 							"smsCode": _this.code.value
 						}).then(function(e) {
 							let responseData = e.data;
+							_this.submitBtn = true;
 
 							if(responseData.errcode != 1) {
-								_this.$vux.toast.show({
-				          text: responseData.errmsg
+								_this.$vux.alert.show({
+				          content: responseData.errmsg
 				        })
 							} else {
-								_this.pay.show = true;
-								_this.pay.allPrice = allMoney;
-								_this.pay.list[0].value = responseData.data.orderList[0].groupCode;
-								_this.pay.list[1].value = _this.course.value;
-								_this.pay.list[2].value = _this.addMan.list.length;
-								_this.pay.list[3].value = _this.address.value;
-								_this.pay.list[4].value = _this.date.value;
+								_this.payOrder(responseData.data.orderList[0].groupCode, responseData.data.orderList[0].code)
 							}
-						});
+						}).catch(function (error) {
+							_this.submitBtn = true;
+							if(error.response.status == 500) {
+								_this.$vux.alert.show({
+									content: "服务器超时"
+								})								
+							}
+					  });
 	    	} else {
 					this.$http.post('/wechat/order/create',
 							{
 								"userCode": _this.$store.state.user.userCode,
-								"productCode": _this.period.productCode,
-								"amount": 1,
-								"money": money,
+								"productCode": _this.courseInfo.productCode,
+								"amount": count,
+								"money": price,
 								"orderType":  orderType,
-								"lessonCode": _this.period.value
+								"lessonCode": _this.courseInfo.code
 							}
 						).then(function(e) {
+							_this.submitBtn = true;
 							let responseData = e.data;
 
 							if(responseData.errcode != 1) {
-								_this.$vux.toast.show({
-				          text: responseData.errmsg
+								_this.$vux.alert.show({
+				          content: responseData.errmsg
 				        })
 							} else {
-								_this.pay.show = true;
-								_this.pay.allPrice = money;
-								_this.pay.list[0].value = responseData.data.order.code;
-								_this.pay.list[1].value = _this.course.value;
-								_this.pay.list[2].value = 1;
-								_this.pay.list[3].value = _this.address.value;
-								_this.pay.list[4].value = _this.date.value;
+								_this.payOrder(responseData.data.order.code, responseData.data.order.code)
 							}
-						})
+						}).catch(function (error) {
+							_this.submitBtn = true;
+							if(error.response.status == 500) {
+								_this.$vux.alert.show({
+									content: "服务器超时"
+								})		
+							}
+					  });
 				}
-	    },
-	    payOrder () {
+			},
+	    payOrder (orderCode, code) {
+	    	// orderCode 订单code或者组code
 	    	let _this = this;
-
-	    	alert(_this.$store.state.user.pay);
-	    	alert(1);
-	    	alert(JSON.stringify(_this.$store.state.user));
-
-	    	alert(_this.userStatus);
 
 	    	if(!_this.$store.state.user.pay) return false;
 
-	    	if(_this.userStatus == 0) {
-	    		this.$http.post('/wechat/order/pay/enroll/prepare',
-							{
-								"openId": _this.$store.state.user.openId,
-								"groupCode": _this.pay.list[0].value,
-							}
-						).then(function(e) {
-							let responseData = e.data.data,
-									weixinConfig = {
-										"appId": responseData.payment.appId,     //公众号名称，由商户传入     
-				           	"timeStamp": responseData.payment.timeStamp,         //时间戳，自1970年以来的秒数     
-				            "nonceStr": responseData.payment.nonceStr, //随机串     
-				            "package": responseData.payment.packageValue,     
-				            "signType": "MD5",         //微信签名方式：     
-				            "paySign": responseData.payment.paySign //微信签名 
-									};
-							WeixinJSBridge.invoke(
-				       'getBrandWCPayRequest', weixinConfig,
-				       function(res){
-				       		alert(res.err_msg)
-				          if(res.err_msg == "get_brand_wcpay_request:ok" ) {
-				          }
-				           // 使用以上方式判断前端返回,微信团队郑重提示：res.err_msg将在用户支付成功后返回    ok，但并不保证它绝对可靠。 
-				       })
-						})
+	    	if(_this.courseInfo.type == 2) {
+					this.payWeixinOrder(orderCode, {name: 'questionnaire', query: { groupCode: _this.courseInfo.productCode, orderCode: code }}, 1, 1)
 	    	} else {
-					this.payWeixinOrder(_this.pay.list[0].value, {name: 'orderDone', query: { type: 1 }})
-
-					// this.$http.post('/wechat/order/pay/prepare',
-					// 		{
-					// 			"openId": _this.$store.state.user.openId,
-					// 			"orderCode": _this.pay.list[0].value,
-					// 		}
-					// 	).then(function(e) {
-					// 		let responseData = e.data.data,
-					// 				weixinConfig = {
-					// 					"appId": responseData.payment.appId,     //公众号名称，由商户传入     
-				 //           	"timeStamp": responseData.payment.timeStamp,         //时间戳，自1970年以来的秒数     
-				 //            "nonceStr": responseData.payment.nonceStr, //随机串     
-				 //            "package": responseData.payment.packageValue,     
-				 //            "signType": "MD5",         //微信签名方式：     
-				 //            "paySign": responseData.payment.paySign //微信签名 
-					// 				};
-					// 		WeixinJSBridge.invoke(
-				 //       'getBrandWCPayRequest', weixinConfig,
-				 //       function(res){
-				 //       		// alert(res.err_msg)
-				 //          if(res.err_msg == "get_brand_wcpay_request:ok" ) {
-				 //          	_this.$router.push({name: 'orderDone', query: { type: 1 }});
-				 //          }
-				 //           // 使用以上方式判断前端返回,微信团队郑重提示：res.err_msg将在用户支付成功后返回    ok，但并不保证它绝对可靠。 
-				 //       })
-					// });
+					this.payWeixinOrder(orderCode, {name: 'questionnaire', query: { groupCode: _this.courseInfo.productCode, orderCode: code }}, 1)
 				}
-	    },
-	    cancelPayOrder () {
-				this.pay.show = false
 	    }
-	    // payBackend () {
-	    // 	this.$http.post('/wechat/order/pay/prepare',
-					// 	{
-					// 		"openId": _this.$store.state.user.openId,
-					// 		"orderCode": "201707182253247664367215373362",
-					// 	}
-					// ).then(function(e) {
-
-					// });
-	    // }
 	  }
 	}
 </script>
+
+<style lang="scss">
+	@import '~assets/css/form';
+</style>
 
 <style lang="scss" scoped>
 	@import '~lib/sandal/core';
 	@import '~assets/css/core/functions', '~assets/css/core/mixins', '~assets/css/core/vars';
 	
-	@import '~assets/css/form';
+	$addBtnW: 30px;
+	$addBorderColor: #f3f3f3;
+	
+	.enlist-title {
+		padding: 0 $padding;
+		line-height: 50px;
+		font-size: 20px;
+		color: #fff;
+		background: $colorGreen;
+		overflow: hidden;
+
+		.price {
+			float: right;
+		}
+	}
+	
+	.add-btn {
+		position: relative;
+		width: 100%;
+		line-height: $inputH + 7px;
+		padding: 0 $padding;
+		padding-left: $padding + $iconL;
+		background: #fff;
+		border-top: $paddingTop solid $addBorderColor;
+
+		&:before {
+			left: $padding;
+		}
+
+		.add-btn-click {
+			// margin-top: ($inputH - $addBtnW)/2;
+		}
+	}
+
+	.add-btn-click {
+		position: absolute;
+		top: 50%;
+		right: $padding;
+		// float: right;
+		width: $addBtnW;
+		height: $addBtnW;
+		margin-top: - $addBtnW/2;
+		line-height: $addBtnW + 2px;
+		text-align: center;
+		border-radius: $addBtnW;
+		background: $colorOrange;
+		color: #fff;
+		font-size: $addBtnW - 8px;
+
+		&.delete {
+			background: $colorRed;
+		}
+	}
 
 	.pay {
 		.pay-btn {
@@ -505,8 +441,9 @@
 
 	.add-man {
 		@include halfpxline(0, $borderColor, 1px, 0, 0, 0);
-		margin: 0 $padding ;
-		padding: 6px;
+		// margin: 0 $padding ;
+		// padding: 6px;
+		border-top: $paddingTop solid $addBorderColor;
 
 		.add-name {
 			// font-size: 18px;

@@ -33,7 +33,7 @@ module.exports = {
             target: 'http://glyh.qibeisoft.com/wechat',
             // target: 'http://test.yoao.com/wechat',
             // target: 'http://192.168.1.158:8080/csm/wechat/',
-            // target: 'http://192.168.1.175:8080/csm/wechat/',
+            // target: 'http://192.168.1.174:8080/csm/wechat/',
             // target: 'http://192.168.1.199:81/wechat/',
             changeOrigin: true,
             secure: false, // 接受 运行在 https 上的服务

@@ -50,7 +50,9 @@
   }
 </script>
 
-<style src="assets/css/common.scss" lang="scss"></style>
+<style lang="scss">
+  @import "~assets/css/common.scss";
+</style>
 
 <style lang="scss" scoped>
   @import '~lib/sandal/core';

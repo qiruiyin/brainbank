@@ -5,7 +5,8 @@ $maxW: 414px;
 // 最小宽度
 $minW: 320px;
 // 左右间距
-$padding: 10px;
+$padding: 12px;
+$paddingTop: 12px;
 
 // 头部高度
 $headerH: 60px;
@@ -20,7 +21,7 @@ $borderRadius: 6px;
 $inputH: 44px;
 
 // 基础字体大小
-$fontSize: 12px;
+$fontSize: 14px;
 
 // 颜色
 // 新设计
@@ -29,15 +30,18 @@ $colorOrange: #ff8501;
 // $colorYellow: #fe6e12;
 $colorYellow: #f2c138;
 // $colorGreen: #09BB07;
-$colorGreen: #13ce66;
-$colorGray: #ccc;
+$colorGreen: #1AAD19;
+$colorGrayDisabled: #ccc;
+$colorBgGray: #f1f1f1;
+$colorGray: #eee;
 
 $fontColorBlack: #333;
 $fontColor: #666;
 $fontColorGray: #888;
+$colorRed: #f03939;
 // end
 
-$colorRed: red;
+// $colorRed: red;
 $colorBlue: #0065bd;
 
 $fontColorBlue: #0065bd;
@@ -55,3 +59,18 @@ $cartColorYellow: #FF9500;
 $cartColorRed: #DD2727;
 
 $disabledPay: rgba(0, 0, 0, .2);
+
+// icon
+$iconW: 30px;
+$iconL: $iconW + 6px;
+
+// 提示
+$tipsPadding: 10px;
+$tipsLeft: $iconW + $tipsPadding * 2;
+$tipsBg: $colorGray;
+
+// 头部
+$headerPaddingTop: $padding;
+$headerContentH: $headerH - $headerPaddingTop*2;
+$headerLinkH: 30px;
+$headerPaddingLeft: $padding/2;

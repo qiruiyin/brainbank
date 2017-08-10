@@ -1,4 +1,6 @@
 // 时间线
+@import '~lib/sandal/core';
+@import '~assets/css/core/functions', '~assets/css/core/mixins', '~assets/css/core/vars';
 
 .vux-timeline {
 	.vux-timeline-item-content {

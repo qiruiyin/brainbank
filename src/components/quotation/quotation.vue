@@ -38,10 +38,10 @@
 				<div class="comment-list" v-if="quotationData.comments.length > 0">
 					<div @click="btnComment(quotationData.code, commentItem)" class="comment-card" v-for="(commentItem, commentIndex) in quotationData.comments" :key="commentIndex">
 						<div class="comment-card-header">
-							{{ commentItem.sendName }}
+							<i>{{ commentItem.sendName }}</i>
 							<template v-if="commentItem.receiveCode">
 								<span>回复</span>
-								{{ commentItem.receiveName }}
+								<i>{{ commentItem.receiveName }}</i>
 							</template>：{{ commentItem.content }}
 						</div>
 					</div>
@@ -155,15 +155,18 @@
 	@import '~lib/sandal/core';
 	@import '~assets/css/core/functions', '~assets/css/core/mixins', '~assets/css/core/vars';
 	
+	$userImgW: $headerContentH;
+
 	.quotation-list {
 		padding: $padding;
+		padding-right: $padding*2;
 		display: flex;
 	}
 
 	.user-img {
-		width: 40px;
-		height: 40px;
-		border-radius: 40px;
+		width: $userImgW;
+		height: $userImgW;
+		border-radius: $userImgW;
 	}
 
 	.block {
@@ -172,7 +175,7 @@
 	}
 
 	.block-header {
-		padding-bottom: $padding;
+		padding-bottom: $padding/2;
 	}
 
 	.block-title {
@@ -185,20 +188,27 @@
 	}
 	
 	.block-img {
+		padding-right: 20%;
 		@extend %clearfix;
 		padding-bottom: $padding;
 
 		img {
 			float: left;
-			width: 100%;
+			// width: 50%;
+			// padding-right: 10px;
+
+			// img {
+			width: 33.3%;
+			border-right: 10px solid #fff;
+			// }	
 		}
 	}
 
-	.block-img-2 {
-		img {
-			width: 50%;
-		}
-	}
+	// .block-img-2 {
+	// 	img {
+	// 		width: 50%;
+	// 	}
+	// }
 
 	.block-img-3 {
 		img {
@@ -209,7 +219,7 @@
 	.block-header-footer {
 		position: relative;
 		@extend %clearfix;
-		height: 30px;
+		height: 26px;
 	}
 
 	.block-time {
@@ -218,7 +228,7 @@
 
 	.block-btns {
 		position: absolute;
-		top: 0;
+		top: -6px;
 		right: 0;
 		width: 20px;
 		height: 30px;
@@ -237,7 +247,8 @@
 			width: 30px;
 			height: 100%;
 	    line-height: 25px;
-			text-align: right;
+			text-align: center;
+			text-indent: 6px;
 		}
 
 		.block-btns-content {
@@ -267,8 +278,13 @@
 	.block-content {
 		padding: $padding;
 		border-radius: $borderRadius;
-		background-color: #999;
-		color: #fff;
+		background-color: #f1f1f1;
+		color: $fontColorBlack;
+
+		i {
+			font-style: normal;
+			color: $colorGreen;
+		}
 	}
 
 	.zan-list {

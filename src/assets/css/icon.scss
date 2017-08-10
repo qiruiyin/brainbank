@@ -1,0 +1,35 @@
+// 图标css
+
+$icon: service, // 服务
+			 idCard, // 身份证
+			 tel, // 手机号
+			 add, // 添加
+			 horn, // 喇叭
+			 user, // 姓名
+			 qrcode, // 验证码
+			service; // 
+
+.icon {
+	position: relative;
+	padding-left: $iconL;
+	
+  &:before {
+  	content: "";
+  	position: absolute;
+  	left: 0;
+  	top: 50%;
+  	margin-top: - $iconW/2;
+  	width: $iconW;
+	  height: $iconW;
+  	background: left center no-repeat;
+  	background-size: 100%;
+	}
+}
+
+@each $iconName in $icon {
+	.icon-#{$iconName} {
+		&:before {
+			background-image: url("~assets/img/icon/#{$iconName}.png");
+		}
+	}
+}

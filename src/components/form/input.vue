@@ -1,12 +1,10 @@
 <!-- 
-	表单示例
+	输入框
  -->
-
+<!-- 
 <template>
-	<div class="dn-form">
-		<div class="dn-form-group">
-			
-		</div>
+	<div class="dn-input">
+		<input type="text">
 	</div>
 </template>
 
@@ -19,7 +17,10 @@
 		components: { elInput, elVerificationCode },
 		data () {
 			return {
-				title: "标题"
+				title: "标题",
+				type: 'text',
+				placeholder: "输入提示",
+				value: "值",
 			}
 		}
 	}
@@ -28,6 +29,5 @@
 <style lang="scss" scoped>
 	@import '~lib/sandal/core';
 	@import '~assets/css/core/functions', '~assets/css/core/mixins', '~assets/css/core/vars';
-
 	
-</style>
+</style> -->

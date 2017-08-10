@@ -9,7 +9,8 @@ Vue.filter('numToCash', function (value) {
 	} else {
 		var end = "",
 			start = "";
-
+		value = value.toFixed(2);
+		
 		if(value < 0) {
 			start = "-";
 			value += "";

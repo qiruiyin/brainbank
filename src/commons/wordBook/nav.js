@@ -5,6 +5,8 @@ const nav = [
 	"share", // 分享
 	"confirmOrder", // 支付订单页面
 	"questionnaire", // 问卷调查
+	"orderDone", // 订单完成页面
+	"courseOrder", // 课程报名
 ]
 
 export default nav;

@@ -4,15 +4,15 @@ const routes = [
 	{
 		path: '*',
 		redirect: '/index' 
-	// },{
-	// 	path: '/demo',
-	// 	name: 'demo',
-	// 	component:  loadView(loaded => {
-	// 		require(['../modules/demo.vue'], loaded)
-	// 	}),
-	// 	meta: {
-	// 		title: '大脑银行'
-	// 	}
+	},{
+		path: '/form',
+		name: 'form',
+		component:  loadView(loaded => {
+			require(['../components/form/form.vue'], loaded)
+		}),
+		meta: {
+			title: '大脑银行'
+		}
 	},{
 		path: '/index',
 		name: 'index',
@@ -169,7 +169,7 @@ const routes = [
 		}
 	},{
 		// 课程详情
-		path: '/course-detail/:courseCode/:courseStatus',
+		path: '/course-detail/:courseCode',
 		name: 'courseDetail',
 		component:  loadView(loaded => {
 			require(['../modules/course/detail-course.vue'], loaded)

@@ -48,7 +48,7 @@
 			imgTextClick () {
 				let _this = this;
 				if(this.imgTextData.isClick) {
-					this.$router.push({name: 'courseDetail', params: { courseCode: this.imgTextData.code, courseStatus: '0'}}) 
+					this.$router.push({name: 'courseDetail', params: { courseCode: this.imgTextData.code }}) 
 				} else if (!_this.$store.state.user.userCode) {
 					// this.$emit("show-bangding")
 					_this.$vux.confirm.show({

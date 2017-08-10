@@ -37,8 +37,10 @@ Vue.http.defaults.headers.post['Content-Type'] = 'application/raw';           //
 // 未绑定
 // window.localStorage.setItem("openId", "oOVVes2YmKf-O6ChTa5CrOAELfnU");
 // window.localStorage.setItem("openId", "oOVVes7rzHEB4HOXruZiNOkaXNRg");
+window.localStorage.setItem("openId", "oOVVesyAwayTie9oX2qAh0wbz9ss");
 
 // 赵陵
+// window.localStorage.setItem("openId", "oOVVes2x6v6Iv4wHuDv6dUwvfNTM");
 // window.localStorage.setItem("userCode", "20170718220214960433651736252496");
 // james 
 // window.localStorage.setItem("userCode", "201707281605164831276233257855888");
@@ -51,8 +53,8 @@ Vue.http.defaults.headers.post['Content-Type'] = 'application/raw';           //
 // window.localStorage.setItem("userCode", "20170719115339110483535886346825");
 
 // 马一鸣
-window.localStorage.setItem("openId", "oOVVesw9m3Q8SQbYebfQ05u53BqE");
-window.localStorage.setItem("userCode", "20170721160758734671595511675408");
+// window.localStorage.setItem("openId", "oOVVesw9m3Q8SQbYebfQ05u53BqE");
+// window.localStorage.setItem("userCode", "20170721160758734671595511675408");
 
 // ceshi
 // window.localStorage.setItem("openId", "oOVVes2x6v6Iv4wHuDv6dUwvfNTM");

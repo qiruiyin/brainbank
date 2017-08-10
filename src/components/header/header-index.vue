@@ -45,6 +45,18 @@
 	      user: state => state.user
 	    })
 	  },
+    mounted () {
+      let userCode = this.$store.state.user.userCode || hold.storage.get("userCode"),
+          storageOpenId = hold.storage.get("openId"),
+          storeOpenId = this.$store.state.user.openId,
+          openId = storageOpenId || storeOpenId;
+
+      if(userCode && userCode != 'undefined' && userCode != '') {
+        this.getUserInfo(openId, userCode);
+      } else if(openId && openId != 'undefined' && openId != '') {
+        this.getUserCode(openId);
+      }
+    },
 		methods: {
 			goPage (link) {
 				let _this = this;
@@ -60,11 +72,6 @@
 	@import '~lib/sandal/core';
 	@import '~assets/css/core/functions', '~assets/css/core/mixins', '~assets/css/core/vars';
 	
-	$paddingTop: $padding;
-	$headerContentH: $headerH - $paddingTop*2;
-	$headerLinkH: 30px;
-	$paddingLeft: $padding/2;
-	
 	.vux-sticky-box {
 		& + div {
 			padding-top: $headerH;
@@ -78,7 +85,7 @@
 		left: 0;
 		width: 100%;
 		height: $headerH;
-		padding: $paddingTop $padding;
+		padding: $headerPaddingTop $padding;
 		background-color: #fff;
 		z-index: 10;
 
@@ -94,8 +101,8 @@
 			}
 
 			span {
-				margin-left: $paddingLeft;
-				padding-left: $paddingLeft;
+				margin-left: $headerPaddingLeft;
+				padding-left: $headerPaddingLeft;
 				@include halfpxline(0, $borderColor, 0 , 0, 0, 1px);
 			}
 
@@ -114,7 +121,7 @@
 			.btn {
 				float: left;
 				padding: 0 .5em;
-				margin-left: $paddingLeft;
+				margin-left: $headerPaddingLeft;
 				font-size: 12px;
 				@include halfpxline($borderRadius, $borderColor, 1px, 1px, 1px, 1px);
 				display: block;

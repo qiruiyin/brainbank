@@ -3,7 +3,7 @@
  -->
 
 <template>
-	<div v-transfer-dom>
+	<div v-transfer-dom v-cloak>
 		<div @click="goCart" class="cart-frame fa fa-shopping-cart">
 			<span>{{ cartNum }}</span>
 		</div>
@@ -38,8 +38,7 @@
 	    }
 	  },
 		mounted () {
-			// 如果还没有取过购物车信息
-			if(!this.$store.state.cart.hasAjax && this.$store.state.user.userCode) this.fetchData();
+			if(this.$store.state.user.userCode) this.fetchData();
 		},
 		methods: {
 			fetchData () {
@@ -51,7 +50,6 @@
 					).then(function(e) {
 						if(e.data.errcode == 1) {
 							_this.$store.commit("updateCartNum", { num: e.data.data.number });
-							_this.$store.commit("updateCartHasAjax", { hasAjax: true });
 						}
 					});
 			},

@@ -2,7 +2,7 @@
 	视频和音频的图文混排
  -->
 <template>
-	<div class="img-text" @click="imgTextClick">
+	<div class="img-text" @click="imgTextClick" v-cloak>
 		<div class="img-text-img">
 
 			<img class="img" v-if="imgTextData.img" :src="imgTextData.img" alt="">
@@ -18,7 +18,7 @@
 				<!-- <span>{{ imgTextData.priceCurrency }}{{ imgTextData.price }}/{{ imgTextData.priceUnit }}</span>	 -->
 			</h5>
 			<p class="desc">{{ imgTextData.desc }}</p>
-			<p>{{ imgTextData.label }}：{{ imgTextData.speaker }}</p>
+			<p>{{ imgTextData.label }}：{{ imgTextData.speaker }} <span v-if="imgTextData.classDay" class="class-day">{{ imgTextData.classDay }}</span></p>
 		</div>
 	</div>
 </template>
@@ -47,21 +47,22 @@
 		methods: {
 			imgTextClick () {
 				let _this = this;
-				if(this.imgTextData.isClick) {
-					this.$router.push({name: 'courseDetail', params: { courseCode: this.imgTextData.code }}) 
-				} else if (!_this.$store.state.user.userCode) {
-					// this.$emit("show-bangding")
-					_this.$vux.confirm.show({
-						content: "你还没有绑定用户，确定去绑定用户",
-					  onConfirm () {
-					  	_this.$router.push({ name: "bangding" });
-					  }
-					})
-				} else {
-					this.$vux.alert.show({
-						content: '你还没有报名，请立即去报名',
-					})
-				}
+					this.$router.push({name: 'courseDetail', query: { courseCode: this.imgTextData.code }}) 
+				// if(this.imgTextData.isClick) {
+				// 	this.$router.push({name: 'courseDetail', query: { courseCode: this.imgTextData.code }}) 
+				// } else if (!_this.$store.state.user.userCode) {
+				// 	// this.$emit("show-bangding")
+				// 	_this.$vux.confirm.show({
+				// 		content: "你还没有绑定用户，确定去绑定用户",
+				// 	  onConfirm () {
+				// 	  	_this.$router.push({ name: "bangding" });
+				// 	  }
+				// 	})
+				// } else {
+				// 	this.$vux.alert.show({
+				// 		content: '你还没有报名，请立即去报名',
+				// 	})
+				// }
 			}
 		}
 	}

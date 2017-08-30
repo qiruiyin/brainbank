@@ -3,30 +3,32 @@
  -->
 
 <template>
-	<div class="user-center">
+	<div class="user-center" v-cloak>
 		<header>
-			<div class="header-btn" @click="checkLogin({ 'name': 'kefu' })">我的客服</div>
-			<div class="header-msg">
-				<img :src="user.img" alt="">
-				<p>{{ user.name }}<span>{{ user.course }}</span></p>
+			<img :src="user.img" alt="">
+			<!-- <p>{{ user.openId }}</p> -->
+			<div class="header-info">
+				<p>{{ user.name }}</p>
+				<p>{{ user.course }}</p>
 			</div>
-			<div class="header-btn" @click="checkLogin({ 'name': 'share' })">分享有奖</div>
 		</header>
 
 		<main>
-			<cell v-for="item in operations" @click.native="checkLogin({name: item.url}, item.click)" :title="item.name" :key="item.value" is-link>
-        <i slot="icon" :class="['fa', 'fa-' + item.icon ]"></i>
-      </cell>
-      <cell @click.native="clearStorage" :title="clearData.name" >
+			<group v-for="(groupItem, groupIndex) in operations" :key="groupIndex">
+				<cell v-show="item.show" v-for="(item, index) in groupItem.list" @click.native="checkLogin({name: item.url}, item.click)" :title="item.name" :key="index" is-link>
+	        <i slot="icon" :class="['icon', 'icon-user-' + item.icon]"></i>
+	      </cell>
+			</group>
+      <!-- <cell @click.native="clearStorage" :title="clearData.name" >
         <i slot="icon" :class="['fa', 'fa-' + clearData.icon ]"></i>
-      </cell>
+      </cell> -->
 		</main>	
 	</div>
 </template>
 
 <script type="text/babel">
 	import { mapState } from 'vuex'
-	import { Cell } from 'vux'
+	import { Group, Cell } from 'vux'
 	
 	import imgUser from 'assets/img/user-center/user.png'
 	import imgIcon01 from 'assets/img/user-center/icon01.png'
@@ -37,7 +39,7 @@
 
 	export default {
 		components: {
-			Cell
+			Group, Cell
 		},
 		data () {
 			return {
@@ -45,63 +47,115 @@
 				kefuUrl: 'kefu',
 				operations: [
 					{
-						value: '',
-						name: '修改个人资料',
-						url: 'personalEdit',
-						img: imgIcon01,
-						icon: 'address-card-o',
-						click: false // 不绑定是否可点击
+						list: [
+							{
+								value: '',
+								name: '我的客服',
+								url: 'kefu',
+								img: imgIcon01,
+								icon: 'kefu',
+								click: false, // 不绑定是否可点击
+								show: true
+							},{
+								value: '',
+								name: '分享给好友',
+								url: 'share',
+								img: imgIcon01,
+								icon: 'share',
+								click: true, // 不绑定是否可点击
+								show: true,
+							}
+						]
 					},{
-						value: '',
-						name: '我的推广积分',
-						url: 'integral',
-						img: imgIcon02,
-						icon: 'diamond',
-						click: false 
+						list: [
+							{
+								value: '',
+								name: '个人资料',
+								url: 'personalEdit',
+								img: imgIcon01,
+								icon: 'person',
+								click: false,  // 不绑定是否可点击
+								show: true
+							},{
+								value: '',
+								name: '我的好友',
+								url: 'integral',
+								img: imgIcon02,
+								icon: 'haoyou',
+								click: false,
+								show: true
+							}
+						]
 					},{
-						value: '',
-						name: '我的商城订单',
-						url: 'orderMallList',
-						img: imgIcon04,
-						icon: 'shopping-cart',
-						click: false 
+						list: [
+							{
+								value: '',
+								name: '商城订单',
+								url: 'orderMallList',
+								img: imgIcon04,
+								icon: 'mall',
+								click: false,
+								show: true
+							},{
+								value: '',
+								name: '课程订单',
+								url: 'orderCourseList',
+								img: imgIcon04,
+								icon: 'course',
+								click: false,
+								show: true
+							},{
+								value: '',
+								name: '我的学习',
+								url: 'orderSourceList',
+								img: imgIcon04,
+								icon: 'study',
+								click: false,
+								show: true
+							},
+						]
 					},{
-						value: '',
-						name: '我的课程订单',
-						url: 'orderCourseList',
-						img: imgIcon04,
-						icon: 'shopping-cart',
-						click: false 
+						list: [
+							{
+								value: '',
+								name: '地址管理',
+								url: 'address',
+								img: imgIcon04,
+								icon: 'address',
+								click: false,
+								show: true
+							}
+						]
 					},{
-						value: '',
-						name: '我的学习',
-						url: 'orderSourceList',
-						img: imgIcon04,
-						icon: 'shopping-cart',
-						click: false 
-					},{
-						value: '',
-						name: '地址管理',
-						url: 'address',
-						img: imgIcon04,
-						icon: 'bookmark-o',
-						click: false 
-					},{
-						value: '',
-						name: '意见反馈',
-						url: 'feedback',
-						img: imgIcon05,
-						icon: 'info-circle',
-						click: true
+						list: [
+							{
+								value: '',
+								name: '编辑语录',
+								url: 'quotationSend',
+								img: imgIcon05,
+								icon: 'quotation',
+								click: true,
+								show: false
+							},{
+								value: '',
+								name: '意见反馈',
+								url: 'feedback',
+								img: imgIcon05,
+								icon: 'feedback',
+								click: true,
+								show: true
+							},{
+								value: 'clear',
+								name: '清空缓存',
+								url: '',
+								img: imgIcon05,
+								icon: 'clear',
+								click: true,
+								show: true
+							}
+						]
 					}
-				],
-				clearData: {
-					value: '',
-					name: '清空缓存',
-					url: '',
-					img: imgIcon05,
-					icon: 'info-circle'
-				}
+				]
 			}
 		},
 		computed: {
@@ -115,31 +169,14 @@
 		methods: {
 			fetchData () {
 				let _this = this;
-
-				_this.$http.post('/wechat/discover/userinfo/get',
-		  			{
-		  				"userCode": _this.$store.state.user.userCode,
-		  				"openId": _this.$store.state.user.openId
-		  			}
-		  		).then(function(e) {
-		  			let responseData = e.data.data,
-		  					headerUrl;
-
-	  				headerUrl = _this.resolveImg(responseData.headerUrl) ;
-
-		  			_this.$store.commit('updateUserImg', {img: headerUrl});
-		  			_this.$store.commit('updateUserName', {name: responseData.name ? responseData.name : '普通用户'})
-
-		  			if(responseData.userLevelMap) {
-		  				_this.$store.commit('updateUserLevel', {level: responseData.userLevelMap.categoryLevel });
-		  				_this.$store.commit('updateUserBtns', {btns: _this.wordBook.headerBtns['level' + responseData.userLevelMap.categoryLevel].btns})
-		  				_this.$store.commit('updateUserCourse', {course: responseData.userLevelMap.categoryName})
-		  			} else {
-	  					_this.$store.commit('updateUserBtns', {btns: _this.wordBook.headerBtns.level1.btns})
-		  				_this.$store.commit('updateUserCourse', {course: _this.wordBook.headerBtns.level1.course})
-		  				_this.$store.commit('updateUserLevel', {level: 1 });
-		  			}
-	  			});
+				this.$http.post('/wechat/usercenter/zjl',
+					{
+						openId: _this.user.openId
+					}).then(function(e) {
+						if(e.data.errcode == 1) {
+							_this.operations[_this.operations.length - 1].list[0].show = true;
+						}
+					})
 			},
 			clearStorage () {
 				window.localStorage.clear();
@@ -147,7 +184,11 @@
 			},
 			checkLogin (url, data) {
 				if(data) {
-					this.$router.push(url); 
+					if(url.name) {
+						this.$router.push(url); 
+					} else {
+						this.clearStorage(); 
+					}
 				} else {
 					if(!this.isLogin()) return false
 
@@ -158,87 +199,86 @@
 	}
 </script>
 
-<style lang="scss" scoped>
+
+<style lang="scss">
 	@import '~lib/sandal/core';
 	@import '~assets/css/core/functions', '~assets/css/core/mixins', '~assets/css/core/vars';
 	
-	$headerPadding: 40px;
-
 	.user-center {
-		background-color: $bgGray;
-	}
-	
-	header {
-		position: relative;
-		padding-top: $headerPadding;
-		padding-bottom: $padding*2;
-		margin-bottom: $padding;
-		text-align: center;
-		background: #fff;
-		// background: #fff url("~assets/img/user-center/user-bg.png") no-repeat;
-		// background-size: 100% auto;
-
-		&:before {
-			content: "";
-			position: absolute;
-			top: 0;
-			left: 0;
-			width: 100%;
-			height: 56%;
-			background: $colorBlue;
+		
+		main {
+			border-bottom: $uiMarginH solid $uiMarginBg;
 		}
 
-		.header-btn {
-			// @include halfpxline($borderRadius, #fff, 1px, 1px, 1px, 1px);
-			position: absolute;
-			top: $headerPadding;
-			left: auto;
-			right: 30px;
-			line-height: 30px;
-			padding: 0 1em;
-			color: #fff;
-			z-index: 2;
+		.weui-cell_access .weui-cell__ft:after {
+			width: 10px;
+			height: 10px;
+		}
 
-			&:first-child {
-				left: 30px;
-				right: auto;
+		.weui-cells {
+			margin-top: 0;
+			border-top: $uiMarginH solid $uiMarginBg;
+
+			&:before {
+				border-top: 0;
+			}
+			&:after {
+				border-bottom: 0;
+			}
+		}
+	}
+</style>
+
+<style lang="scss" scoped>
+	@import '~lib/sandal/core';
+	@import '~assets/css/core/functions', '~assets/css/core/mixins', '~assets/css/core/vars';
+
+	@import '~assets/css/icon';
+	
+	$userCenterheaderImgW: 50px;
+	
+	$userCenterIconW: 22px;
+
+	.user-center {
+		.icon {
+			padding-left: $userCenterIconW + 6px;
+
+			&:before {
+				width: $userCenterIconW;
+				height: $userCenterIconW;
+				margin-top: -$userCenterIconW/2;
 			}
 		}
 	}
 
-	.header-msg {
-		margin: 0 auto;
+	header {
+		padding: $paddingTop 0;
+		background-color: $colorOrange;
 		text-align: center;
-		z-index: 1;
-    position: relative;
+		color: #fff;
 
 		img {
-			width: 80px;
+			width: $userCenterheaderImgW;
+			height: $userCenterheaderImgW;
 			margin: 0 auto;
-    	border-radius: 80px;
+			border-radius: $userCenterheaderImgW;
 		}
+		
+		.header-info {
+			width: 100%;
+			line-height: 2;
+			@extend %clearfix;
 
-		p {
-			padding-top: 5px;
-			line-height: 1;
+			p {
+				float: left;
+				width: 50%;
+				padding: 0 .5em;
+				text-align: right;
+
+				&:last-child {
+					text-align: left;
+				}
+			}
 		}
-
-		span {
-			margin-left: 1em;
-			// border-left: 1px solid $borderColor;
-			padding-left: 1em;
-		}
-	}
-
-	main {
-		background-color: #fff;
-	}
-
-	.fa {
-		width: 1em;
-		text-align: center;
-		margin-right: 1em;
-		color: $colorBlue;
-		font-size: 24px;
 	}
 </style>

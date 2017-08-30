@@ -3,10 +3,10 @@
  -->
 
 <template>
-    <div v-transfer-dom>
+    <div v-transfer-dom v-cloak>
       <nav>
     	<tabbar icon-class="vux-center" slot="bottom">
-          <tabbar-item v-for="item in navDatas" :link="{name: item.link}" :selected="item.value == navSelected" :key="item.value">
+          <tabbar-item v-for="item in navDatas" :link="{name: item.link}" :selected="item.value == navSelected" :badge="item.link == 'msg' ? user.hasMsg : ''" :key="item.value">
             <img v-if="item.value == 'mall'" :class="{'nav-icon-big': item.value == 'mall'}" slot="icon" :src="item.img">
             <i v-else :class="['fa', 'fa-' + item.value ]" slot="icon"></i>
             <span slot="label" class="nav-icon">{{ item.name }}</span>
@@ -18,6 +18,7 @@
 
 <script type="text/babel">
 	import { Tabbar, TabbarItem, TransferDom } from 'vux'
+    import { mapState } from 'vuex'
 	
 	import imgIndex from 'assets/img/nav/nav-index.png'
 	import imgCourse from 'assets/img/nav/nav-course.png'
@@ -65,6 +66,11 @@
         		navSelected: 'home'
     	    }
 	    },
+        computed: {
+          ...mapState({
+            user: state => state.user
+          })
+        },
         // computed: {
         //     navSelected () {
         //         let _this = this,
@@ -80,6 +86,24 @@
         // }
 	}
 </script>
+
+<style lang="scss">
+    @import '~lib/sandal/core';
+    @import '~assets/css/core/functions', '~assets/css/core/mixins', '~assets/css/core/vars';
+        
+    $vuxBadgeW: 8px;
+    
+    .vux-center {
+        .vux-badge {
+            font-size: 0;
+            width: $vuxBadgeW;
+            height: $vuxBadgeW;
+            margin-top: 6px;
+            color: $msgCircleColor;
+            border-radius: $vuxBadgeW;
+        }
+    }
+</style>
 
 <style lang="scss" scoped>
 	@import '~lib/sandal/core';

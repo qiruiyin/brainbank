@@ -3,10 +3,11 @@
  -->
 
 <template>
-	<div v-transfer-dom>
+	<div v-transfer-dom v-cloak>
 		<div class="cart cart-pay">
-			<p>共<span>{{ orderInfo.num }}</span>件，总金额 <span><i>￥</i>{{ orderInfo.money }}</span></p>
-			<div @click="payOrder" :class="['pay-order', { 'disabled': !isActive }]">支付</div>
+			<!-- <p>共<span>{{ orderInfo.num }}</span>件，总金额 <span><i>￥</i>{{ orderInfo.money }}</span></p> -->
+			<p>总金额 <span><i>￥</i>{{ orderInfo.money }}</span></p>
+			<div @click="payOrder" :class="['pay-order', { 'disabled': !isActive }]">提交订单</div>
 		</div>	
 	</div>
 </template>
@@ -33,7 +34,8 @@
 		},
 		computed: {
       ...mapState({
-        user: state => state.user
+        user: state => state.user,
+        loadbar: state => state.loadbar
       }),
       isActive () {
       	return this.orderInfo.isActive && this.user.pay
@@ -41,7 +43,6 @@
     },
 		methods: {
 			payOrder () {
-				console.log(2222)
 				let _this = this;
 				if(_this.isActive) {
 					if(_this.orderInfo.isActive) {
@@ -56,9 +57,11 @@
 			pay () {
 				let _this = this;
 				if(_this.orderInfo.type == 1) {
-					this.payWeixinOrder(_this.orderInfo.code, {name: "orderDone", query: { type: 1 }});
+					// 跳过支付看问题
+					// _this.$router.push({name: 'questionnaire', query: { productCode: _this.orderInfo.productCode, groupCode: "", orderCode: _this.orderInfo.code }})
+					this.payWeixinOrder(_this.orderInfo.code, {name: 'questionnaire', query: { productCode: _this.orderInfo.productCode, groupCode: "", orderCode: _this.orderInfo.code }}, 1)
       	} else {
-					this.payWeixinOrder(_this.orderInfo.code, {name: "orderDone"});
+					this.payWeixinOrder(_this.orderInfo.code, {name: "orderDoneMall", query: { orderCode: _this.orderInfo.code }});
       	}
 			}
 		}
@@ -68,6 +71,8 @@
 <style lang="scss" scoped>
 	@import '~lib/sandal/core';
 	@import '~assets/css/core/functions', '~assets/css/core/mixins', '~assets/css/core/vars';
+
+	@import '~assets/css/cart';
 	
 	.cart {
 		position: absolute;
@@ -76,16 +81,17 @@
 		right: 0;
 		width: 100%;
 		height: $cartH;
-		background: #fff;
+		background: $cartBg;
 		z-index: 10;
 		display: flex;
-		font-size: 15px;
+		font-size: $cartBtnFontSize;
+		border-top: 1px solid $borderColor;
+		color: $cartColor;
 
 		div {
 			width: 50%;
 			line-height: $cartH;
 			text-align: center;
-			color: #fff;
 		}
 	}
 
@@ -98,7 +104,7 @@
 			text-align: right;
 
 			span {
-				color: $cartColorYellow;
+				color: $cartColor;
 				
 				i {
 					font-style: normal;

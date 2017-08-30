@@ -3,70 +3,80 @@
  -->
 
 <template>
-	<div class="msg">
-		<swipeout class="vux-1px-tb">
-      <swipeout-item transition-mode="follow" v-for="(item, index) in msgDatas" :key="item.date">
-      	<div slot="left-menu">
-          <swipeout-button @click.native="btnDelete(item.code, index)" type="warn">删除</swipeout-button>
-        </div>
-        <div slot="right-menu">
-          <swipeout-button @click.native="btnDelete(item.code, index)" type="warn">删除</swipeout-button>
-        </div>
-      	
-      	<div slot="content" class="msg-simple vux-1px-t">
-        <!-- 客户消息 -->
-        	<template  v-if="item.status == 1">
-						<main v-show="item.show" @click="btnReply(item.code, item.sendUserCode,item.sendUserName)">
-							<div class="title">{{ item.title }}</div>
-							<div class="desc">详情：{{ item.content }}</div>
-							<div class="time">时间：{{ item.time }}</div>
-							<div class="reply fa fa-mail-reply"></div>
-						</main>  	 
-	        </template>
-        	<!-- 系统消息 -->
-        	<template v-else>
-						<main>
-							<div class="title">系统{{ item.title }}</div>
-							<div class="desc">详情：{{ item.content }}</div>
-							<div class="time">时间：{{ item.time }}</div>
-							<div class="reply fa fa-mail-reply"></div>
-						</main>
-						<footer v-if="item.url">
-							<router-link :to="{ name: item.url }">
-								{{ item.urlMsg }}
-							</router-link>
-						</footer>  	 
-        	</template>
-        </div>
-        
-      </swipeout-item>
-    </swipeout>
+	<div class="msg" v-cloak>
+		<div class="msg-group">
+			<el-msg :data-msg="orderInfo"></el-msg>
+			<el-msg :data-msg="sysInfo"></el-msg>
+		</div>
+
+		<div class="msg-group group-pengyou" ref="group" v-if="pengyou.list.length > 0">
+			<scroller class="scroller" lock-x :height="-offsetBottom + 'px'" @done-pulldown="donePulldown" @on-pulldown-loading="onPulldownLoading" @on-pullup-loading="onPullupLoading" ref="scrollerBottom" :scroll-bottom-offst="200" :use-pulldown="true" :use-pullup="true" :pulldown-config="pulldownConfig" :pullup-config="pullupConfig">
+				<div>
+					<el-msg :data-msg="item" v-for="(item, index) in pengyou.list" :key="index"></el-msg>
+					
+					<!-- <el-load-more :load-all="pengyou.loadAll"></el-load-more> -->
+				</div>
+			</scroller>
+		</div>
 	</div>
 </template>
 
 <script type="text/babel">
-import hold from 'src/commons/hold'
-	import { GroupTitle, Swipeout, SwipeoutItem, SwipeoutButton, XButton, Toast } from 'vux'
+	import { Scroller, LoadMore } from 'vux'
+	import elLoadMore from 'components/load-more/load-more'
+	import elMsg from "components/msg/msg"
+
+	import imgOrder from "assets/img/icon/msg-order.png"
+	import imgSys from "assets/img/icon/msg-sys.png"
 
 	export default {
-		name: 'msg',
+		name: "msg",
 		components: {
-			GroupTitle, Swipeout, SwipeoutItem, SwipeoutButton, XButton, Toast
+			Scroller, LoadMore, elMsg, elLoadMore
 		},
 		data () {
 			return {
-				title: '消息',
-				msgDatas: [
-					// {
-					// 	status: 1,
-					// 	show: true,
-					// 	title: '',
-					// 	content: '',
-					// 	time: '',
-					// 	url: '',
-					// 	urlMsg: ''
-					// }
-				]
+				orderInfo: {
+					img: imgOrder,
+					title: "订单通知",
+					time: "",
+					status: "1",
+					content: "",
+					sendUser: "",
+					msgType: "2"
+				},
+				sysInfo: {
+					img: imgSys,
+					title: "系统通知",
+					time: "",
+					status: "1",
+					sendUser: "",
+					content: "",
+					msgType: "1"
+				},
+				pengyou: {
+					scrollH: 0, // 初始scroll高度
+					onFetching: false, // 是否在加载数据
+					loadAll: false, // 是否加载完
+					pageSize: 1,
+					pageCount: this.wordBook.pageCount,
+					oldTime: "",
+					list: []
+				},
+				scrollH: 0, // 初始scroll高度
+				offsetBottom: this.$route.query.msgType == 3 ? 70 : 0, // 距底部高度
+				pulldownConfig: {
+					content: '',
+					downContent: '',
+					upContent: '',
+					loadingContent: '正在加载'
+				},
+				pullupConfig: {
+					content: '',
+					downContent: '',
+					upContent: '',
+					loadingContent: '正在加载'
+				},
 			}
 		},
 		mounted () {
@@ -75,68 +85,137 @@ import hold from 'src/commons/hold'
 		methods: {
 			fetchData () {
 				let _this = this;
-				
+				this.getSys();
+				this.getPengyou(true);
+			},
+			getSys () {
+				let _this = this;
+
 				this.$http.post('/wechat/message/index',
+					{
+						openId: _this.$store.state.user.openId
+					}
+				).then(function(e) {
+					let responseData = e.data.data;
+
+					if(e.data.errcode == 1) {
+						if(responseData.orderList) {
+							_this.orderInfo.time = responseData.orderList.time;
+							_this.orderInfo.content = responseData.orderList.content;
+							_this.orderInfo.status = responseData.orderList.msg_status;
+							_this.orderInfo.msgType = responseData.orderList.msg_type;
+						}
+
+						if(responseData.sysList) {
+							_this.sysInfo.time = responseData.sysList.time;
+							_this.sysInfo.content = responseData.sysList.content;
+							_this.sysInfo.status = responseData.sysList.msg_status;
+							_this.sysInfo.msgType = responseData.sysList.msg_type;
+						}
+					} else {
+						_this.$vux.alert.show({
+							content: e.data.errmsg
+						})
+					}
+				});
+			},
+			getPengyou (status) {
+				// status: true 加载最新， false 加载分页记录
+				let _this = this,
+						pageSize = _this.pengyou.pageSize,
+						createTime = _this.pengyou.oldTime;
+
+				_this.pengyou.onFetching = true;
+
+				if(status) {
+					pageSize = 1;
+					createTime = "";
+				}
+
+				this.$http.post('/wechat/message/userIndex',
 						{
-							"customerCode": _this.$store.state.user.userCode,
-							"pageSize": 1,
-							"pageCount": 10
+							openId: _this.$store.state.user.openId,
+							pageSize: pageSize,
+							pageCount: _this.pengyou.pageCount,
+							createTime: createTime
 						}
 					).then(function(e) {
-						// messageType: 0系统消息,1客户消息
-						let responseData = e.data;
-						if(responseData.errcode == 1) {
-							// 标题：来自某某的短消息
-							// 内容
-							// 时间
-							if(responseData.data.messageList) {
-								_this.msgDatas = responseData.data.messageList.map(function(item, index){
+						let responseData = e.data.data,
+								list = [];
+						if(e.data.errcode == 1) {
+							if(responseData.userList && responseData.userList.length > 0) {
+								list = responseData.userList.map(function(item, index){
 									return {
-										status: 1,
-										show: true,
-										title: "来自" + item.sendUserName + "的短消息",
+										img: _this.resolveImg(item.header),
+										title: item.name,
+										time: item.time,
+										createTime: item.createTime,
+										status: item.msg_status,
 										content: item.content,
-										time: item.createTime,
-										code: item.messageCode,
-										sendUserName: item.sendUserName,
-										sendUserCode: item.sendCode,
-										url: '',
-										urlMsg: '',
+										msgType: item.msg_type,
+										sendUser: item.send_user
 									}
 								})
 							}
+
+							if(pageSize == 1) {
+								_this.pengyou.oldTime = list[0].createTime;
+								_this.pengyou.list = list;
+								_this.pengyou.pageSize = 2;
+								_this.pengyou.loadAll = false;
+							} else {
+								_this.pengyou.pageSize++;
+								_this.pengyou.list = _this.pengyou.list.concat(list);
+							}
+
+							if(list.length < _this.pengyou.pageCount) {
+								_this.pengyou.loadAll = true;
+							}
+						} else {
+							_this.$vux.alert.show({
+								content: e.data.errmsg
+							})
 						}
 
+						_this.pengyou.onFetching = false;
+						if(!status) {
+							_this.$refs.scrollerBottom.donePullup();
+						} else {
+							_this.$refs.scrollerBottom && _this.$refs.scrollerBottom.donePulldown();
+						}
+						_this.resetView();
 					})
 			},
-			btnDelete (code, ind) {
+			resetView (status) {
+				// status: true 到底部，false：保持当前
 				let _this = this;
-
-				_this.msgDatas.map(function(item, index) {
-      		if(index == ind) {
-      			item.show = false
-      		}
-      	})
-
-				this.$http.post('/wechat/message/deleteMessage',
-						{
-							"messageCode": code
-						}
-					).then(function(e) {
-						if(e.data.errcode == 1) {
-							_this.$vux.toast.show({
-			          text: '删除成功',
-			        })
-						}
-					})
+				_this.$nextTick(() => {
+				  _this.$refs.scrollerBottom.reset()
+				})
 			},
-			btnReply (code, sendUserCode, sendUserName) {
-				console.log(code, sendUserCode, sendUserName)
-				this.$store.commit("updateMsgName", { name: sendUserName });
-				this.$store.commit("updateMsgUserCode", { userCode: sendUserCode });
-				this.$store.commit("updateMsgUrl", { url: 'msg' });
-				this.$router.push({ name: 'msgAdd' })
-			}
+			onPulldownLoading () {
+	      if (this.pengyou.onFetching) {
+	        // do nothing
+	      } else {
+	        this.pengyou.onFetching = true
+					this.getPengyou(true);
+	      }
+	    },
+	    onPullupLoading (){
+	    	if (this.pengyou.onFetching || this.pengyou.loadAll) {
+	        // do nothing
+					this.$refs.scrollerBottom.donePullup();
+	      } else {
+		    	this.pengyou.onFetching = true;
+					this.getPengyou(false);
+				}
+	    },
+	    donePulldown () {
+	    	console.log(111);
+	    },
+	    donePullup () {
+	    	console.log(111);
+	    },
 		}
 	}
 </script>
@@ -144,44 +223,24 @@ import hold from 'src/commons/hold'
 <style lang="scss" scoped>
 	@import '~lib/sandal/core';
 	@import '~assets/css/core/functions', '~assets/css/core/mixins', '~assets/css/core/vars';
-	
-	$msgMargin: $padding;
 
 	.msg {
-    min-height: 100%;
-		padding: $msgMargin 0 0;
-		background: $bgGray;
+
 	}
 
-	.msg-simple {
-		margin-bottom: $msgMargin;
-		background-color: #fff;
+	.msg-group {
+		border-bottom: $uiMarginH solid $uiMarginBg;
+
+		&:first-child {
+			border-top: $uiMarginH solid $uiMarginBg;
+		}
 	}
 
-	header	{
-		line-height: 40px;
-		@include halfpxline(0, $borderColor, 0 , 0, 1px, 0);
-		text-align: center;
-	}
-
-	main {
-		padding: $padding;
-		line-height: 1.75;
-		text-align: left;
-	}
-
-	.title {
-		color: $fontColorBlack;
-		font-size: 18px;
-	}
-
-	footer {
-		padding: 0 $padding $padding;
-	}
-
-	.reply {
+	.group-pengyou {
 		position: absolute;
-		top: $padding;
-		right: $padding;
+		top: 162px;
+		bottom: $containerBottom - $padding;
+		left: 0;
+		right: 0;
 	}
 </style>

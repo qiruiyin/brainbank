@@ -3,7 +3,7 @@
  -->
 
 <template>
-	<div class="pay">
+	<div class="pay" v-cloak>
 		<form-preview header-label="付款金额" header-value="¥2400.00" :body-items="list" :footer-buttons="buttons2" name="demo"></form-preview>
 	</div>
 </template>

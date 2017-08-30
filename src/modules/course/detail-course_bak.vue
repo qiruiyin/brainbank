@@ -3,7 +3,7 @@
  -->
 
 <template>
-	<div class="detail-course">
+	<div class="detail-course" v-cloak>
 		<el-header-index></el-header-index>
 
 		<div class="container">

@@ -3,7 +3,7 @@
  -->
 
 <template>
-	<div class="kefu-detail">
+	<div class="kefu-detail" v-cloak>
 		<el-header-index></el-header-index>
 
 		<div class="container">
@@ -24,7 +24,13 @@
 			
 			<card v-if="header.tel || header.weixin" :header="{title: '联系方式'}">
 				<div slot="content" class="kefu-link">
-					<a v-if="header.tel" class="link-icon-tel" :href="'tel:' + header.tel">{{ header.tel }}<span>（点击拨打）</span></a>
+					<div class="link-block">
+						<a v-if="header.tel" class="link-icon-tel" :href="'tel:' + header.tel">
+							{{ header.tel }}
+							<span>（点击拨打）</span>
+						</a>
+						<p @click="goMsg">发送站内信</p>
+					</div>
 					<a v-if="header.weixin" class="link-icon-weixin">{{ header.weixin }}<span>（复制微信号添加服务老师）</span></a>
 				</div>
 			</card>
@@ -65,7 +71,8 @@
 					weixin: '',
 					likeRate: '',
 					customerWitness: '',
-					serviceLevel: ''			
+					serviceLevel: '',
+					openId: ""
 				},
 				courseAll: [],
 			}
@@ -79,35 +86,42 @@
 				this.$http.post('/wechat/usercenter/customerService/info',
 						{
 							"customerCode": _this.$store.state.user.userCode,
-							"userCode": _this.$route.params.serviceCode
+							"userCode": _this.$route.query.serviceCode
 						}
 					).then(function(e) {
-						let responseData = e.data.data,
-								header = responseData.customerServiceInfoList;
+						if(e.data.errcode == 1) {
+							let responseData = e.data.data,
+									header = responseData.customerServiceInfoList;
 
-						_this.header = {
-							img: _this.resolveImg(header.headPhoto),
-							name: header.NAME,
-							position: header.roleName,
-							time: header.workTime + '年',
-							customerNum: header.customerCount,
-							tel: header.mobile,
-							weixin: '',
-							likeRate: '99%',
-							customerWitness: '25',
-							serviceLevel: '75'	
-						};
+							_this.header = {
+								img: _this.resolveImg(header.headPhoto),
+								name: header.NAME,
+								position: header.roleName,
+								time: header.workTime + '年',
+								customerNum: header.customerCount,
+								tel: header.mobile,
+								weixin: '',
+								likeRate: '99%',
+								customerWitness: '25',
+								serviceLevel: '75',
+								openId: header.openId
+							};
 
-						let courseAll = [];
-						responseData.medalBeanList.map(function(item, index) {
-							courseAll[index] = {
-								name: item.name.substr(0, 1),
-								nameAll: item.name,
-								code: item.code,
-								owner: item.owner
-							}
-						});
-						_this.courseAll = courseAll;
+							let courseAll = [];
+							responseData.medalBeanList.map(function(item, index) {
+								courseAll[index] = {
+									name: item.name.substr(0, 1),
+									nameAll: item.name,
+									code: item.code,
+									owner: item.owner
+								}
+							});
+							_this.courseAll = courseAll;
+						} else {
+							_this.$vux.alert.show({
+								content: e.data.errmsg
+							})
+						}
 					}
 				);
 			},
@@ -126,7 +140,10 @@
 				this[name] = arr;
 			},
 			goPage (url, code) {
-	  		this.$router.push({ name: url, params: { courseCode: code }})
+	  		this.$router.push({ name: url, query: { courseCode: code }})
+			},
+			goMsg () {
+				this.$router.push({ name: 'msgDetail', query: { sendUser: this.header.openId , msgType: 3 }})
 			}
 		}
 	}
@@ -146,8 +163,8 @@
 		width: 100%;
 		height: 240px;
 		padding: 30px $padding $padding;
-		background: url("~assets/img/user-center/kefu-bg.png") no-repeat;
-		background-size: 100%;
+		background: url("~assets/img/user-center/kefu.jpg") no-repeat;
+		background-size: cover;
 		text-align: center;
 		line-height: 2;
 		color: #fff;
@@ -240,6 +257,36 @@
 
 		span {
 			float: right;
+		}
+	}
+
+	.link-block {
+		display: flex;
+
+		a {
+			flex: 1;
+		}
+
+		p {
+			width: 8em;
+			height: 30px;
+			margin-top: 5px;
+			line-height: 30px;
+			text-indent: 30px;
+			@include halfpxline($borderRadius, $colorGreen, 1px, 1px, 1px, 1px);
+			
+			&:before {
+				content: "";
+				position: absolute;
+				left: 0;
+				top: 50%;
+				width: 30px;
+				height: 30px;
+				margin-top: -15px;
+				background: url("~assets/img/user-center/service-msg.png") no-repeat;
+				background-size: 80%;
+				background-position: center;
+			}
 		}
 	}
 

@@ -23,6 +23,7 @@ originalConfig = {
     extensions: ['.js', '.vue', '.json'],
     alias: {
       'vue$': 'vue/dist/vue.esm.js',
+      'node': path.resolve(__dirname, '../node_modules'),
       '@': resolve('src'),
       'src': path.resolve(__dirname, '../src'),
       'assets': path.resolve(__dirname, '../src/assets'),

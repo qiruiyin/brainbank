@@ -21,8 +21,9 @@ let historyCount = history.getItem('count') * 1 || 0
 history.setItem('/', 0);
 
 router.beforeEach((to, from, next) => {
+
   // 是否加载
-  store.commit('updateLoadingStatus', {isLoading: true})
+  store.commit('updateLoadingStatus', {isLoading: true});
 
   if(!hold.storage.get('openId') && to.path != '/author'){
     // 第一次进入项目
@@ -33,8 +34,11 @@ router.beforeEach((to, from, next) => {
   // 用户是否授权结束
 
   // 底部显不显示（Vue.prototype.wordBook.nav不显示列表）
-  store.commit("updateNavStatus", { status: !Vue.prototype.arrContain(Vue.prototype.wordBook.nav, to.name) })
+  store.commit("updateNavStatus", { status: !Vue.prototype.arrContain(Vue.prototype.wordBook.nav, to.name) });
 
+  if(to.name == 'msg') {
+    store.commit("updateUserHasMsg", { hasMsg: '' });
+  }
   // 切换效果
   const toIndex = history.getItem(to.path)
   const fromIndex = history.getItem(from.path)
@@ -61,10 +65,33 @@ router.beforeEach((to, from, next) => {
 })
 
 router.afterEach((to, from, next) => {
-  if(from.path != "/") {
-    Vue.prototype.signUrl(location.href.replace(from.path, to.path));
+
+  // 微信签名
+  if(!store.state.user.shareImg) {
+    Vue.prototype.openShare(Vue.prototype.wordBook.urlLink.share, "大脑银行商学院", '海量"企业"管理与"行业资料"任你下载，大量"培训视频"与"商业思维"随你观看！', store.state.user.openId, "", true);
   } else {
-    Vue.prototype.signUrl(location.href);
+    Vue.prototype.signUrl(location.href, true, { url: store.state.user.shareImg, imgUrl: '' });
+  }
+  // 统计页面访问记录
+  if(to.name && Vue.prototype.arrContain(Vue.prototype.wordBook.visitRouter, to.name)) {
+    if(to.name == 'rankList') {
+      Vue.prototype.visitRouter(to.meta.routerTitle[to.params.type], to.fullPath, 'in')
+    } else if (to.name == 'courseTypeDetail') {
+      Vue.prototype.visitRouter(to.meta.routerTitle[to.query.type], to.fullPath, 'in')
+    } else {
+      Vue.prototype.visitRouter(to.meta.routerTitle, to.fullPath, 'in')
+    }
+  }
+
+  // 统计页面访问记录
+  if(from.name && Vue.prototype.arrContain(Vue.prototype.wordBook.visitRouter, from.name)) {
+    if(from.name == 'rankList') {
+      Vue.prototype.visitRouter(from.meta.routerTitle[from.params.type], from.fullPath, 'out')
+    } else if (from.name == 'courseTypeDetail') {
+      Vue.prototype.visitRouter(from.meta.routerTitle[from.query.type], from.fullPath, 'out')
+    } else {
+      Vue.prototype.visitRouter(from.meta.routerTitle, from.fullPath, 'out')
+    }
   }
  
   store.commit('updateLoadingStatus', {isLoading: false})

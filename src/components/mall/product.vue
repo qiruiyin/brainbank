@@ -1,9 +1,9 @@
 <!-- 
-	生成产品列表
+	产品列表
  -->
 
 <template>
-	<div class="mall-product">
+	<div class="mall-product" v-cloak>
 		<img :src="mallProductData.img" alt="">
 		<h5>{{ mallProductData.name }}</h5>
 		<p>{{ mallProductData.desc }}</p>
@@ -18,10 +18,16 @@
 		data () {
 			return {
 				mallData: {
+					// img: '',
+					// name: '',
+					// desc: '',
+					// price: ''
 					img: '',
-					name: '',
+					name: '测试书籍',
 					desc: '',
-					price: ''
+					price: '12',
+					code: "",
+					type: '' // 判别是音频，视频还是商品
 				}
 			}
 		}
@@ -33,31 +39,33 @@
 	@import '~lib/sandal/core';
 	@import '~assets/css/core/functions', '~assets/css/core/mixins', '~assets/css/core/vars';
 	
+	$mallProductBorder: 3px;
+	
 	.mall-product {
 		float: left;
 		width: 50%;
-		margin-bottom: $padding;
+		border-bottom: $mallProductBorder solid $uiMarginBg;
 		line-height: 1.5;
 		text-align: center;
 		background: #fff;
 
 		&:nth-child(odd) {
-			border-right: $padding/2 solid $bgGray;
+			border-right: $mallProductBorder/2 solid $uiMarginBg;
     }
 		&:nth-child(even) {
-			border-left: $padding/2 solid $bgGray;
+			border-left: $mallProductBorder/2 solid $uiMarginBg;
     }
 
 		img {
 			width: 80%;
+			height: 200px;
 			margin: 0 auto;
-	    padding: $padding 0;
+	    padding: 10px 0;
 		}
 		
 		h5, p {
-			overflow:hidden;
-			white-space:nowrap;
-			text-overflow:ellipsis;
+			padding: 0 $padding;
+			@include ellipsisOne();
 		}
 
 		h5 {

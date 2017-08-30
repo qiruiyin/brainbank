@@ -3,7 +3,7 @@
  -->
 
 <template>
-	<div class="img-text img-text-quotation">
+	<div class="img-text img-text-quotation" v-cloak>
 		<div class="img-text-img">
 			<img class="img" src="~assets/img/index/video-course.png" alt="">
 		</div>

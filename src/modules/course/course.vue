@@ -3,7 +3,7 @@
  -->
 
 <template>
-	<div class="detail-type">
+	<div class="detail-type" v-cloak>
 		<el-header-index></el-header-index>
 
 		<div class="container">
@@ -11,15 +11,15 @@
 				<tab :line-width=2 v-model="tabSelected">
 		      <tab-item class="vux-center" v-for="(item, index) in tabData" :key="index">{{ item.name }}</tab-item>
 		    </tab>
-		    <swiper v-model="tabSelected" height="100%" :show-dots="false">
+		    <swiper v-model="tabSelected" height="100%" :show-dots="false" :threshold="tabChangeW">
 		      <swiper-item v-for="(tabItem, ind) in tabData" :key="ind">
 		    		<template v-if="tabItem.value == 'recent'">
-							<el-course-recent :course-list-data="courseList"></el-course-recent>
+							<el-course-recent></el-course-recent>
 		    		</template>
 
 		    		<template v-if="tabItem.value == 'all'">
 							<div class="banner">
-								<router-link v-for="(item, index) in banner" :key="index" :to="{ name: 'courseDetail', params: { courseCode: item.code } }">
+								<router-link v-for="(item, index) in banner" :key="index" :to="{ name: 'courseDetail', query: { courseCode: item.code } }">
 									<img class="img" :src="item.img" alt="">
 								</router-link>
 							</div>
@@ -52,6 +52,7 @@
 		data () {
 			return {
 				title: '课程列表',
+				tabChangeW: this.wordBook.tabChangeW,
 				tabData: [
 					{
 						value: 'all',
@@ -65,7 +66,6 @@
 				],
 				tabSelected: this.$route.query.type == 1 ? 1 : 0,
 				courseTitle: [ '日期', '课程', '讲师', '时间', '地点' ],
-				courseList: [],
 				banner: [],
 				courseTuijian: []
 			}
@@ -81,47 +81,7 @@
 	  			"customerCode": _this.$store.state.user.userCode	
 	  		}).then(function(e) {
 					let responseData = e.data.data;
-	  			_this.courseList = responseData.lessonList.map(function(item, index){
-	  				// customerLessonType 用户可操作性的状态 0 可报名 1 已报名 2 复训 3 已生成订单未支付
-	  				// lessonType 1 思维商学院 2总裁商业思维 3 企业自动化运转 0其他课程
-	  				let btn = {
-	  					name: "报名",
-  						link: "courseOrder",
-	  					type: "enlist",
-	  					value: "enlist"
-	  				};
-
-	  				if(item.customerLessonType == 1) {
-	  					btn = {
-	  						name: "已报名",
-	  						link: "",
-	  						type: "",
-	  						value: "disabled"
-	  					}
-	  				} else if (item.customerLessonType == 2) {
-	  					btn = {
-	  						name: "复训",
-  							link: "courseOrder",
-		  					type: "retrain",
-	  						value: "retrain"
-	  					}
-	  				} else if (item.customerLessonType == 3) {
-	  					btn = {
-	  						name: "报名",
-  							link: "已生成订单未支付",
-		  					type: "3",
-	  						value: "disabled"
-	  					}
-	  				}
-
-	  				return {
-	  					lessonType: item.lessonType,
-	  					code: item.code,
-	  					name: item.name,
-	  					balance_count: item.balance_count,
-	  					btn: btn
-	  				}
-	  			});
+	  			
 	  			_this.banner = responseData.adLessonList.map(function(item, index){
 	  				return {
 	  					img: _this.resolveImg(item.ad_code),
@@ -141,20 +101,21 @@
 							isClick: true,
 							// priceUnit: '年',
 							// priceCurrency: '￥',
-							desc: item.DESCRIPTION || '介绍',
+							desc: item.DESCRIPTION,
 							label: '主讲', 
 							speaker: item.author || '苏引华',
 							subscribe: item.subCount,
 							url: '',
 							id: '',
 							code: item.productCode,
+							classDay: item.class_day,
 							img: _this.resolveImg(item.thumbnail)
 						}		  			
 		  		});
 	  		});
 	  	},
 	  	goPage(code, status) {
-	  		this.$router.push({name: "courseDetail", params: { courseCode: code, courseStatus: status }})
+	  		this.$router.push({name: "courseDetail", query: { courseCode: code, courseStatus: status }})
 	  	}
 		}
 	}

@@ -2,11 +2,11 @@
 	课程详情页
  -->
 <template>
-	<div class="detail">
+	<div class="detail" v-cloak>
 		<el-header-index></el-header-index>
 
 		<div class="container">
-			<video class="top-video" :src="course.fileUrl"></video>
+			<video class="top-video" :src="course.fileUrl" controls="controls" preload="auto" :poster="course.fileThumb"></video>
 			
 			<div class="tab">
 	      <tab v-model="tabSelected">
@@ -14,16 +14,20 @@
 	      </tab>
 	      <div class="list">
 	      	<template v-if="tabSelected == 0">
-	      		<div v-html="courseInfo.content"></div>
+	      		<div class="rich-html" v-html="courseInfo.content"></div>
+						
+						<div class="btns">
+							<x-button type="primary" @click.native="goPage('course', {type: 1})">在线报名</x-button>
+	      		</div>
 	      	</template>
 	        
 	        <template v-if="tabSelected == 1">
-	        	<el-witness :witness-data="witnessData"></el-witness>     	
-						<!-- <el-comment :comment-data="commentData"></el-comment> -->
+	        	<el-witness :product-code="witnessData"></el-witness>     	
+						<!-- <el-comment :comment-code="commentCode"></el-comment> -->
 	        </template>
 
 	        <template v-if="tabSelected == 2">
-	        	<el-img-text-rank v-for="(item, ind) in relateData" :img-text-data="item" :key="ind"></el-img-text-rank>
+	        	<el-img-text-rank v-for="(item, ind) in relateData" :img-text-data="item" img-text-btn="-1" :key="ind"></el-img-text-rank>
 	        </template>
 	      </div>
 	    </div>
@@ -49,7 +53,7 @@
 			return {
 				title: '课程详情',
 				courseInfo: {
-					code: this.$route.params.courseCode,
+					code: this.$route.query.courseCode,
 					content: "",
 					name: ""
 				},
@@ -79,41 +83,39 @@
 				tabSelected: 0,
 				course: {
 					src: '',
-					course: '总裁商业思维',
-					courseNum: 26,
-					lecturer: '苏引华',
-					subscribe: 360426,
-					desc: 'wehfwkf',
-					fileUrl: ''
+					course: '',
+					courseNum: 0,
+					lecturer: '',
+					subscribe: 0,
+					desc: '',
+					fileUrl: '',
+					fileThumb: ''
 				},
 				relateData: [
 					{
-						title: '总裁商业思维',
-						type: '游戏',
-						pay: '1340.0',
+						title: '',
+						type: '',
+						pay: '',
 						img: '',
-						like: {
-							num: 2234,
-							percent: 3.4
-						},
+						like: '',
 						url: '',
-						params: {}
+						query: {}
 					}
 				],
-				witnessData: {
-					productCode: this.$route.params.courseCode,
-					pagesize: 1,
-					pagecount: this.wordBook.pageCount
-				},
+				witnessData: this.$route.query.courseCode,
 				playBtn: {
 					status: false,
 					obj: ''
 				}
 			}
 		},
+		watch: {
+	    // 如果路由有变化，会再次执行该方法
+	    '$route': 'fetchData'
+	  },
 		mounted () {
 			this.fetchData();
-			this.visitCount(this.$route.params.code);
+			this.visitCount(this.$route.query.courseCode);
 		},
 		methods: {
 			fetchData () {
@@ -122,7 +124,7 @@
 				this.$http.post('/wechat/discover/product/lessonDetails',
 						{
 							"userCode": _this.$store.state.user.userCode,
-							"productCode": _this.$route.params.courseCode
+							"productCode": _this.courseInfo.code
 						}
 					).then(function(e) {
 						let responseData = e.data.data.product;
@@ -135,6 +137,7 @@
 						};
 
 						_this.course.fileUrl = _this.resolveImg(responseData.file_url);
+						_this.course.fileThumb = _this.resolveImg(responseData.file_thumb);
 						_this.course.desc = responseData.DESCRIPTION;
 						_this.courseInfo.name = responseData.name;
 						_this.courseInfo.content = _this.resolveRichTextImg(responseData.CONTENT);
@@ -145,15 +148,13 @@
 								id: item.id,
 								title: item.name,
 								type: item.DESCRIPTION,
-								pay: item.price,
-								like: {
-									num: item.commentAmount,
-									percent: item.rank | 3.2
-								},
-								url: 'detail',
-								params: {
-									id: item.code,
-									type: _this.$route.params.type
+								pay: 0,
+								isBuy: responseData.isBuy || 0,
+								like: '',
+								url: 'courseTypeDetail',
+								query: {
+									type: "course",
+									code: item.code
 								}
 							}
 						})
@@ -168,6 +169,9 @@
 					this.playBtn.obj = document.querySelector(".play-audio").play();
 				}
 				this.playBtn.status = !this.playBtn.status;
+			},
+			goPage(url, query) {
+				this.$router.push({name: url, query: query});
 			}
 		}
 	}

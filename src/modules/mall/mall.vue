@@ -3,27 +3,16 @@
  -->
 
 <template>
-	<div class="mall">
+	<div :class="['mall', { 'active': searchData.popup }]" v-cloak>
 		<el-header-index></el-header-index>
 
-		<div class="container">
+		<div class="container mall-container">
 			<div class="banner">
-	    	<swiper auto :list="bannerTopDatas" dots-position="center" :aspect-ratio="600/1500"></swiper>
+	    	<swiper auto :list="bannerTopDatas" dots-position="center" :aspect-ratio="bannerWidthHeight" loop></swiper>
 			</div>
-
-			<search 
-				@result-click="resultClick"
-				@on-change="getResult" 
-				:results="results"
-				v-model="value"
-				position="absolute"
-				auto-scroll-to-top top="60px"
-				@on-focus="onFocus"
-				@on-cancel="onCancel"
-				@on-submit="onSubmit"
-				ref="search">
-			</search>
-
+			
+			<el-search search-type=""></el-search>
+			
 			<!-- 经典推荐(图片) -->
 			<div class="tuijian-img">
 				<div class="tuijian-img-left">
@@ -42,33 +31,38 @@
 			
 			<el-cart-frame></el-cart-frame>
 		</div>
+
 	</div>
 </template>
 
 <script type="text/babel">
-	import { Group, Cell, Swiper, Card, Panel, Search } from 'vux'
+	import { TransferDom, Group, Cell, Swiper, Card, Panel, Search, Popup } from 'vux'
 	
 	import elHeaderIndex from 'components/header/header-index'
 	import elMallCard from 'components/mall/card'
 	import elCartFrame from 'components/cart/cart-frame'
+	import elSearch from 'components/search/search'
 	
 	import { getterIndex } from 'services/index';
 
-	import imgGoods from 'assets/img/book01.png'
-	import imgBig from 'assets/img/mall/big.jpg'
-	import imgSmall1 from 'assets/img/mall/small1.jpg'
-	import imgSmall2 from 'assets/img/mall/small2.jpg'
+	// import imgGoods from 'assets/img/book01.png'
+	// import imgBig from 'assets/img/mall/big.jpg'
+	// import imgSmall1 from 'assets/img/mall/small1.jpg'
+	// import imgSmall2 from 'assets/img/mall/small2.jpg'
 
 	export default {
+		name: "mall",
+		directives: {
+	    TransferDom
+	  },
 		components: {
-			Group, Cell, Swiper, Card, Panel, Search, elHeaderIndex, elMallCard, elCartFrame
+			Group, Cell, Swiper, Card, Panel, Search, Popup, elHeaderIndex, elMallCard, elCartFrame, elSearch
 		},
 		data () {
 			return {
 				title: '商城',
+	    	bannerWidthHeight: this.wordBook.bannerWidthHeight,
 	      bannerTopDatas: [],
-	      results: [],
-      	value: 'test',
       	tuijianImgLeft: {},
       	tuijianImgRight: {},
       	tuijianList: [{
@@ -76,7 +70,20 @@
   				type: "",
   				title: "",
   				list: []
-      	}]
+      	}],
+      	searchData: {
+      		popup: false,
+      		value: "",
+      		list: [
+      			{
+      				img: "",
+      				title: "经营思维",
+      				desc: "经营思维经营思维经营思维经营思维经营思维经营思维经营思维经营思维经营思维",
+      				price: "12",
+      				sellNum: "111"
+      			}
+      		]
+      	}
 			}
 		},
 		mounted ()  {
@@ -100,12 +107,11 @@
 			  				listData = item.list.map(function(listItem, listIndex){
 			  					return {
 			  						img: _this.resolveImg(listItem.thumbnail),
-										link: 'mallDetail',
-										url: "",
 										name: listItem.name,
-										desc: listItem.description,
+										desc: listItem.DESCRIPTION,
 										price: listItem.price,
-										code: listItem.code
+										code: listItem.code,
+										type: '1'
 			  					}
 			  				})
 			  			}
@@ -120,41 +126,7 @@
 		  		}
 				});
 			},
-	    setFocus () {
-	      this.$refs.search.setFocus()
-	    },
-	    resultClick (item) {
-	      window.alert('you click the result item: ' + JSON.stringify(item))
-	    },
-	    getResult (val) {
-	      this.results = val ? getResult(this.value) : []
-	    },
-	    onSubmit () {
-	      this.$refs.search.setBlur()
-	      this.$vux.toast.show({
-	        type: 'text',
-	        position: 'top',
-	        text: 'on submit'
-	      })
-	    },
-	    onFocus () {
-	      console.log('on focus')
-	    },
-	    onCancel () {
-	      console.log('on cancel')
-	    }
-	  },
-	}
-
-	function getResult (val) {
-	  let rs = []
-	  for (let i = 0; i < 20; i++) {
-	    rs.push({
-	      title: `${val} result: ${i + 1} `,
-	      other: i
-	    })
 	  }
-	  return rs
 	}
 </script>
 
@@ -164,9 +136,24 @@
 	
 	$tuijianPadding: 5px;
 
+	$productImgW: $imgTextImgW;
+	$productImgH: $imgTextImgH;
+
 	.mall {
+		width: 100%;
+		height: 100%;
 		background-color: $bgGray;
+
+		&.active {
+	    overflow: hidden;
+		}
 	}
+
+	.mall-container {
+		padding-bottom: $containerBottom;
+		
+	}
+
 	.tuijian-img {
 		display: flex;
 		padding: $padding;

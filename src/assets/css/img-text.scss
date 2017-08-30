@@ -9,7 +9,7 @@
 	&.img-text-rank {
 		.text {
 			.title {
-				width: 80%;
+				width: 70%;
 			}
 		}
 
@@ -36,12 +36,16 @@
 	position: relative;
 	width: 90px;
 
+	& + .text {
+		padding-left: $padding;
+	}
+
 	img {
-		position: absolute;
-	  top: 0;
-	  bottom: 0;
-	  left: 0;
-	  right: 0;
+		// position: absolute;
+	 //  top: 0;
+	 //  bottom: 0;
+	 //  left: 0;
+	 //  right: 0;
 		max-height: 100%;
 	  max-width: 100%;
 	  width: auto;
@@ -73,15 +77,15 @@
 
 .text {
 	position: relative;
-	padding-left: $padding;
 	line-height: 1.5;
 	flex: 1;
 	width: 0;
 
 	.title {
 		width: 100%;
-		font-size: 18px;
-		line-height: 30px;
+		font-size: 16px;
+		line-height: 1.35;
+		color: $fontColorBlack;
 		display: flex;
 
 		p {
@@ -104,7 +108,16 @@
 	}
 	
 	.desc, .type {
+		font-size: 14px;
 		padding: 6px 0;
+	}
+
+	.type {
+		padding: 0;
+		text-align: justify;
+		@include ellipsisMore(2);
+		margin-bottom: 6px;
+		margin-top: 6px;
 	}
 
 	.desc {
@@ -117,10 +130,28 @@
 	position: absolute;
 	top: 0;
 	right: 0;
-	line-height: 30px;
-	padding: 0 10px;
-	border: 1px solid $borderColor;
+	line-height: 22px;
+	padding: 0 5px;
+	border: 1px solid $colorOrange;
 	border-radius: $borderRadius;
+	color: $colorOrange;
+
+	&.btn-integral {
+		padding-left: 26px;
+
+		&:before {
+			content: "";
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 26px;
+			height: 26px;
+			background: url("~assets/img/icon/integral.png") no-repeat;
+			background-size: 60%;
+			background-position: center;
+			display: inline-block;
+		}
+	}
 }
 
 .zan {

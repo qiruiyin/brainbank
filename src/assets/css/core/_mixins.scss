@@ -47,7 +47,7 @@ $ie6-7: false;
 // inline-block end
 
 // 0.5像素的线
-@mixin halfpxline($borderRadius: 100%, $color: $borderColor, $top: 1px, $right: 1px, $bottom: 1px, $left: 1px) {
+@mixin halfpxline($borderRadius: 100%, $color: $borderColor, $top: 1px, $right: 1px, $bottom: 1px, $left: 1px, $borderStyle: solid) {
   position: relative;
   z-index: 2;
 
@@ -56,7 +56,7 @@ $ie6-7: false;
     position: absolute;
     top: 0;
     left: 0;
-    border: solid $color;
+    border: $borderStyle $color;
     border-top-width: $top;
     border-right-width: $right;
     border-bottom-width: $bottom;

@@ -1,9 +1,9 @@
 <!-- 
-	客户与客户消息页面
+	客户与客户消息页面（废弃）
  -->
 
 <template>
-	<div class="integral-msg">
+	<div class="integral-msg" v-cloak>
 		<group>
       <x-textarea title="内容" :rows="8" placeholder="请填写消息内容" :max="200" v-model="value"></x-textarea>
     </group>

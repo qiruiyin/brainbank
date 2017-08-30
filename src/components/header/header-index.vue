@@ -2,8 +2,8 @@
 	头部
  -->
 <template>
-	<sticky>
-		<header id="header">
+	<sticky >
+		<header id="header" v-cloak>
 			<div class="user">
 				<img :src="user.img" alt="头像">
 				<p>
@@ -12,7 +12,7 @@
 				</p>
 			</div>
 			<div class="link">
-				<div class="btn" @click="goPage(btns.link)">{{ btns.name }}</div>
+				<div class="link-btn" @click="goPage(btns.link)">{{ btns.name }}</div>
 			</div>
 		</header>
 	</sticky>
@@ -80,7 +80,7 @@
 
 	#header {
 		@include halfpxline(0, $borderColor, 0 , 0, 1px, 0);
-		position: fixed;
+		position: absolute;
 		top: 0;
 		left: 0;
 		width: 100%;
@@ -118,12 +118,14 @@
 			margin-top: ($headerContentH - $headerLinkH)/2;
 			line-height: $headerLinkH;
 
-			.btn {
+			.link-btn {
 				float: left;
-				padding: 0 .5em;
+				padding: 0 1em;
 				margin-left: $headerPaddingLeft;
 				font-size: 12px;
-				@include halfpxline($borderRadius, $borderColor, 1px, 1px, 1px, 1px);
+				background-color: $colorOrange;
+				color: #fff;
+				border-radius: 2em;
 				display: block;
 
 				&:first-child {

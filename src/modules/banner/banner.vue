@@ -3,7 +3,7 @@
  -->
 
 <template>
-	<div class="banner">
+	<div class="banner" v-cloak>
 		<div v-html="richText"></div>
 	</div>
 </template>

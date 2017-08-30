@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import store from '../store'
+import wordBook from './wordBook'
 
 import { AjaxPlugin } from 'vux'
 Vue.use(AjaxPlugin)
@@ -27,7 +28,10 @@ let weChatFriend = (title, desc, promoteUrl, imgUrl) => {
 		link : promoteUrl,
 		imgUrl : imgUrl,
 		success : function() {},
-		cancel : function() {}
+		cancel : function() {},
+    fail: function (res) {
+      alert(JSON.stringify(res));
+    }
 	});
 }
 
@@ -64,7 +68,8 @@ let setShareProductUrl = (title, desc, promoteUrl, imgUrl) => {
 	tencentWeiBo(title, desc, promoteUrl, imgUrl);
 }
 
-let openShare = (baseUrl, title, desc, openId, imgUrl) => {
+Vue.prototype.openShare = (baseUrl, title, desc, openId, imgUrl, status = false) => {
+	console.log(openId)
 	if(!openId || openId == null || openId == ''){
 		// toastr.error("分享码未取到,不能分享!");
 		return false;
@@ -75,7 +80,12 @@ let openShare = (baseUrl, title, desc, openId, imgUrl) => {
 		if(qrcodePath && qrcodePath != null && qrcodePath.length > 0){
 			// $("#share-tip").show();
 			store.commit("updateUserQrcode", { 'qrcode': baseUrl+qrcodePath + "?time=" + Date.parse(new Date())})
-			setShareProductUrl(title, desc, baseUrl+qrcodePath, baseUrl+imgUrl);
+
+			if(status) {
+				Vue.prototype.signUrl(location.href, true, { url: baseUrl+qrcodePath, imgUrl: 'http://m.yoao.com/mobile/wechat/logo.jpg' });
+			} else {
+				setShareProductUrl(title, desc, baseUrl+qrcodePath, 'http://m.yoao.com/mobile/wechat/logo.jpg');
+			}
 		} else {
 			// toastr.error("二维码获取失败,请稍后再试!");
 			// Vue.vux.toast.text('二维码获取失败,请稍后再试!', 'top')
@@ -84,7 +94,7 @@ let openShare = (baseUrl, title, desc, openId, imgUrl) => {
 }
 
 // 微信分享
-Vue.prototype.signUrl = (url) => {
+Vue.prototype.signUrl = (url, status = false, obj = {}) => {
 	store.commit("updateUserPay", { 'pay': false})
 	// store.
   Vue.http.post("/wechat/wx/sign/url",{url: url}).then(function(e) {
@@ -108,6 +118,10 @@ Vue.prototype.signUrl = (url) => {
 			Vue.wechat.checkJsApi({
 				jsApiList : [ 'onMenuShareTimeline', 'onMenuShareAppMessage', 'onMenuShareQQ', 'onMenuShareWeibo', 'showMenuItems', 'hideOptionMenu', 'showOptionMenu', 'hideAllNonBaseMenuItem', 'closeWindow' ]
 			});
+
+			if(status) {
+				setShareProductUrl("大脑银行商学院", '海量"企业"管理与"行业资料"任你下载，大量"培训视频"与"商业思维"随你观看！', obj.url, obj.imgUrl);
+			}
 		});
 		
 		Vue.wechat.error(function(res) {
@@ -116,8 +130,11 @@ Vue.prototype.signUrl = (url) => {
 			}
 		});
 
-		// openShare("http://test.yoao.com/", "分享", "分享二维码", window.localStorage.getItem("openId"), "");
-		openShare("http://glyh.qibeisoft.com/", "分享", "分享二维码", window.localStorage.getItem("openId"), "");
+		if(!status) {
+			Vue.prototype.openShare(Vue.prototype.wordBook.urlLink.share, "大脑银行商学院", '海量"企业"管理与"行业资料"任你下载，大量"培训视频"与"商业思维"随你观看！', window.localStorage.getItem("openId"), "", status);
+		} else {
+			store.commit("updateUserShareImg", { 'shareImg': obj.url + "?time=" + Date.parse(new Date())})
+		}
   });
 }
 

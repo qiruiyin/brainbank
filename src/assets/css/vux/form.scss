@@ -5,7 +5,11 @@
 .dn-form {
 	// background-color: $bgGray;
 	.weui-cell__hd {
-		width: 6em;
+		width: 7em;
+	}
+
+	.vux-selector.weui-cell_select-after {
+		padding-left: $padding;
 	}
 
 	.weui-input {
@@ -31,3 +35,8 @@
 	}
 }
 
+.el-selector {
+	.weui-cell__ft {
+		text-align: left;
+	}
+}

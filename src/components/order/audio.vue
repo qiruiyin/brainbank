@@ -3,17 +3,19 @@
  -->
 
 <template>
-	<div class="order-audio">
-		<form-preview header-label="付款金额" :header-value="money" :body-items="list"></form-preview>
+	<div class="order-audio" v-cloak>
+		<!-- <form-preview header-label="付款金额" :header-value="money" :body-items="list"></form-preview> -->
+		<el-card-mall class="card-mall-padding" :card-mall-data="orderAudioData"></el-card-mall>
 	</div>
 </template>
 
 <script type="text/babel">
 	import { FormPreview } from 'vux'
+	import elCardMall from 'components/card/card-mall'
 	
 	export default {
 		name: "orderAudio",
-		components: { FormPreview },
+		components: { FormPreview, elCardMall },
 		props: ['orderAudioData'],
 		data () {
 			return {
@@ -21,14 +23,14 @@
 				money: "",
 				list: [
 					{
-		        label: '订单号',
-		        value: '电动打蛋机'
+		        label: '',
+		        value: ''
 		      },{
-		        label: '商品名称',
-		        value: '名字名字名字'
+		        label: '',
+		        value: ''
 		      },{
-		        label: '时间',
-		        value: '很长很长的名字很长很长的名字很长很长的名字很长很长的名字很长很长的名字'
+		        label: '',
+		        value: ''
 		      }
 		    ]
 			}
@@ -36,10 +38,10 @@
 		mounted () {
 			let _this = this;
 
-			_this.money = _this.orderAudioData.amount;
-			_this.list[0].value = _this.orderAudioData.code;
-			_this.list[1].value = _this.orderAudioData.name;
-			_this.list[2].value = _this.orderAudioData.time;
+			// _this.money = _this.orderAudioData.amount;
+			// _this.list[0].value = _this.orderAudioData.code;
+			// _this.list[1].value = _this.orderAudioData.name;
+			// _this.list[2].value = _this.orderAudioData.time;
 		}
 	}
 </script>
@@ -48,4 +50,9 @@
 	@import '~lib/sandal/core';
 	@import '~assets/css/core/functions', '~assets/css/core/mixins', '~assets/css/core/vars';
 	
+	.order-audio {
+		padding: $paddingTop $padding;
+		background: #fff;
+	}
+
 </style>

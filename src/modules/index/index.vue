@@ -3,12 +3,13 @@
  -->
 
 <template>
-	<div class="index">
+	<div class="index" v-cloak>
 		<el-header-index></el-header-index>
 		
 		<div class="container">
+			
 			<div class="banner">
-	    	<swiper auto dots-position="center" :list="bannerTopDatas" :aspect-ratio="600/1500"></swiper>
+	    	<swiper auto dots-position="center" :list="bannerTopDatas" :aspect-ratio="bannerWidthHeight" loop></swiper>
 			</div>
 			
 			<div class="entry">
@@ -17,51 +18,57 @@
 				</div>
 			</div>
 
-			<div class="entry-videos">
-				<div @click="goPage('courseTypeDetail', { type: 'video', code: item.code})" v-for="(item, index) in entryVideosDatas" :key="index">
+			<div class="entry-videos uiBorderTop">
+				<div v-for="(item, index) in entryVideosDatas" :key="index" @click="goPage('courseTypeDetail', {type: 'video', code: item.code})">
 					<img :src="item.img" alt="">
 					<p>{{ item.name }}</p>
 				</div>
 			</div>
 
-			<div class="tuijian">
-				<el-tuijian :tuijian-status="playAudioInfo.index" tuijian-link="audio" :tuijian-data="tuijianAudioDatas.list">
+			<div class="tuijian uiBorderTop">
+				<el-tuijian @play-change="playChange" :tuijian-status="playAudioInfo.index" tuijian-link="audio" :tuijian-data="tuijianAudioDatas.list">
 					<div class="play">
 						<div class="play-audio">
 							<audio :src="item.src" @ended="audioEnded" controls="controls" preload hidden :class="'play-audio-' + index" class="play-audio-btn" v-for="(item, index) in tuijianAudioDatas.list" :key="index">
 							</audio>	
 						</div>
 						<div :class="['play-img', {'active': playStatus}]" @click="play('start')"></div>
-						<p>{{ tuijianAudioDatas.num }}</p>
+						<p>苏引华</p>
+						<!-- <p>{{ tuijianAudioDatas.num }}</p> -->
 					</div>
 				</el-tuijian>
 			</div>
 
-			<div class="tuijian">
-				<el-tuijian tuijian-status="-1" tuijian-link="quotation" :tuijian-data="tuijianQuotationDatas.list">
-					<div class="tuijian-data">
-						<img :src="tuijianQuotationDatas.img" alt="">
-						<p>{{ tuijianQuotationDatas.name }}</p>	
+			<div class="card-block uiBorderTop">
+				<div class="card-block-header">
+					<h5>经典语录</h5>
+					<div class="link" @click="goPage('quotation')">查看全部<span class="fa fa-angle-right"></span></div>
+				</div>
+				<div class="card-block-content">
+					<div class="quotation-index">
+						<div class="quotation-index-img" :style="{backgroundImage: 'url(' + tuijianQuotationDatas.img + ')'}"></div>
+						<p v-html="quotationTransContent(tuijianQuotationDatas.list[0].content)"></p>
 					</div>
-				</el-tuijian>
+				</div>
 			</div>
 
-			<div class="video-course">
-				<card :header="{title:'在线学习区'}">
-					<div slot="content">
-						<el-img-text v-for="(item, index) in tuijianVideoDatas" :img-text-data="item" :key="index"></el-img-text>
-					</div>
-				</card>
+			<div class="card-block uiBorderTop">
+				<div class="card-block-header">
+					<h5>在线学习区</h5>
+				</div>
+				<div slot="card-block-content">
+					<el-img-text v-for="(item, index) in tuijianVideoDatas" :img-text-data="item" :key="index"></el-img-text>
+				</div>
 			</div>
 
 			<div class="banner">
-	    	<swiper auto dots-position="center" :list="bannerBottom1Datas" :aspect-ratio="250/500"></swiper>
+	    	<swiper auto dots-position="center" :list="bannerBottom1Datas" :aspect-ratio="bannerWidthHeight" loop></swiper>
 			</div>
-
+		
 			<div class="course-others">
-				<router-link v-for="(item, index) in bannerBottom2Datas" :to="{ name: item.link }" :key="index">
+				<a v-for="(item, index) in bannerBottom2Datas" :href="item.url" :key="index">
 					<img :src="item.img" alt="">
-				</router-link>
+				</a>
 			</div>
 		</div>
 	</div>
@@ -69,11 +76,12 @@
 
 <script type="text/babel">
 	import hold from 'src/commons/hold'
-	import { Group, Cell, Swiper, Card, Panel, Popup, XInput, XButton, Toast, TransferDomDirective as TransferDom } from 'vux'
+	import { Group, Cell, Swiper, Card, Panel, Popup, XInput, XButton, TransferDom } from 'vux'
 	
 	import elHeaderIndex from 'components/header/header-index'
 	import elTuijian from 'components/tuijian/tuijian'
 	import elImgText from 'components/img-text/img-text'
+	import elVideo from 'components/video/video'
 	
 
 	import { getterIndex } from 'services/index';
@@ -84,13 +92,14 @@
 		directives: {
 	    TransferDom
 	  },
-		components: { Group, Cell, Swiper, Card, Panel, Popup, XInput, XButton, Toast, elHeaderIndex, elTuijian, elImgText },
+		components: { Group, Cell, Swiper, Card, Panel, Popup, XInput, XButton, elHeaderIndex, elTuijian, elImgText, elVideo },
 	  data () {
 	    return {
 	    	playAudioInfo: {
-	    		index: -1,
+	    		index: -1, // 
 	    		current: ''
 	    	},
+	    	bannerWidthHeight: this.wordBook.bannerWidthHeight,
 	      bannerTopDatas: [],
 	      bannerBottom1Datas: [],
 	      bannerBottom2Datas: [],
@@ -103,8 +112,10 @@
 	      tuijianVideoDatas: [],
 	      tuijianQuotationDatas: {
 	      	name: '苏引华',
-	      	img: imgTuijianHeader,
-	      	list: []
+	      	img: '',
+	      	list: [{
+	      		conetnt: ""
+	      	}]
 	      },
 	      // courseOthers: getterIndex.courseOthers,
 	      playStatus: false,
@@ -143,60 +154,79 @@
 	  		_this.$http.post('/wechat/discover/index',{
 	  				"userCode": _this.$store.state.user.userCode
 	  			}).then(function(e) {
-		  		let responseData = e.data.data,
-		  				tuijianQuotationDatas = [],
-		  				tuijianVideoDatas = [];
-		  		// 顶部长banner
-		  		_this.resolveField(_this, 'bannerTopDatas', responseData.bannerTop, 'ad_code', "", 'ad_link');
-		  		// 底部banner
-		  		_this.resolveField(_this, 'bannerBottom1Datas', responseData.bannerBottom1, 'ad_code', "", 'ad_link');
-		  		// 底部banner
-		  		_this.resolveField(_this, 'bannerBottom2Datas', responseData.bannerBottom2, 'ad_code', "", 'ad_link');
-		  		// 视频推荐
-		  		_this.resolveField(_this, 'entryVideosDatas', responseData.movies, 'thumbnail');
 
-					// 音频推荐
-					_this.tuijianAudioDatas.num = responseData.voicesPlayCount | 13421;
-					_this.tuijianAudioDatas.list = responseData.voices.map(function(item, index){
-						return {
-							code: item.code,
-							src: _this.resolveImg(item.file_url),
-							name: item.name
-						}
-					});
-					// 语录推荐
-					responseData.quList.map(function(item, index) {
-						if(index == 0 && item.img && item.img.length > 0) {
-							_this.tuijianQuotationDatas.img = _this.resolveImg(item.img[0]);
-						}
+	  				if(e.data.errcode == 1) {
+	  					let responseData = e.data.data,
+				  				tuijianQuotationDatas = [],
+				  				tuijianVideoDatas = [],
+				  				tuijianAudioDatas = [];
+				  		// 顶部长banner
+				  		_this.resolveField(_this, 'bannerTopDatas', responseData.bannerTop, 'ad_code', "", 'ad_link');
+				  		// 底部banner
+				  		_this.resolveField(_this, 'bannerBottom1Datas', responseData.bannerBottom1, 'ad_code', "", 'ad_link');
+				  		// 底部banner
+				  		_this.resolveField(_this, 'bannerBottom2Datas', responseData.bannerBottom2, 'ad_code', "", 'ad_link');
+				  		// 视频推荐
+				  		_this.resolveField(_this, 'entryVideosDatas', responseData.movies, 'thumbnail');
 
-						tuijianQuotationDatas[index] = {
-							name: item.title,
-							code: item.code,
-							id: ''
-						}
-					});
-					_this.tuijianQuotationDatas.list = tuijianQuotationDatas;
-					// 视频教程
-					responseData.lessInfo.map((item, index) => {
-						tuijianVideoDatas[index] = {
-							title: item.name,
-							price: item.price,
-							// priceUnit: '年',
-							// priceCurrency: '￥',
-							desc: item.description || '介绍',
-							label: '主讲', 
-							speaker: item.author || '苏引华',
-							subscribe: item.subCount,
-							code: item.code,
-							url: '',
-							id: '',
-							isClick: item.jurisdiction,
-							img: _this.resolveImg(item['thumbnail'])
-						}
-					});
+							// 音频推荐
+							_this.tuijianAudioDatas.num = responseData.voicesPlayCount;
+							if(responseData.voices && responseData.voices.length > 0) {
+								tuijianAudioDatas = responseData.voices.map(function(item, index){
+									return {
+										code: item.code,
+										src: _this.resolveImg(item.file_url),
+										name: item.name
+									}
+								});	
+							}
+							_this.tuijianAudioDatas.list = tuijianAudioDatas;
 
-					_this.tuijianVideoDatas = tuijianVideoDatas;
+							// 语录推荐
+							if(responseData.quList && responseData.quList.length > 0) {
+								tuijianQuotationDatas = responseData.quList.map(function(item, index) {
+									if(index == 0 && item.img && item.img.length > 0) {
+										_this.tuijianQuotationDatas.img = _this.resolveImg(item.img[0]);
+									}
+
+									return {
+										name: item.title,
+										code: item.code,
+										id: '',
+										content: item.content
+									}
+								});	
+							}
+							
+							_this.tuijianQuotationDatas.list = tuijianQuotationDatas;
+							// 视频教程
+							if(responseData.lessInfo.length > 0) {
+								tuijianVideoDatas = responseData.lessInfo.map((item, index) => {
+									return {
+										title: item.name,
+										price: item.price,
+										// priceUnit: '年',
+										// priceCurrency: '￥',
+										desc: item.description || '介绍',
+										label: '主讲', 
+										speaker: item.author || '苏引华',
+										subscribe: item.subCount,
+										code: item.code,
+										url: '',
+										id: '',
+										isClick: item.jurisdiction,
+										classDay: item.class_day,
+										img: _this.resolveImg(item['thumbnail'])
+									}
+								});
+							}
+							
+							_this.tuijianVideoDatas = tuijianVideoDatas;
+	  				} else {
+	  					_this.$vux.alert.show({
+	  						content: e.data.errmsg
+	  					})
+	  				}
 				})
 	  	},
 	  	entry (url, type) {
@@ -205,7 +235,7 @@
 	  	videoAudioDetail (url, id) {
 	  		this.$router.push({ name: url, params: { id: id }})
 	  	},
-	  	play (status) {
+	  	play (status) {	  		
 	  		if(this.playAudioInfo.index == -1) this.playAudioInfo.index = 0;
 	  		if(!this.playStatus) {
 	  			this.playAudio();
@@ -222,6 +252,17 @@
 	  	pauseAudio () {
 	  		this.playAudioInfo.current = document.querySelector('.play-audio-' + this.playAudioInfo.index).pause();
 	  	},
+	  	reloadAudio () {
+	  		if(this.playAudioInfo.index != -1) {
+	  			this.playAudioInfo.current = document.querySelector('.play-audio-' + this.playAudioInfo.index).load();
+	  		}
+	  	},
+	  	playChange (ind) {
+  			this.reloadAudio();
+	  		this.playStatus = true;
+	  		this.playAudioInfo.index = ind;
+  			this.playAudio();
+	  	},
 	  	audioEnded () {
   			if(this.playAudioInfo.index == 2) {
   				this.playAudioInfo.index = 0;
@@ -230,8 +271,12 @@
   			}
 	  		this.playAudio();
 	  	},
-			goPage (url, params) {
-				this.$router.push({ name: url, params: params })
+			goPage (url, query) {
+				if(query) {
+					this.$router.push({ name: url, query: query })
+				} else {
+					this.$router.push({ name: url})
+				}
 			}
 	  }
 	}
@@ -324,6 +369,52 @@
 	.tuijian-data {
 		img {
 			border-radius: $tuijianImgW
+		}
+	}
+
+	.card-block {
+		.card-block-header {
+			position: relative;
+			padding: 0 $padding;
+			@include halfpxline(0, $borderColor, 0 , 0, 1px, 0);
+			line-height: 50px;
+
+			h5 {
+				font-size: 16px;
+				color: $fontColorBlack;
+			}
+
+			.link {
+				position: absolute;
+				top: 0;
+				right: $padding;
+
+				span {
+					margin-left: .5em;
+				}
+			}
+		}
+
+		.card-block-content {
+			padding: 0 $padding;
+		}
+	}
+
+	.quotation-index {
+		padding: $padding 0;
+		display: flex;
+
+		.quotation-index-img {
+			width: 102px;
+			height: 80px;
+			background-size: cover;
+		}
+
+		p {
+			flex: 1;
+			padding-left: 1em;
+			line-height: 2;
+			@include ellipsisMore(3);
 		}
 	}
 </style>

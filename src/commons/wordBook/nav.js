@@ -7,6 +7,11 @@ const nav = [
 	"questionnaire", // 问卷调查
 	"orderDone", // 订单完成页面
 	"courseOrder", // 课程报名
+	"shopCart", // 购物车
+	"msgDetail", // 消息详情页
+	"signCode", // 签到二维码
+	"quotationSend", // 发送朋友圈
+	"quotationAdd", // 发布朋友圈
 ]
 
 export default nav;

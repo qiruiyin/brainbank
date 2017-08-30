@@ -3,7 +3,7 @@
  -->
 
 <template>
-	<div class="author">
+	<div class="author" v-cloak>
 		
 	</div>
 </template>
@@ -21,14 +21,19 @@
 		mounted () {
 			let _this = this,
 					urlJson = _this.parseToJson(location.href),
-					openId = "";
+					openId = "",
+					paramP = "";
+
 			if(urlJson) {
-				openId = urlJson.openId
+				openId = urlJson.openId;
+				paramP = urlJson.p;
 			}
 
 			if(!openId) {
         // 跳转到微信授权页面
-        _this.$http.post('/wechat/wx/access/generate',{}).then(function(e) {
+        _this.$http.post('/wechat/wx/access/generate',{
+        		p: paramP
+        	}).then(function(e) {
 	 				window.location.href = e.data.data.accessUrl
 	  		});
 	    } else {

@@ -3,25 +3,23 @@
  -->
 
 <template>
-	<div class="rank-list">
+	<div class="rank-list" v-cloak>
 		<el-headerIndex></el-headerIndex>
 
 		<div class="container">
 			<div class="tab">
 	      <tab v-model="tabSelected">
-	        <tab-item :selected="tabSelected == index" v-for="(item, index) in tabDatas" @click="tabSelected = index" :key="index">{{ item.title }}</tab-item>
+	        <tab-item :selected="tabSelected == index" v-for="(item, index) in tabData" @click="tabSelected = index" :key="index">{{ item.title }}</tab-item>
 	      </tab>
-	      <swiper class="list" height="100%" v-model="tabSelected" :show-dots="false">
-	        <swiper-item v-for="(tabContentDatasList, index) in tabDatas" :key="index">
-	          <el-img-text-rank @on-btn-click="btnClick" v-for="(item, ind) in tabContentDatas[tabContentDatasList.value]" :img-text-data="item" img-text-btn="0" :key="ind"></el-img-text-rank>
-						
-						<template v-if="tabContentDatas[tabContentDatasList.value].length == count">						
-							<x-button @click.native="loadMore(tabContentDatasList.value)">加载更多</x-button>
-						</template>
-						
-						<template v-else>
-							<divider>没有更多数据</divider>
-						</template>
+	      <swiper class="list" height="100%" v-model="tabSelected" :show-dots="false" :threshold="tabChangeW">
+	        <swiper-item v-for="(tabContentDatasList, index) in tabData" :key="index">
+	  				<scroller lock-x :height="-scrollerInfo.offsetBottom + 'px'" @on-scroll-bottom="loadMore" ref="scrollerBottom" :scroll-bottom-offst="200">
+	          	<div>
+	          		<el-img-text-rank v-for="(item, ind) in tabContentDatasList.list" :img-text-data="item" img-text-btn="0" :key="ind"></el-img-text-rank>
+								
+								<el-load-more :load-all="tabContentDatasList.loadAll"></el-load-more>
+							</div>
+						</scroller>
 	        </swiper-item>
 	      </swiper>
 	    </div>
@@ -42,39 +40,56 @@
 </template>
 
 <script type="text/babel">
-	import { Tab, TabItem, Swiper, SwiperItem, XButton, Divider, Toast, FormPreview, Popup, TransferDomDirective as TransferDom } from 'vux'
+	import { Scroller, Tab, TabItem, Swiper, SwiperItem, XButton, Divider, FormPreview, Popup, TransferDom } from 'vux'
   import { mapState } from 'vuex'
 	import elHeaderIndex from 'components/header/header-index'
 	import elImgTextRank from 'components/img-text/img-text-rank'
+	import elLoadMore from 'components/load-more/load-more'
 
 	export default {
 		name: 'rankList',
 		directives: {
 	    TransferDom
 	  },
-		components: { Tab, TabItem, Swiper, SwiperItem, XButton, Toast, FormPreview, Popup, Divider, elHeaderIndex, elImgTextRank },
+		components: { Scroller, Tab, TabItem, Swiper, SwiperItem, XButton, FormPreview, Popup, Divider, elHeaderIndex, elImgTextRank, elLoadMore },
 		data () {
 			return {
 				index: 0,
 				count: this.wordBook.pageCount,
-				tabDatas: [
+				tabChangeW: this.wordBook.tabChangeW,
+				scrollerInfo: {
+					offsetBottom: 170,
+					onfetching: false,
+					loadAll: false, // 是否加载完
+				},
+				tabData: [
 					{
 						value: 'pay',
 						title: '付费',
+						rankType: 1,
+						pageSize: 1,
+						onfetching: false,
+						loadAll: false,
+						list: []
 					},{
 						value: 'free',
 						title: '免费',
+						rankType: 2,
+						pageSize: 1,
+						onfetching: false,
+						loadAll: false,
+						list: []
 					},{
 						value: 'hot',
 						title: '排行榜',
+						rankType: 3,
+						pageSize: 1,
+						onfetching: false,
+						loadAll: false,
+						list: []
 					}
 				],
 				tabSelected: 0,
-				tabContentDatas: {
-					pay: [],
-					free: [],
-					hot: []
-				},
 				type: {
 					video: 1,
 					audio: 2
@@ -104,143 +119,89 @@
         user: state => state.user
       })
 		},
+		watch: {
+			tabSelected (newValue, oldValue) {
+				this.onTabClick(newValue)
+			}
+		},
 		mounted () {
-			let _this = this,
-					count = _this.count,
-					type = _this.$route.params.type;
-
-			_this.typeCurrent = _this.type[type];
-
-			this.$http.all([
-					_this.fetchData(_this.type[type], 1, 1, count),
-					_this.fetchData(_this.type[type], 2, 1, count),
-					_this.fetchData(_this.type[type], 3, 1, count)
-				])
-			  .then(_this.$http.spread(function (acct, perms) {
-			  })
-			);
+			this.fetchData(this.tabData[this.tabSelected], this.tabSelected);
 		},
 		methods: {
-			fetchData (type = 1, rankType = 1, pagesize = 1, pagecount = 10) {
+			fetchData (obj, ind) {
 				let _this = this;
 				this.$http.post('/wechat/discover/rank/list',
 						{
-							"type": type,
-							"rankType": rankType,
+							"type": _this.type[_this.$route.params.type],
+							"rankType": obj.rankType,
 							"userCode": _this.$store.state.user.userCode,
-							"pagesize": pagesize,
-							"pagecount": pagecount,
+							"pagesize": obj.pageSize,
+							"pagecount": _this.count,
 						}
 					).then(function(e) {
-						let data = [];
-						if(e.data.data && e.data.data.list && e.data.data.list.length > 0) {
-							e.data.data.list.map(function(item, index) {
-								data[index] = {
-									img: _this.resolveImg(item.thumbnail),
-									id: item.id,
-									title: item.name,
-									type: item.DESCRIPTION,
-									pay: item.price,
-									isBuy: item.isBuy,
-									like: {
-										num: item.commentAmount,
-										percent: item.rank || 3.2
-									},
-									url: 'courseTypeDetail',
-									params: {
-										code: item.code,
-										type: _this.$route.params.type
+						let list = [];
+						_this.tabData[ind].onFetching = false;
+
+						if(e.data.errcode == 1) {
+							if(e.data.data && e.data.data.list && e.data.data.list.length > 0) {
+								list = e.data.data.list.map(function(item, index) {
+									return {
+										img: _this.resolveImg(item.thumbnail),
+										id: item.id,
+										title: item.name,
+										type: item.DESCRIPTION,
+										pay: item.price,
+										isBuy: item.isBuy || 0,
+										like: {
+											num: item.commentAmount,
+											percent: item.rank
+										},
+										url: 'courseTypeDetail',
+										query: {
+											code: item.code,
+											type: _this.$route.params.type
+										}
 									}
-								}
+								})
+							}
+
+							if(list.length < _this.count) {
+								_this.tabData[ind].loadAll = true;
+							}
+
+							if(obj.pageSize == 1) {
+								_this.tabData[ind].list = list;
+							} else {
+								_this.tabData[ind].list = _this.tabData[ind].list.concat(list);
+							}
+							_this.tabData[ind].pageSize++;
+						} else {
+							_this.$vux.alert.show({
+								content: e.data.errmsg
 							})
 						}
 
-						if(rankType == 1) {
-							_this.tabContentDatas.pay.push.apply(_this.tabContentDatas.pay, data);
-						} else if(rankType == 2) {
-							_this.tabContentDatas.free.push.apply(_this.tabContentDatas.free, data);
-						} else if(rankType == 3) {
-							_this.tabContentDatas.hot.push.apply(_this.tabContentDatas.hot, data);
-						}
+						_this.resetView(ind);
 				})
 			},
-			loadMore (arg) {
-				let _this = this,
-						count = 2;
-				if(arg == "pay") {
-					_this.fetchData(_this.typeCurrent, 1, 2, _this.count)
-				} else if(arg == "free") {
-					_this.fetchData(_this.typeCurrent, 2, 2, _this.count, 0)
-				} else if(arg == "hot") {
-					_this.fetchData(_this.typeCurrent, 3, 2, _this.count, 0)
+			resetView (ind) {
+				let _this = this;
+				this.$nextTick(() => {
+          this.$refs.scrollerBottom[ind].reset()
+        })
+			},
+			onTabClick (val) {
+				if(this.tabData[val].list.length == 0){
+					this.fetchData(this.tabData[val], val)
 				}
 			},
-			btnClick (val) {
-				let _this = this;
-				_this.payCode = val.params.code;
-					
-				this.$http.post('/wechat/order/create',
-					{
-						"userCode": _this.$store.state.user.userCode,
-						"productCode": val.params.code,
-						"amount": 1,
-						"money": val.pay,
-						"allMoney": val.pay,
-						"orderType":  4,
-						"lessonCode": '',
-						"address": ""
-					}).then(function(e) {
-						let responseData = e.data;
+			loadMore () {
+				if(this.tabData[this.tabSelected].onFetching || this.tabData[this.tabSelected].loadAll) {
 
-						if(responseData.errcode != 1) {
-							_this.$vux.toast.show({
-			          text: responseData.errmsg
-			        })
-						} else {
-							_this.pay.show = true;
-							_this.pay.allPrice = val.pay;
-							_this.pay.list[0].value = responseData.data.order.code;
-							_this.pay.list[1].value = val.title;
-							_this.pay.list[2].value = 1;
-						}
-					})	
-			},
-			payOrder () {
-	    	let _this = this;
-
-				if(!this.user.pay) return false;
-				this.payWeixinOrder(_this.pay.list[0].value);
-
-				// this.$http.post('/wechat/order/pay/prepare',
-				// 		{
-				// 			"openId": _this.$store.state.user.openId,
-				// 			"orderCode": _this.pay.list[0].value,
-				// 		}
-				// 	).then(function(e) {
-				// 		let responseData = e.data.data,
-				// 				weixinConfig = {
-				// 					"appId": responseData.payment.appId,     //公众号名称，由商户传入     
-			 //           	"timeStamp": responseData.payment.timeStamp,         //时间戳，自1970年以来的秒数     
-			 //            "nonceStr": responseData.payment.nonceStr, //随机串     
-			 //            "package": responseData.payment.packageValue,     
-			 //            "signType": "MD5",         //微信签名方式：     
-			 //            "paySign": responseData.payment.paySign //微信签名 
-				// 				};
-				// 		WeixinJSBridge.invoke(
-			 //       'getBrandWCPayRequest', weixinConfig,
-			 //       function(res){
-			 //       		alert(res.err_msg)
-			 //          if(res.err_msg == "get_brand_wcpay_request:ok" ) {
-			 //          	// alert("")
-			 //          	_this.tabContentDatas.pay.map(function(item, index) {
-			 //          		if(item.params.code == _this.payCode) {
-			 //          			item.isBuy = true
-			 //          		}
-			 //          	})
-			 //          }
-			 //           // 使用以上方式判断前端返回,微信团队郑重提示：res.err_msg将在用户支付成功后返回    ok，但并不保证它绝对可靠。 
-			 //       })
-				// });
+				} else {
+					this.tabData[this.tabSelected].onFetching = true;					
+					this.fetchData(this.tabData[this.tabSelected], this.tabSelected);
+				}
 			}
 		}
 	}

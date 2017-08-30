@@ -3,7 +3,7 @@
  -->
 
 <template>
-	<div class="address-add">
+	<div class="address-add" v-cloak>
 		<group>
       <!-- <x-address title="地址" v-model="address" :list="addressData" placeholder="请选择地址"></x-address> -->
       <selector title="省" placeholder="请选择省份" :options="province.list" v-model="province.value" @on-change="provinceChange"></selector>
@@ -51,7 +51,7 @@
 	      addressDetail: '',
 	      name: '',
 	      tel: '',
-	      checkAddress: false
+	      checkAddress: true
 			}
 		},
 		mounted () {
@@ -128,7 +128,7 @@
 		  			"state": _this.checkAddress ? 1 : 0
 		  			}).then(function(e) {
 							if(e.data.errcode == 1) {
-								_this.$router.push({ name: "address", query: { orderCode: _this.orderCode } });
+								_this.$router.push({ name: _this.$route.query.url, query: { orderCode: _this.orderCode } });
 							} else {
 								_this.$vux.toast.show({
 				          text: e.data.errmsg

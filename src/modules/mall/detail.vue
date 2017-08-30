@@ -3,19 +3,26 @@
  -->
 
 <template>
-	<div class="detail">
+	<div class="detail" v-cloak>
 		<div class="detail-body">
-			<div class="banner">
-				<img :src="goodsMsg.img" alt="">
-	    	<!-- <swiper auto dots-position="center" :list="bannerTopDatas" :aspect-ratio="600/1500"></swiper> -->
+			<div class="banner" @click="show">
+				<!-- <img :src="goodsMsg.img" alt=""> -->
+	    	<swiper v-model="goodsMsg.bannerIndex"  auto dots-position="center" :list="goodsMsg.img" :aspect-ratio="800/750" loop></swiper>
+			</div>
+			<div v-transfer-dom>
+	      <previewer :list="goodsMsg.imgPriviwer" ref="previewer"></previewer>
+	    </div>
+
+			<div class="detail-ggct uiBorderTop">
+				<div :class="['detail-ggct-info', 'detail-ggct-icon-' + item.icon]" v-for="(item, index) in ggctData" :key="index">{{ item.name }}</div>
 			</div>
 
-			<div class="msg">
+			<div class="msg uiBorderTop">
 				<div class="msg-header">{{ goodsMsg.title }}</div>
 				<div class="msg-body">
 					<div class="msg-body-info">
-						<span>已购买：{{ goodsMsg.sellNum }}</span>
-						<span>{{ goodsMsg.author }} 著</span>
+						<!-- <span>已购买：{{ goodsMsg.sellNum }}</span> -->
+						<!-- <span>{{ goodsMsg.author }} 著</span> -->
 						<div class="price">单价<i>￥</i>{{ goodsMsg.price }}</div>
 					</div>
 					<div class="num">
@@ -24,20 +31,17 @@
 				</div>
 			</div>
 			
-			
-			<el-cart :product-info="goodsMsg"></el-cart>
-			
-			<div class="tab">
+			<div class="tab uiBorderTop">
 				<div class="tab">
 		      <tab v-model="tabSelected">
 		        <tab-item :selected="tabSelected == index" v-for="(item, index) in tabDatas" @click="tabSelected = index" :key="index">{{ item.title }}</tab-item>
 		      </tab>
 		      <div class="list">
-	      		<template v-if="tabSelected == 0">	      			
-		          <div v-html="goodsMsg.details"></div>
+	      		<template v-if="tabSelected == 0">
+		          <div class="rich-html" v-html="goodsMsg.details"></div>
 	      		</template>
 	      		<template v-if="tabSelected == 1">
-	          	<el-comment :comment-data="commentData"></el-comment>
+	          	<el-comment :comment-code="commentCode"></el-comment>
 	      		</template>
 	      		<template v-if="tabSelected == 2">
 		      		<div class="record" v-for="(item, index) in recordData" :key="index">
@@ -51,6 +55,8 @@
 	      	</div>
 		    </div>
 	    </div>
+
+			<el-cart :product-info="goodsMsg"></el-cart>
 		</div>
 
 		<el-back-index></el-back-index>
@@ -58,7 +64,7 @@
 </template>
 
 <script type="text/babel">
-	import { XNumber, Swiper, Card, Tab, TabItem, SwiperItem } from 'vux'
+	import { XNumber, Swiper, Card, Tab, TabItem, SwiperItem, Previewer, TransferDom } from 'vux'
 
 	import elComment from 'components/comment/comment'
 	import elCart from 'components/cart/cart'
@@ -69,15 +75,35 @@
 
 	export default {
 		name: "mallDatail",
-		components: { XNumber, Swiper, Card, Tab, TabItem, SwiperItem, elComment, elCart, elBackIndex },
+		directives: {
+	    TransferDom
+	  },
+		components: { XNumber, Swiper, Card, Tab, TabItem, SwiperItem, Previewer, elComment, elCart, elBackIndex },
 		data () {
 			return {
 				title: "商城详情",
 				cartNum: 0,
 				bannerTopDatas: getterIndex.bannerDatas,
-				productCode: this.$route.params.goodsCode,
+				productCode: this.$route.query.goodsCode,
+				ggctData: [
+					{
+						name: "官方商城",
+						icon: "guan"
+					},{
+						name: "正品保证",
+						icon: "zheng"
+					},{
+						name: "优品优价",
+						icon: "you"
+					},{
+						name: "极速发货",
+						icon: "su"
+					},
+				],
 				goodsMsg: {
-					img: "",
+					img: [],
+					imgPriviwer: [],
+					bannerIndex: 0,
 					title: "商品名字",
 					price: "5",
 					sellNum: "100",
@@ -99,42 +125,63 @@
 						title: '购买记录',
 					}
 				],
-				tabSelected: 0,
+				tabSelected: this.$route.query.type ? parseInt(this.$route.query.type) : 0,
 				tabContentDatas: {
 					detail: [],
 					comment: [],
 					record: []
 				},
 				details: "",
-				commentData: {
-					productCode: this.$route.params.goodsCode,
-					pagesize: 1,
-					pagecount: this.wordBook.pageCount
-				},
+				commentCode: this.$route.query.goodsCode,
 				recordData: []
 			}
 		},
+		computed: {
+			
+		},
 		mounted () {
 			this.fetchData();
-			this.visitCount(this.$route.params.goodsCode);
+			this.visitCount(this.$route.query.goodsCode);
 		},
 		methods: {
 			fetchData () {
 				let _this = this,
-						goodsCode = _this.$route.params.goodsCode;
+						goodsCode = _this.productCode;
 
 				_this.$http.post('/wechat/shop/productDetail',
 					{
 						code: goodsCode
 					}).then(function(e) {
-						let responseData = e.data.data;
-		  			_this.goodsMsg.code = responseData.code;
-		  			_this.goodsMsg.title = responseData.name;
-		  			_this.goodsMsg.author = responseData.author;
-		  			_this.goodsMsg.price = responseData.PRICE;
-		  			_this.goodsMsg.details = _this.resolveRichTextImg(responseData.CONTENT);
-		  			_this.goodsMsg.img = _this.resolveImg(responseData.thumbnail);
-		  			_this.commentData.productcode =  _this.$route.params.goodsCode;
+						if(e.data.errcode == 1) {
+							let responseData = e.data.data;
+			  			_this.goodsMsg.code = responseData.code;
+			  			_this.goodsMsg.title = responseData.name;
+			  			_this.goodsMsg.author = responseData.author;
+			  			_this.goodsMsg.price = responseData.PRICE;
+			  			_this.goodsMsg.details = _this.resolveRichTextImg(responseData.CONTENT);
+			  			
+			  			if(responseData.product_images) {
+				  			let img = responseData.product_images.split(";");
+				  			_this.goodsMsg.img = img.map(function(item, index){
+				  				return {
+				  					img: _this.resolveImg(item)
+				  				}
+				  			});	
+
+				  			_this.goodsMsg.imgPriviwer = img.map(function(item, index){
+				  				return {
+				  					src: _this.resolveImg(item)
+				  				}
+				  			});	
+			  			} else {			  				
+			  				_this.goodsMsg.img = _this.resolveImg(responseData.product_images);
+			  				_this.goodsMsg.imgPriviwer = _this.resolveImg(responseData.product_images);
+			  			}
+						} else {
+							_this.$vux.alert.show({
+								content: e.data.errmsg
+							})
+						}
 				});
 
 				_this.payRecord(1, 10);	
@@ -148,33 +195,41 @@
 						pageSize: pageSize,
 						pageCount: pageCount
 					}).then(function(e) {
-						let responseData = e.data.data;
-						if(responseData.list.length > 0) {
-							if(pageSize > 0) {
-								let listData = responseData.list.map(function(item, index) {
-									return {
-										img: _this.resolveImg(item.header),
-										name: item.name,
-										date: item.time
-									}
-								});
-								_this.recordData.push.apply(_this.recordData, listData);
-							} else {
-								_this.recordData = responseData.list.map(function(item, index) {
-									return {
-										img: _this.resolveImg(item.header),
-										name: item.name,
-										date: item.time
-									}
-								});
-							}
+						if(e.data.errcode == 1) {
+							let responseData = e.data.data;
+							if(responseData.list.length > 0) {
+								if(pageSize > 0) {
+									let listData = responseData.list.map(function(item, index) {
+										return {
+											img: _this.resolveImg(item.header),
+											name: item.name,
+											date: item.time
+										}
+									});
+									_this.recordData.push.apply(_this.recordData, listData);
+								} else {
+									_this.recordData = responseData.list.map(function(item, index) {
+										return {
+											img: _this.resolveImg(item.header),
+											name: item.name,
+											date: item.time
+										}
+									});
+								}
+							}	
+						} else {
+							_this.$vux.alert.show({
+								content: e.data.errmsg
+							})
 						}
 				});	
-			}
+			},
+			show () {
+	      this.$refs.previewer.show(this.goodsMsg.bannerIndex)
+	    },
 		}
 	}
 </script>
-
 
 <style lang="scss" scoped>
 	@import '~lib/sandal/core';
@@ -195,11 +250,11 @@
 
 	.msg {
 	  padding: $padding;
-	  line-height: 2;
+	  line-height: 1.5;
 	}
 
 	.msg-header {
-		font-size: 20px;
+		font-size: 16px;
 		color: $fontColorBlack;	
 	}
 
@@ -215,11 +270,11 @@
 		}
 	}
 
-	.msg-footer {
-		color: $colorYellow;
+	.msg-body-info {
 		
 		.price {
-			font-size: 22px;
+			font-size: 14px;
+			color: $colorYellow;
 			display: inline-block;
 
 			i {
@@ -231,6 +286,12 @@
 		.cart {
 			float: right;
 			font-size: 22px;
+		}
+	}
+
+	.num {
+		.num-data {
+			padding: 0;
 		}
 	}
 
@@ -254,4 +315,43 @@
 			font-size: 18px;
   	}
 	}
+	
+	.detail-ggct {
+		padding: $padding;
+		background: #fff;
+		display: flex;
+	}
+
+	$ggctDataIcon: guan, zheng, you, su;
+
+	.detail-ggct-info {
+		position: relative;
+		flex: 1;
+		text-align: center;
+		text-indent: 12px;
+		font-size: 12px;
+
+		&:before {
+			content: "";
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			margin-left: -36px;
+			margin-top: -10px;
+			width: 18px;
+			height: 20px;
+			background: url("~assets/img/mall/guan.png") no-repeat;
+			background-size: 80%;
+			background-position: center;
+		}
+	}
+
+
+@each $iconName in $ggctDataIcon {
+	.detail-ggct-icon-#{$iconName} {
+		&:before {
+			background-image: url("~assets/img/mall/#{$iconName}.png");
+		}
+	}
+}
 </style>

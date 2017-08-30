@@ -3,10 +3,10 @@
  -->
 
 <template>
-	<div class="tuijian">
+	<div class="tuijian" v-cloak>
 		<div class="tuijian-left">
 			<div :class="{ 'tuijian-img': item.src, 'active': tuijianStatus == index }"  v-for="(item, index) in tuijianData" :key="index">
-				<div v-if="item.src" @click="goPage('courseTypeDetail', { type: 'audio', code: item.code})" >{{ item.name }}</div>
+				<div v-if="item.src" @click="play(index)" >{{ item.name }}</div>
 				<div v-else @click="goPage('quotation')" >{{ item.name }}</div>
 			</div>
 		</div>
@@ -49,6 +49,10 @@
 				} else {
 		  		this.$router.push({ name: url })
 				}
+			},
+			play (ind) {
+				console.log(ind)
+				this.$emit('play-change', ind);
 			}
 		}	
 	}
@@ -86,7 +90,7 @@
 				width: $tuijianImg;
     		height: $tuijianImg;
     		background: url("~assets/img/index/tuijian-quotation.png") no-repeat;
-    		background-size: 80%;
+    		background-size: 70%;
     		background-position: left center;
 			}
 

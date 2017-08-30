@@ -5,6 +5,7 @@ export default {
   state: {
     name: "",
     userCode: "",
+    openId: "",
     url: ''
   },
   mutations: {
@@ -13,6 +14,9 @@ export default {
     },
     updateMsgUserCode (state, payload) {
       state.userCode = payload.userCode
+    },
+    updateMsgOpenId (state, payload) {
+      state.openId = payload.openId
     },
     updateMsgUrl (state, payload) {
       state.url = payload.url

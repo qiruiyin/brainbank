@@ -3,22 +3,22 @@
  -->
 
 <template>
-	<div class="mall-card">
+	<div class="mall-card" v-cloak>
 		<div class="mall-card-header" v-if="mallCardData.title">
 			<h3>{{ mallCardData.title }}</h3>
 			<p>{{ mallCardData.desc }}</p>
 		</div>
 		<div class="mall-card-body">
-			<el-mall-product :mall-product-data="item" v-for="(item, index) in mallCardData.list" @click.native="goPage(item.link, item.code)" :key="index"></el-mall-product>
+			<el-mall-product :mall-product-data="item" v-for="(item, index) in mallCardData.list" :key="index"></el-mall-product>
 
-			<cell v-if="mallCardData.type" title="查看更多" :link="{name: 'mallList', params: { type: mallCardData.type }}" is-link></cell>
+			<cell class="mall-more" v-if="mallCardData.type" title="查看更多" :link="{name: 'mallList', query: { type: mallCardData.type }}" is-link></cell>
 		</div>
 	</div>
 </template>
 
 <script type="text/babel">
 	import { Cell } from 'vux'
-	import elMallProduct from 'components/mall/product'
+	import elMallProduct from 'components/mall/product-like'
 	
 	export default {
 		name: "mallProduct",
@@ -38,7 +38,7 @@
 		},
 		methods: {
 	    goPage (link, code) {
-	    	this.$router.push({name: link, params: { goodsCode: code }})
+	    	this.$router.push({name: link, query: { goodsCode: code }})
 	    }
 		}
 	}
@@ -49,13 +49,14 @@
 	@import '~assets/css/core/functions', '~assets/css/core/mixins', '~assets/css/core/vars';
 	
 	.mall-card {
-
+		width: 100%;
 	}
 
 	.mall-card-header {
 		position: relative;
 		text-align: center;
 		padding: $padding 0;
+		background-color: $uiMarginBg;
 		// @include halfpxline(0, #fff, 0 , 0, 1px, 0);
 
 		h3 {
@@ -86,8 +87,13 @@
 		}
 	}
 
-	.tuijian-card-body {
+	.mall-card-body {
 		@extend %clearfix;
-		padding: $padding;
+		// padding: $padding;
+		background-color: $uiMarginBg;
+	}
+
+	.mall-more {
+		width: 100%;
 	}
 </style>

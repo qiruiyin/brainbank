@@ -12,7 +12,10 @@ export default {
     btns: [],
     bangdingStatus: false,
     qrcode: "",
-    pay: false // 是否可支付
+    hasMsg: '',
+    pay: false, // 是否可支付
+    shareImg: "", // 分享二维码
+    randomNum: '' // 访问记录随机数
   },
   mutations: {
     updateUserImg (state, payload) {
@@ -44,6 +47,15 @@ export default {
     },
     updateUserPay (state, payload) {
       state.pay = payload.pay
+    },
+    updateUserHasMsg (state, payload) {
+      state.hasMsg = payload.hasMsg
+    },
+    updateUserShareImg (state, payload) {
+      state.shareImg = payload.shareImg
+    },
+    updateUserRandomNum (state, payload) {
+      state.randomNum = payload.randomNum
     }
   }
 }

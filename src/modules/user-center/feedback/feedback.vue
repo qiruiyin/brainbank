@@ -3,7 +3,7 @@
  -->
 
 <template>
-	<div class="feedback">
+	<div class="feedback" v-cloak>
 		<group>
       <x-textarea v-model="textarea.value" :max="200" name="description" :placeholder="textarea.placeholder"></x-textarea>
       <x-input v-model="input.value" :placeholder="input.placeholder"></x-input>

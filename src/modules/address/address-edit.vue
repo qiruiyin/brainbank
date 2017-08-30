@@ -3,7 +3,7 @@
  -->
 
 <template>
-	<div class="address-add">
+	<div class="address-add" v-cloak>
 		<group>
       <!-- <x-address title="地址" v-model="address" :list="addressData" placeholder="请选择地址"></x-address> -->
       <selector title="省" placeholder="请选择省份" :options="province.list" v-model="province.value" @on-change="provinceChange"></selector>
@@ -51,7 +51,7 @@
 	      addressDetail: '',
 	      name: '',
 	      tel: '',
-	      checkAddress: false,
+	      checkAddress: true,
 	      responseData: {
 	      	id: "",
 	      	code: ""
@@ -85,7 +85,7 @@
 			fetchData () {
 				let _this = this;
 	  		_this.$http.post('/wechat/shop/queryCustomerAddressDetail',{
-	  			"code": _this.$route.params.code
+	  			"code": _this.orderCode
 	  			}).then(function(e) {
 						let responseData = e.data.data;
 						_this.addressDetail = responseData.result.address;

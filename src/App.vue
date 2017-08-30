@@ -1,13 +1,15 @@
 <template>
   <div id="app">
-    <loading v-model="isLoading"></loading>
+    <loading v-model="loadbar.isLoading"></loading>
     <div :class="['container', {'active': nav.status}]">
-      <transition :name="'vux-pop-' + (direction.direction === 'forward' ? 'in' : 'out')">
-          <router-view class="router-view"></router-view>
-        </transition>
+      <!-- <transition :name="'vux-pop-' + (direction.direction === 'forward' ? 'in' : 'out')"> -->
+          <router-view class="router-view" :key="key"></router-view>
+        <!-- </transition> -->
       <!-- <router-view></router-view>     -->
     </div>
     <el-nav v-show="nav.status"></el-nav>
+
+    <!-- <el-frame-btn></el-frame-btn> -->
   </div>
 </template>
 
@@ -17,6 +19,7 @@
   import hold from 'src/commons/hold'
 
   import elNav from 'components/nav/nav'
+  // import elFrameBtn from 'components/frame-btn/frame-btn'
 
   export default {
     name: 'app',
@@ -31,20 +34,63 @@
       ...mapState({
         user: state => state.user,
         nav: state => state.nav,
-        isLoading: state => state.isLoading,
+        loadbar: state => state.loadbar,
         direction: state => state.direction
-      })
+      }),
+      key() {
+        return this.$route.name !== undefined ? this.$route.name + +new Date(): this.$route + +new Date()
+      }
+    },
+    watch: {
+      '$route' (to, from) {
+        if(to.name == from.name) {
+          if(!this.isObjectValueEqual(to.params, from.params) || !this.isObjectValueEqual(to.query, from.query)) {
+            this.$router.go(0);
+          }
+        }
+        // console.log(to, from)
+        // this.$router.go(0)
+      }
     },
     mounted () {
       let userCode = this.$store.state.user.userCode || hold.storage.get("userCode"),
           storageOpenId = hold.storage.get("openId"),
           storeOpenId = this.$store.state.user.openId,
           openId = storageOpenId || storeOpenId;
+      let _this = this;
 
       if(userCode && userCode != 'undefined' && userCode != '') {
         this.getUserInfo(openId, userCode);
+        _this.$http.post('/wechat/message/unReadMsg',{
+            "openId": openId
+          }).then(function(e) {
+          if(e.data.errcode == 1) {
+            let num = e.data.data.result;
+            if(num > 0) {
+              _this.$store.commit("updateUserHasMsg", { hasMsg: num + ""});
+            }
+          } else {
+            _this.$vux.alert.show({
+              content: e.data.errmsg
+            })
+          }
+        })
       } else if(openId && openId != 'undefined' && openId != '') {
         this.getUserCode(openId);
+        _this.$http.post('/wechat/message/unReadMsg',{
+            "openId": openId
+          }).then(function(e) {
+          if(e.data.errcode == 1) {
+            let num = e.data.data.result;
+            if(num > 0) {
+              _this.$store.commit("updateUserHasMsg", { hasMsg: num + ""});
+            }
+          } else {
+            _this.$vux.alert.show({
+              content: e.data.errmsg
+            })
+          }
+        })
       }
     }
   }
@@ -52,6 +98,8 @@
 
 <style lang="scss">
   @import "~assets/css/common.scss";
+  @import '~node/video.js/dist/video-js.css';
+  @import '~node/vue-video-player/src/custom-theme.css';
 </style>
 
 <style lang="scss" scoped>

@@ -3,7 +3,7 @@ import * as types from '../mutation-types'
 
 export default {
   state: {
-    isLoading: false
+    isLoading: true
   },
   mutations: {
     updateLoadingStatus (state, payload) {

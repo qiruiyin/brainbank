@@ -1,3 +1,13 @@
+// 路由到path
+
+// 例如：复训retrain
+
+// query参数传递 :/retain?lessonCode=值&lessonType=值
+
+// 例如：courseOrder
+
+// path上的冒号参数传递：/confirm-order/1 1为参数值
+
 import loadView from './async-view-loader'
 
 const routes = [
@@ -5,22 +15,14 @@ const routes = [
 		path: '*',
 		redirect: '/index' 
 	},{
-		path: '/form',
-		name: 'form',
-		component:  loadView(loaded => {
-			require(['../components/form/form.vue'], loaded)
-		}),
-		meta: {
-			title: '大脑银行'
-		}
-	},{
 		path: '/index',
 		name: 'index',
 		component:  loadView(loaded => {
 			require(['../modules/index/index.vue'], loaded)
 		}),
 		meta: {
-			title: '大脑银行'
+			title: '大脑银行',
+			routerTitle: '公众号首页'
 		}
 	},{
 		path: '/author',
@@ -41,15 +43,32 @@ const routes = [
 			title: '信息绑定'
 		}
 	},{
-		path: '/header/:introType',
-		name: 'intro',
+		path: '/sign-code',
+		name: 'signCode',
+		query: {
+			code: "", // ticketcode
+		},
 		component:  loadView(loaded => {
-			require(['../modules/index/header/intro.vue'], loaded)
+			require(['../modules/index/sign-code.vue'], loaded)
+		}),
+		meta: {
+			title: '签到二维码'
+		}
+	},{
+		path: '/retrain',
+		name: 'retrain',
+		query: {
+			lessonCode: "", // 课程期数code
+			lessonType: "" // 课程期数类型
+		},
+		component:  loadView(loaded => {
+			require(['../modules/index/header/retrain.vue'], loaded)
 		}),
 		meta: {
 			title: '复训须知'
 		}
 	},{
+		// 废弃
 		path: '/register',
 		name: 'register',
 		component:  loadView(loaded => {
@@ -59,6 +78,7 @@ const routes = [
 			title: '注册'
 		}
 	},{
+		// 废弃
 		path: '/info-add',
 		name: 'infoAdd',
 		component:  loadView(loaded => {
@@ -70,6 +90,11 @@ const routes = [
 	},{
 		path: '/questionnaire',
 		name: 'questionnaire',
+		query: {
+			productCode: "", // 产品code
+			groupCode: "", // 组code
+			orderCode: "" // 订单code
+		},
 		component:  loadView(loaded => {
 			require(['../modules/index/questionnaire.vue'], loaded)
 		}),
@@ -77,7 +102,7 @@ const routes = [
 			title: '问卷调查'
 		}
 	},{
-		path: '/confirm-order/:payType',
+		path: '/confirm-order/:payType', // 支付类型1: 复训， 0：报名
 		name: 'courseOrder',
 		component:  loadView(loaded => {
 			require(['../modules/index/course-order.vue'], loaded)
@@ -88,6 +113,10 @@ const routes = [
 	},{
 		path: '/order-done',
 		name: 'orderDone',
+		query: {
+			groupCode: "", // 组code
+			orderCode: "" // 订单code
+		},
 		component:  loadView(loaded => {
 			require(['../modules/order/order-done.vue'], loaded)
 		}),
@@ -95,6 +124,19 @@ const routes = [
 			title: '订单完成'
 		}
 	},{
+		path: '/order-done-mall',
+		name: 'orderDoneMall',
+		query: {
+			orderCode: "" // 订单code (是否传类别，待定)
+		},
+		component:  loadView(loaded => {
+			require(['../modules/order/order-done-mall.vue'], loaded)
+		}),
+		meta: {
+			title: '订单完成'
+		}
+	},{
+		// 废弃
 		path: '/pay',
 		name: 'pay',
 		component:  loadView(loaded => {
@@ -113,6 +155,7 @@ const routes = [
 	// 		title: '大脑银行'
 	// 	}
 	},{
+		// 废弃
 		path: '/banner/:bannerCode',
 		name: 'banner',
 		component:  loadView(loaded => {
@@ -122,13 +165,17 @@ const routes = [
 			title: '大脑银行'
 		}
 	},{
-		path: '/rank/:type',
+		path: '/rank/:type', // video：视频， audio: 音频
 		name: 'rankList',
 		component:  loadView(loaded => {
 			require(['../modules/rank/list.vue'], loaded)
 		}),
 		meta: {
-			title: '排行榜'
+			title: '排行榜',
+			routerTitle: {
+				video: '视频程序首页',
+				audio: '音频程序首页'
+			}
 		}
 	},{
 		path: '/list-download',
@@ -140,8 +187,11 @@ const routes = [
 			title: '资料下载'
 		}
 	},{
-		path: '/list-course/:typeCode',
+		path: '/list-course', 
 		name: 'courseList',
+		query: {
+			typeCode: "" // 资料类型
+		},
 		component:  loadView(loaded => {
 			require(['../modules/rank/list-course.vue'], loaded)
 		}),
@@ -155,37 +205,74 @@ const routes = [
 			require(['../modules/quotation/quotation.vue'], loaded)
 		}),
 		meta: {
-			title: '经典语录'
+			title: '经典语录',
+			routerTitle: '经典语录'
+		}
+	},{
+		path: '/quotation-send',
+		name: 'quotationSend',
+		component:  loadView(loaded => {
+			require(['../modules/quotation/send.vue'], loaded)
+		}),
+		meta: {
+			title: '发送语录'
+		}
+	},{
+		path: '/quotation-add',
+		name: 'quotationAdd',
+		component:  loadView(loaded => {
+			require(['../modules/quotation/add.vue'], loaded)
+		}),
+		meta: {
+			title: '发布语录'
 		}
 	},{
 		// 课程
 		path: '/course',
 		name: 'course',
+		query: {
+			type: "", // 1：近期课程，0：所有课程，只是课程切换
+		},
 		component:  loadView(loaded => {
 			require(['../modules/course/course.vue'], loaded)
 		}),
 		meta: {
-			title: '课程'
+			title: '课程',
+			routerTitle: '课程首页'
 		}
 	},{
 		// 课程详情
-		path: '/course-detail/:courseCode',
+		path: '/course-detail',
 		name: 'courseDetail',
+		force: true,
+		query: {
+			courseCode: "" // 课程code
+		},
 		component:  loadView(loaded => {
 			require(['../modules/course/detail-course.vue'], loaded)
 		}),
 		meta: {
-			title: '课程详情'
+			title: '课程详情',
+			routerTitle: '课程详情'
 		}
 	},{
 		// 视频及音频详情
-		path: '/course-type-detail/:type/:code',
+		path: '/course-type-detail', // type: video视频、audio音频，code产品code
 		name: 'courseTypeDetail',
+		force: true,
+		query: {
+			type: "", // type: video视频、audio音频、course：课程视频
+			code: "" // code产品code
+		},
 		component: loadView(loaded => {
 			require(['../modules/course/detail-type.vue'], loaded)
 		}),
 		meta: {
-			title: '详情'
+			title: '详情',
+			routerTitle: {
+				video: "视频播放页面",
+				audio: "音频播放页面"
+			}
 		}
 	// },{
 	// 	// 课程 audio详情
@@ -205,10 +292,26 @@ const routes = [
 			require(['../modules/msg/msg.vue'], loaded)
 		}),
 		meta: {
-			title: '消息列表'
+			title: '消息列表',
+			routerTitle: '消息列表页'
 		}
 	},{
 		// 消息
+		path: '/msg-detail',
+		name: 'msgDetail',
+		query: {
+			// openId: "", // openId
+			sendUser: "", // sendUser
+			msgType: "" // 消息类型：1：系统消息，2：订单消息，3：普通用户消息
+		},
+		component:  loadView(loaded => {
+			require(['../modules/msg/msg-detail.vue'], loaded)
+		}),
+		meta: {
+			title: '消息详情'
+		}
+	},{
+		// 消息（废弃）
 		path: '/msg/add',
 		name: 'msgAdd',
 		component:  loadView(loaded => {
@@ -225,10 +328,11 @@ const routes = [
 			require(['../modules/user-center/user-center.vue'], loaded)
 		}),
 		meta: {
-			title: '大脑银行'
+			title: '大脑银行',
+			routerTitle: '个人中心列表页'
 		}
 	},{
-		path: '/user-center/kefu',
+		path: '/kefu',
 		name: 'kefu',
 		component:  loadView(loaded => {
 			require(['../modules/user-center/kefu/kefu.vue'], loaded)
@@ -237,8 +341,11 @@ const routes = [
 			title: '我的客服'
 		}
 	},{
-		path: '/user-center/kefu-detail/:serviceCode',
+		path: '/kefu-detail', 
 		name: 'kefuDetail',
+		query: {
+			serviceCode: "" // serviceCode是客服的CODE
+		},
 		component:  loadView(loaded => {
 			require(['../modules/user-center/kefu/kefu-detail.vue'], loaded)
 		}),
@@ -255,7 +362,7 @@ const routes = [
 			title: '分享有奖'
 		}
 	},{
-		path: '/user-center/personal-edit',
+		path: '/personal-edit',
 		name: 'personalEdit',
 		component:  loadView(loaded => {
 			require(['../modules/user-center/personal/edit.vue'], loaded)
@@ -264,16 +371,16 @@ const routes = [
 			title: '修改资料'
 		}
 	},{
-		path: '/user-center/integral',
+		path: '/integral',
 		name: 'integral',
 		component:  loadView(loaded => {
 			require(['../modules/user-center/integral/integral.vue'], loaded)
 		}),
 		meta: {
-			title: '我的推广积分'
+			title: '我的好友'
 		}
 	},{
-		path: '/user-center/feedback',
+		path: '/feedback',
 		name: 'feedback',
 		component:  loadView(loaded => {
 			require(['../modules/user-center/feedback/feedback.vue'], loaded)
@@ -293,8 +400,11 @@ const routes = [
 		}
 	},{
 		// 商城产品列表
-		path: '/mall/list/:type',
+		path: '/mall-list', // 商品类型：book: 书籍, cd: 光盘，如需新增，直接在后台新增即可
 		name: 'mallList',
+		query: {
+			type: "" // 商品类型：book: 书籍, cd: 光盘，如需新增，直接在后台新增即可
+		},
 		component:  loadView(loaded => {
 			require(['../modules/mall/list.vue'], loaded)
 		}),
@@ -303,8 +413,12 @@ const routes = [
 		}
 	},{
 		// 商城详情
-		path: '/mall/detail/:goodsCode',
+		path: '/mall-detail',
 		name: 'mallDetail',
+		query: {
+			goodsCode: "", // 商品code
+			type: '' // 显示tab
+		},
 		component:  loadView(loaded => {
 			require(['../modules/mall/detail.vue'], loaded)
 		}),
@@ -313,18 +427,21 @@ const routes = [
 		}
 	},{
 		// 课程订单
-		path: '/order/list/course',
+		path: '/order-list-course',
 		name: 'orderCourseList',
 		component:  loadView(loaded => {
-			require(['../modules/order/course.vue'], loaded)
+			require(['../modules/order/order-course.vue'], loaded)
 		}),
 		meta: {
 			title: '订单列表'
 		}
 	},{
 		// 商城订单
-		path: '/order/list/mall',
+		path: '/order-list-mall',
 		name: 'orderMallList',
+		// query: {
+		// 	type: '' // 订单状态，可以不传，不传就是tab第一个，1：tab第二个，2：tab第三个
+		// },
 		component:  loadView(loaded => {
 			require(['../modules/order/mall-list.vue'], loaded)
 		}),
@@ -333,7 +450,7 @@ const routes = [
 		}
 	},{
 		// 资料订单
-		path: '/order/list/source',
+		path: '/order-list-source',
 		name: 'orderSourceList',
 		component:  loadView(loaded => {
 			require(['../modules/order/source-list.vue'], loaded)
@@ -345,6 +462,9 @@ const routes = [
 		// 订单
 		path: '/confirm-order',
 		name: 'confirmOrder',
+		query: {
+			orderCode: "" // 订单code
+		},
 		component:  loadView(loaded => {
 			require(['../modules/order/confirm-order.vue'], loaded)
 		}),
@@ -364,7 +484,10 @@ const routes = [
 	},{
 		// 地址信息
 		path: '/address',
-		name: 'address',
+		name: 'address', 
+		query: {
+			orderCode: "" // 订单code,用来判定是不是来自订单
+		},
 		component:  loadView(loaded => {
 			require(['../modules/address/address.vue'], loaded)
 		}),
@@ -375,6 +498,10 @@ const routes = [
 		// 地址信息
 		path: '/address/add',
 		name: 'addressAdd',
+		query: {
+			orderCode: "", // 订单code,用来判定是不是来自订单
+			url: "", // 上一个url路由名字
+		},
 		component:  loadView(loaded => {
 			require(['../modules/address/address-add.vue'], loaded)
 		}),
@@ -383,8 +510,14 @@ const routes = [
 		}
 	},{
 		// 地址编辑
-		path: '/address/edit/:code',
+		path: '/address-edit',
 		name: 'addressEdit',
+		query: {
+			orderCode: "" // 订单code
+		},
+		query: {
+			orderCode: "" // 订单code,用来判定是不是来自订单
+		},
 		component:  loadView(loaded => {
 			require(['../modules/address/address-edit.vue'], loaded)
 		}),

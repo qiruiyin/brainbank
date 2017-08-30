@@ -1,5 +1,5 @@
 $entry: 'video', 'audio', 'quotation', 'download';
-	$entryIconW: 56px;
+	$entryIconW: 54px;
 
 	$entryVideos: '1';
 	$entryVideosIconW: 89px;
@@ -34,6 +34,7 @@ $entry: 'video', 'audio', 'quotation', 'download';
 
 			p {
 				margin: 0 auto;
+		    margin-top: 10px;
 			}
 		}
 
@@ -49,7 +50,7 @@ $entry: 'video', 'audio', 'quotation', 'download';
 	.entry-videos {
 		@include halfpxline(0, $borderColor, 0 , 0, 1px, 0);
 		width: 100%;
-		padding: 20px 0;
+		padding: 20px 8px;
 		text-align: center;
 		display: flex;
 
@@ -57,6 +58,7 @@ $entry: 'video', 'audio', 'quotation', 'download';
 			flex: 1;
 
 			p {
+				margin-top: 6px;
 				max-width: $entryVideosIconW;
 				// text-align: justify;
 			}
@@ -65,5 +67,6 @@ $entry: 'video', 'audio', 'quotation', 'download';
 		img {
 		  width: 90%;
     	margin: 0 auto;
+    	border-radius: 10px;
 		}
 	}

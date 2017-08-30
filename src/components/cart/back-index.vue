@@ -3,7 +3,7 @@
  -->
 
 <template>
-	<div v-transfer-dom>
+	<div v-transfer-dom v-cloak>
 		<div @click="goIndex" class="back-index fa fa-home">
 			{{ title }}
 		</div>

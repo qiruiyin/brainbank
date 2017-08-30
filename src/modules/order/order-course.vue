@@ -3,33 +3,31 @@
  -->
 
 <template>
-	<div class="order-list">
+	<div class="order-list" v-cloak>
 		<tab :line-width=2 v-model="tabSelected">
       <tab-item class="vux-center" v-for="(item, index) in tabData" :key="index">{{ item.name }}</tab-item>
     </tab>
-    <swiper v-model="tabSelected" height="100%" :show-dots="false">
+    <swiper v-model="tabSelected" height="100%" :show-dots="false" :threshold="tabChangeW">
       <swiper-item v-for="(item, index) in tabData" :key="index">
-    		<el-card-order @on-load-more="loadMore" :card-data="item.list" :card-count="count" :card-index="index"></el-card-order>
+  			<el-card-order @on-load-more="loadMore" @on-data-change="dataChange" :card-data="item.list" :card-count="count" :card-index="index" :on-fetching="item.onFetching" :on-fetch-all="item.loadAll"></el-card-order>
       </swiper-item>
     </swiper>
 	</div>
 </template>
 
 <script type="type/babel">
-	import { Tab, TabItem, Swiper, SwiperItem, TransferDom } from 'vux'
+	import { Tab, TabItem, Swiper, SwiperItem } from 'vux'
 
 	import elCardOrder from 'components/card/card-order'
 
 	export default {
 		name: 'orderList',
 		components: { Tab, TabItem, Swiper, SwiperItem, elCardOrder },
-		directives: {
-	    TransferDom
-	  },
 		data () {
 			return {
 				title: '订单列表页面',
 				count: this.wordBook.pageCount,
+				tabChangeW: this.wordBook.tabChangeW,
 				tabData: [
 					{
 						value: 'all',
@@ -38,6 +36,8 @@
 					  paymentStatus: "",
 					  ticketStatus: "",
 						pageSize: 1,
+						onFetching: false,
+						loadAll: false,
 						list: []
 					},{
 						value: 'unpay',
@@ -46,6 +46,8 @@
 					  paymentStatus: "0",
 					  ticketStatus: "",
 						pageSize: 1,
+						onFetching: false,
+						loadAll: false,
 						list: []
 					},{
 						value: 'untake',
@@ -54,6 +56,8 @@
 					  paymentStatus: "1",
 					  ticketStatus: "0",
 					  pageSize: 1,
+						onFetching: false,
+						loadAll: false,
 						list: []
 					},{
 						value: 'take',
@@ -62,6 +66,8 @@
 					  paymentStatus: "1",
 					  ticketStatus: "1",
 						pageSize: 1,
+						onFetching: false,
+						loadAll: false,
 						list: []
 					}
 				],
@@ -89,6 +95,7 @@
 							"ticketStatus": obj.ticketStatus
 						}
 					).then(function(e) {
+						_this.tabData[ind].onFetching = false;
 						let responseData = e.data.data,
 								customerStudyedLessonList;
 
@@ -100,24 +107,31 @@
 									lessonCode: item.lessonCode,
 									commodityCode: item.commodityCode,
 									title: item.NAME,
-									actualAmount: item.expectAmount,
-									amount: item.amount,
+									parentTitle: item.productName,
+									customerName: item.customerName,
+									expectAmount: item.expectAmount, // 已付金额
+									amount: item.amount, // 总金额
 									paymentType: item.paymentType,
-									img: '',
+									img: _this.resolveImg(item.thumbnail),
 									status: (item.paymentType == 1 && item.ticketStatus) ? item.ticketStatus : item.paymentStatus,
 									time: item.createTime,
 									paymentType: item.paymentType,
 									ticketType: item.ticketType,
-									num: item.count,
+									ticketCode: item.ticketCode,
+									num: item.COUNT,
 									// lessonCommodityList: item.lessonCommodityList
 								}
 							});
 
+							if(customerStudyedLessonList.length < _this.count) {
+								_this.tabData[ind].loadAll = true;
+							}
 							if(obj.pageSize == 1) {
 								_this.tabData[ind].list = customerStudyedLessonList;
 							} else {
-								_this.tabData[ind].list.push.apply(_this.tabData[ind].list, customerStudyedLessonList);
+								_this.tabData[ind].list = _this.tabData[ind].list.concat(customerStudyedLessonList);
 							}
+							_this.tabData[ind].pageSize++;
 						}
 				})
 			},
@@ -127,7 +141,16 @@
 				}
 			},
 			loadMore (val) {
-				this.fetchData(this.tabData[val], val)
+				if(this.tabData[val].onFetching || this.tabData[val].loadAll) {
+
+				} else {
+	        this.onFetching = true;
+					this.fetchData(this.tabData[val], val)
+				}
+			},
+			dataChange (ind) {
+				this.tabData[ind].pageSize = 1;
+				this.fetchData(this.tabData[ind], ind)
 			}
 		}
 	}

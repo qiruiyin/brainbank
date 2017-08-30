@@ -3,7 +3,7 @@
  -->
 
 <template>
-	<div class="dn-form enlist">
+	<div class="dn-form enlist" v-cloak>
 		<h5 class="enlist-title">{{ courseInfo.course }}
 			<span class="price" v-if="courseInfo.type == 3">￥{{ count.value == 0 ? courseInfo.price : courseInfo.price * count.value | numToCash }}</span>
 			<span class="price" v-else>￥{{ courseInfo.price * (1+addManInfo.length) | numToCash }}</span>
@@ -15,9 +15,9 @@
 			</div>
 			<x-input type="tel" v-model="tel.value" :placeholder="tel.placeholder" required>
       	<label slot="label" class="label icon icon-tel">{{ tel.title }}</label>
-        <el-verification-code :tel="tel.value" slot="right"></el-verification-code>
+        <el-verification-code :tel="tel.value" code-type="baoming" slot="right"></el-verification-code>
       </x-input>
-      <x-input type="number" :title="code.title" v-model="code.value" :placeholder="code.placeholder" required>
+      <x-input type="tel" :title="code.title" v-model="code.value" :placeholder="code.placeholder" required>
       	<label slot="label" class="label icon icon-qrcode">{{ code.title }}</label>
       </x-input>
     </group>
@@ -27,21 +27,27 @@
 	    	<x-input v-model="userInfo.name.value" :placeholder="userInfo.name.placeholder" readonly required>
 	      	<label slot="label" class="label icon icon-user">{{ userInfo.name.title }}</label>
 	      </x-input>
-	    	<x-input v-model="userInfo.idCard.value" :placeholder="userInfo.idCard.placeholder" readonly required>
+	      <div class="el-selector icon icon-tel">
+		      <selector :title="userInfo.idCardType.title" direction="left" :options="userInfo.idCardType.list" readonly v-model="userInfo.idCardType.value"></selector>	    	
+	      </div>
+	    	<x-input type="tel" v-model="userInfo.idCard.value" :placeholder="userInfo.idCard.placeholder" readonly required>
 	      	<label slot="label" class="label icon icon-idCard">{{ userInfo.idCard.title }}</label>
 	      </x-input>
-	    	<x-input v-model="userInfo.tel.value" :placeholder="userInfo.tel.placeholder" readonly required>
+	    	<x-input type="tel" v-model="userInfo.tel.value" :placeholder="userInfo.tel.placeholder" readonly required>
 	      	<label slot="label" class="label icon icon-tel">{{ userInfo.tel.title }}</label>
 	      </x-input>
     	</template>
     	<template v-else>
-	    	<x-input v-model="userInfo.name.value" :placeholder="userInfo.name.placeholder" required>
+	    	<x-input v-model="userInfo.name.value" @on-change="nameTestNum(userInfo.name.value)" :placeholder="userInfo.name.placeholder" required>
 	      	<label slot="label" class="label icon icon-user">{{ userInfo.name.title }}</label>
 	      </x-input>
-	    	<x-input v-model="userInfo.idCard.value" :placeholder="userInfo.idCard.placeholder" required>
+	      <div class="el-selector icon icon-tel">
+		      <selector :title="userInfo.idCardType.title" direction="left" :options="userInfo.idCardType.list" v-model="userInfo.idCardType.value"></selector>	    	
+	      </div>
+	    	<x-input type="tel" v-model="userInfo.idCard.value" :placeholder="userInfo.idCard.placeholder" required>
 	      	<label slot="label" class="label icon icon-idCard">{{ userInfo.idCard.title }}</label>
 	      </x-input>
-	    	<x-input v-model="userInfo.tel.value" :placeholder="userInfo.tel.placeholder" required>
+	    	<x-input type="tel" v-model="userInfo.tel.value" :placeholder="userInfo.tel.placeholder" required>
 	      	<label slot="label" class="label icon icon-tel">{{ userInfo.tel.title }}</label>
 	      </x-input>
     	</template>
@@ -51,14 +57,33 @@
     	<x-input v-model="userInfo.name.value" :placeholder="userInfo.name.placeholder" readonly required>
       	<label slot="label" class="label icon icon-user">{{ userInfo.name.title }}</label>
       </x-input>
-    	<x-input v-model="userInfo.idCard.value" :placeholder="userInfo.idCard.placeholder" readonly required>
+      <div class="el-selector icon icon-tel">
+	      <selector :title="userInfo.idCardType.title" direction="left" :options="userInfo.idCardType.list" readonly v-model="userInfo.idCardType.value"></selector>	    	
+      </div>
+    	<x-input type="tel" v-model="userInfo.idCard.value" :placeholder="userInfo.idCard.placeholder" readonly required>
       	<label slot="label" class="label icon icon-idCard">{{ userInfo.idCard.title }}</label>
       </x-input>
-    	<x-input v-model="userInfo.tel.value" :placeholder="userInfo.tel.placeholder" readonly required>
+    	<x-input type="tel" v-model="userInfo.tel.value" :placeholder="userInfo.tel.placeholder" readonly required>
       	<label slot="label" class="label icon icon-tel">{{ userInfo.tel.title }}</label>
       </x-input>
     	<x-input v-if="courseInfo.type == 3" :max='3' type="tel" :title="count.title" v-model="count.value" :placeholder="count.placeholder" required>
       	<label slot="label" class="label icon icon-tel">{{ count.title }}</label>
+      </x-input>
+    </group>
+
+	  <group class="add-man" v-for="(item, index) in addManInfo" :key="index">
+    	<x-input v-model="item.name.value"  @on-change="nameTestNum(item.name.value)" :placeholder="item.name.placeholder" required>
+      	<label slot="label" class="label icon icon-user">{{ item.name.title }}</label>
+				<div slot="right" @click="remove(index)" class="add-btn-click fa fa-minus delete"></div>
+      </x-input>
+      <div class="el-selector icon icon-tel">
+	      <selector :title="item.idCardType.title" direction="left" :options="item.idCardType.list" v-model="item.idCardType.value"></selector>	    	
+      </div>
+    	<x-input type="tel" v-model="item.idCard.value" :placeholder="item.idCard.placeholder" required>
+      	<label slot="label" class="label icon icon-idCard">{{ item.idCard.title }}</label>
+      </x-input>
+    	<x-input type="tel" v-model="item.tel.value" :placeholder="item.tel.placeholder" required>
+      	<label slot="label" class="label icon icon-tel">{{ item.tel.title }}</label>
       </x-input>
     </group>
 
@@ -67,19 +92,6 @@
 				<div class="add-btn-click fa fa-plus"></div>
 			</div>
 		</group>
-
-	  <group class="add-man" v-for="(item, index) in addManInfo" :key="index">
-    	<x-input v-model="item.name.value" :placeholder="item.name.placeholder" required>
-      	<label slot="label" class="label icon icon-user">{{ item.name.title }}</label>
-				<div slot="right" @click="remove(index)" class="add-btn-click fa fa-minus delete"></div>
-      </x-input>
-    	<x-input v-model="item.idCard.value" :placeholder="item.idCard.placeholder" required>
-      	<label slot="label" class="label icon icon-idCard">{{ item.idCard.title }}</label>
-      </x-input>
-    	<x-input v-model="item.tel.value" :placeholder="item.tel.placeholder" required>
-      	<label slot="label" class="label icon icon-tel">{{ item.tel.title }}</label>
-      </x-input>
-    </group>
 
 		<div class="btns" >
 			<x-button v-if="!submitBtn" type="primary" @click.native="submit" show-loading>提交</x-button>
@@ -139,10 +151,18 @@
 						title: "姓名",
 						placeholder: "请输入报名人员姓名"
 					},
+					idCardType: {
+						title: "证件类别",
+						list: [
+							{key: '1', value: '身份证'},
+							{key: '2', value: '护照'}
+						],
+						value: "1"
+					},
 					idCard: {
 						value: "",
-						title: "身份证",
-						placeholder: "请输入身份证号码"
+						title: "证件号码",
+						placeholder: "请输入证件号码"
 					},
 					tel: {
 						value: "",
@@ -165,7 +185,7 @@
 			}
 		},
 		mounted () {
-	  	let _this = this;
+	  	// let _this = this;
 			this.fetchData();
 		},
 		methods: {
@@ -190,6 +210,7 @@
 							_this.courseInfo.price = resData.lessonInfo.price;
 
 							_this.userInfo.name.value = resData.user.NAME;
+							_this.userInfo.idCardType.value = resData.user.idCardType;
 							_this.userInfo.idCard.value = resData.user.idcard;
 							_this.userInfo.tel.value = resData.user.mobile;
 						} else {
@@ -205,6 +226,14 @@
 						value: "",
 						title: "姓名",
 						placeholder: "请输入报名人员姓名"
+					},
+					idCardType: {
+						title: "证件类别",
+						list: [
+							{key: '1', value: '身份证'},
+							{key: '2', value: '护照'}
+						],
+						value: "1"
 					},
 					idCard: {
 						value: "",
@@ -259,7 +288,6 @@
 			},
 			submit () {
 				if(!this.submitBtn) return;
-				this.submitBtn = false;
 
 				let _this = this,
 					count = _this.addManInfo.length + 1,
@@ -272,21 +300,47 @@
 	    	if(!_this.valEmpty('userInfo', 'idCard')) return false;
 	    	if(!_this.valEmpty('userInfo', 'tel')) return false;
 
+	    	// 校验名字自是否含有数字和标点符号
+	    	if(_this.nameTestNum(_this.userInfo.name.value)) {
+	    		return false;
+	    	}
+
     		if(count > 1 && !_this.valManListInfo) return false;
 
     		if(this.courseInfo.type == 3) {
     			count = this.count.value;
+    			if(count < 5) {
+    				this.$vux.alert.show({
+    					content: "报名人数不能小于5人"
+    				})
+
+    				return false;
+    			}
     		}
+    		
+				_this.submitBtn = false;
+				_this.$store.commit('updateLoadingStatus', {isLoading: true});
 
 	    	if(_this.courseInfo.type == 2) {
 	    		// 商业思维
-	    		let allMoney = (price * count).toFixed(2);
-	    		let enrollInfo = _this.userInfo.name.value + "," + _this.userInfo.idCard.value + "," + _this.userInfo.tel.value;
+	    		let allMoney = (price * count).toFixed(2),
+	    				nameStatus = false;
+	    		let enrollInfo = _this.userInfo.name.value + "," + _this.userInfo.idCard.value + "," + _this.userInfo.tel.value + "," + _this.userInfo.idCardType.value;
 
 	    		if(count > 1) {
 		    		_this.addManInfo.map(function(item, index){
-		    			enrollInfo += "#" + item.name.value + "," + item.idCard.value + "," + item.tel.value;
+		    			if(_this.nameTestNum(item.name.value)) {
+		    				nameStatus = true;
+		    				return false;
+		    			}
+		    			enrollInfo += "#" + item.name.value + "," + item.idCard.value + "," + item.tel.value + "," + item.idCardType.value;
 		    		});
+
+		    		if(nameStatus) {
+							_this.submitBtn = false;
+							_this.$store.commit('updateLoadingStatus', {isLoading: false});
+		    			return false;
+		    		}
 		    	}
 
 	    		this.$http.post('/wechat/order/enroll/create',
@@ -298,10 +352,11 @@
 							"orderType": orderType,
 							"lessonCode": _this.courseInfo.code,
 							"enrollInfo": enrollInfo,
-							"mobileNum": _this.tel.value,
+							"mobile": _this.tel.value,
 							"smsCode": _this.code.value
 						}).then(function(e) {
 							let responseData = e.data;
+							_this.$store.commit('updateLoadingStatus', {isLoading: false});
 							_this.submitBtn = true;
 
 							if(responseData.errcode != 1) {
@@ -309,9 +364,10 @@
 				          content: responseData.errmsg
 				        })
 							} else {
-								_this.payOrder(responseData.data.orderList[0].groupCode, responseData.data.orderList[0].code)
+								_this.payOrder(responseData.data.orderList[0].groupCode, responseData.data.orderList[0].code, _this.courseInfo.productCode)
 							}
 						}).catch(function (error) {
+							_this.$store.commit('updateLoadingStatus', {isLoading: false});
 							_this.submitBtn = true;
 							if(error.response.status == 500) {
 								_this.$vux.alert.show({
@@ -327,9 +383,12 @@
 								"amount": count,
 								"money": price,
 								"orderType":  orderType,
-								"lessonCode": _this.courseInfo.code
+								"lessonCode": _this.courseInfo.code,
+								"mobile": _this.tel.value,
+								"smsCode": _this.code.value
 							}
 						).then(function(e) {
+							_this.$store.commit('updateLoadingStatus', {isLoading: false});
 							_this.submitBtn = true;
 							let responseData = e.data;
 
@@ -338,9 +397,14 @@
 				          content: responseData.errmsg
 				        })
 							} else {
-								_this.payOrder(responseData.data.order.code, responseData.data.order.code)
+								if(responseData.data.order.paymentStatus.code == "0fe948d8066040b6a6c31f4d338205c4") {
+									_this.$router.push({name: 'questionnaire', query: { groupCode: responseData.data.order.groupCode || "", orderCode: responseData.data.order.code, productCode: _this.courseInfo.productCode }})
+								} else {
+									_this.payOrder(responseData.data.order.groupCode || "", responseData.data.order.code, _this.courseInfo.productCode)
+								}
 							}
 						}).catch(function (error) {
+							_this.$store.commit('updateLoadingStatus', {isLoading: false});
 							_this.submitBtn = true;
 							if(error.response.status == 500) {
 								_this.$vux.alert.show({
@@ -350,29 +414,33 @@
 					  });
 				}
 			},
-	    payOrder (orderCode, code) {
-	    	// orderCode 订单code或者组code
+	    payOrder (groupCode, orderCode, productCode) {
 	    	let _this = this;
 
 	    	if(!_this.$store.state.user.pay) return false;
 
 	    	if(_this.courseInfo.type == 2) {
-					this.payWeixinOrder(orderCode, {name: 'questionnaire', query: { groupCode: _this.courseInfo.productCode, orderCode: code }}, 1, 1)
+					this.payWeixinOrder(groupCode, {name: 'questionnaire', query: { productCode: productCode,  groupCode: groupCode, orderCode: orderCode }}, 1, 1)
 	    	} else {
-					this.payWeixinOrder(orderCode, {name: 'questionnaire', query: { groupCode: _this.courseInfo.productCode, orderCode: code }}, 1)
+					this.payWeixinOrder(orderCode, {name: 'questionnaire', query: { productCode: productCode,  groupCode: groupCode, orderCode: orderCode }}, 1)
 				}
-	    }
+	    },
+	    // nameTestNum (data) {
+	    // 	if(/[0-9]/.test(data) || /^.*[~!@#\$%\^&\*\(\)_+\-=\[\]\{\}\\\|\'\";:,\<\.\>\/\?\s+].*$/.test(data)) {
+	    // 		this.$vux.toast.text(_this.nameTip);
+	    // 		return true;
+	    // 	}
+	    // 	return false;
+	    // }
 	  }
 	}
 </script>
 
-<style lang="scss">
-	@import '~assets/css/form';
-</style>
-
 <style lang="scss" scoped>
 	@import '~lib/sandal/core';
 	@import '~assets/css/core/functions', '~assets/css/core/mixins', '~assets/css/core/vars';
+
+	@import '~assets/css/icon';
 	
 	$addBtnW: 30px;
 	$addBorderColor: #f3f3f3;
@@ -412,7 +480,6 @@
 		position: absolute;
 		top: 50%;
 		right: $padding;
-		// float: right;
 		width: $addBtnW;
 		height: $addBtnW;
 		margin-top: - $addBtnW/2;
@@ -441,16 +508,11 @@
 
 	.add-man {
 		@include halfpxline(0, $borderColor, 1px, 0, 0, 0);
-		// margin: 0 $padding ;
-		// padding: 6px;
 		border-top: $paddingTop solid $addBorderColor;
 
 		.add-name {
-			// font-size: 18px;
-			
 			span {
 				float: right;
-				// font-size: 14px;
 			}
 		}
 	}

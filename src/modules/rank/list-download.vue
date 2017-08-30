@@ -3,7 +3,7 @@
  -->
 
 <template>
-	<div class="rank-list">
+	<div class="rank-list" v-cloak>
 		<el-headerIndex></el-headerIndex>
 		
 		<div class="container">
@@ -11,18 +11,25 @@
 	      <tab v-model="tabSelected">
 	        <tab-item :selected="tabSelected == index" v-for="(item, index) in tabDatas" @click="tabSelected = index" :key="index">{{ item.title }}</tab-item>
 	      </tab>
-	      <swiper class="list" height="100%" v-model="tabSelected" :show-dots="false">
+	      <swiper class="list" height="100%" v-model="tabSelected" :show-dots="false" :threshold="tabChangeW">
 	        <swiper-item v-for="(tabDatasList, index) in tabDatas" :key="index">
 	        	<template v-if="tabDatasList.list">
 	        		<div class="type">
-	        			<router-link :to="{name: item.url, params: { typeCode: item.value }}" class="type-entrance" v-for="item in tabDatasList.list" :key="item.value">
+	        			<router-link :to="{name: item.url, query: { typeCode: item.value }}" class="type-entrance" v-for="item in tabDatasList.list" :key="item.value">
 	        				<img :src="item.icon" alt="">
 	        				{{ item.name }}
 	        			</router-link>
 	        		</div>
 	        	</template>
 	        	<template v-else>
-	        		<el-img-text-rank @on-btn-click="btnClick" v-for="(item, ind) in download" :img-text-data="item" :is-download=true img-text-btn="1" :key="ind"></el-img-text-rank>
+	  					<scroller lock-x :height="-scrollerInfo.offsetBottom + 'px'" @on-scroll-bottom="loadMore" ref="scrollerBottom" :scroll-bottom-offst="200">
+	        			<div>
+        					<!-- <el-img-text-rank @on-data-change="btnClick" v-for="(item, ind) in tabContentDatasList.list" :img-text-data="item" :is-download=true img-text-btn="1" :key="ind"></el-img-text-rank> -->
+	        				<el-img-text-rank @on-data-change="btnClick" v-for="(item, ind) in download.list" :img-text-data="item" :is-download=true img-text-btn="1" :key="ind"></el-img-text-rank>
+									
+									<el-load-more :load-all="download.loadAll"></el-load-more>
+	        			</div>
+	        		</scroller>
 	        	</template>
 	        </swiper-item>
 	      </swiper>
@@ -32,19 +39,32 @@
 </template>
 
 <script type="text/babel">
-	import { Tab, TabItem, Swiper, SwiperItem, Sticky } from 'vux'
+	import { Scroller, Tab, TabItem, Swiper, SwiperItem, Sticky } from 'vux'
 	import elHeaderIndex from 'components/header/header-index'
 	import elImgTextRank from 'components/img-text/img-text-rank'
+	import elLoadMore from 'components/load-more/load-more'
 
 	export default {
 		name: 'listDownload',
-		components: { Tab, TabItem, Swiper, SwiperItem, Sticky, elHeaderIndex, elImgTextRank },
+		components: { Scroller, Tab, TabItem, Swiper, SwiperItem, Sticky, elHeaderIndex, elImgTextRank, elLoadMore },
 		data () {
 			return {
 				index: 0,
+				count: this.wordBook.pageCount,
+				tabChangeW: this.wordBook.tabChangeW,
+				scrollerInfo: {
+					offsetBottom: 170,
+					onfetching: false,
+					loadAll: false, // 是否加载完
+				},
 				tabDatas: [],
 				tabSelected: 0,
-				download: []
+				download: {
+					onFetching: false,
+					loadAll: false,
+					pageSize: 1,
+					list: []
+				}
 			}
 		},
 		mounted () {
@@ -57,92 +77,118 @@
 				// 资料分类
 	  		_this.$http.post('/wechat/coursewaremobile/queryType',{}).then(function(e) {
 	  			let responseData = e.data.data;
-	  			responseData.list.map(function(item, index) {
-	  				let queryTypeData = [];
-	  				item.list.map(function(it, ind) {
-	  					queryTypeData[ind] = {
-	  						value: it.code,
-	  						name: it.name,
-	  						url: 'courseList',
-	  						parentCode: it.parentCode,
-	  						icon: _this.resolveImg(it.thumbnail)
-	  					};
+	  			if(e.data.errcode == 1) {
+		  			tabDatas = responseData.list.map(function(item, index) {
+		  				let queryTypeData = [];
+		  				queryTypeData = item.list.map(function(it, ind) {
+		  					return {
+		  						value: it.code,
+		  						name: it.name,
+		  						url: 'courseList',
+		  						parentCode: it.parentCode,
+		  						icon: _this.resolveImg(it.thumbnail)
+		  					};
+		  				})
+		  				return {
+		  					title: item.name,
+		  					value: item.code,
+		  					id: item.id,
+		  					list: queryTypeData
+		  				};
+		  			})
+
+	  				tabDatas.push({
+	  					value: '',
+	  					title: '下载最多',
 	  				})
-	  				tabDatas[index] = {
-	  					title: item.name,
-	  					value: item.code,
-	  					id: item.id,
-	  					list: queryTypeData
-	  				};
-	  			})
 
-  				tabDatas.push({
-  					value: '',
-  					title: '下载最多',
-  				})
-
-  				_this.tabDatas = tabDatas;
+	  				_this.tabDatas = tabDatas;
+		  			_this.getMore();
+		  		} else {
+		  			_this.$vux.alert.show({
+		  				content: e.data.errmsg
+		  			})
+		  		}
 	  		});
-	  		// 下载做多
+			},
+			getMore () {
+				let _this = this;
+				// 下载做多
 	  		_this.$http.post('/wechat/coursewaremobile/queryRank',
 	  			{
 	  				"customerCode": _this.$store.state.user.userCode,
-	  				"pageSize": 1,
-	  				"pageCount": 10
+	  				"pageSize": _this.download.pageSize,
+	  				"pageCount": _this.count
 	  			}).then(function(e) {
+						_this.download.onFetching = false;
 	  				let responseData = e.data.data,
 	  						downloadData = [];
-	  				responseData.list.map(function(item, index){
-	  					downloadData[index] = {
-	  						id: item.id,
-	  						code: item.code,
-								title: item.name,
-								type: item.memo,
-								pay: item.requiredpoints,
-								isBuy: item.isbuy,
-								download: item.downloads,
-								downloadUrl: _this.resolveImg(item.file_url),
-								price: item.requiredpoints,
-								url: '',
-								img: _this.resolveImg(item.thumbnail),
-								params: {
-									code: item.code
-								}
-	  					}
-	  				});
+	  				if(e.data.errcode == 1) {
+	  					if(e.data.data.list && e.data.data.list.length > 0) {
+		  					downloadData = responseData.list.map(function(item, index){
+			  					return {
+			  						id: item.id,
+			  						code: item.code,
+										title: item.name,
+										type: item.memo,
+										pay: item.requiredpoints,
+										isBuy: item.isbuy,
+										download: item.downloads,
+										downloadUrl: _this.resolveImg(item.file_url),
+										price: item.requiredpoints,
+										url: '',
+										img: _this.resolveImg(item.thumbnail),
+										query: {
+											code: item.code
+										}
+			  					}
+			  				});
+		  				}
 
-	  				_this.download = downloadData;
+		  				if(downloadData.length < _this.count) {
+								_this.download.loadAll = true;
+							}
+
+		  				if(_this.download.pageSize == 1) {
+		  					_this.download.list = downloadData;
+		  				} else {
+		  					_this.download.list = _this.download.list.concat(downloadData);
+		  				}
+
+							_this.download.pageSize++;
+	  				} else {
+	  					_this.$vux.alert.show({
+	  						content: e.data.errmsg
+	  					})
+	  				}
+
+	  				_this.resetView();
 	  		});
 			},
-			btnClick (val) {
-				if(!this.isLogin()) return false;
-				let _this = this;
-				_this.payCode = val.params.code;
-				
-				_this.$vux.confirm.show({
-					content: "需要积分：" + val.pay,
-			    onConfirm () {
-			      _this.$http.post('/wechat/coursewaremobile/buy',
-							{
-								"customerCode": _this.$store.state.user.userCode,
-								"productCode": val.params.code
-							}).then(function(e) {
-								let responseData = e.data.data;
-								if(responseData.result.tag == 1) {
-									_this.download.map(function(item, index) {
-										if(item.code == val.params.code) {
-											item.isBuy = 1;
-										}
-									})
-								} else {
-									_this.$vux.alert.show({
-										content: responseData.result.msg
-									});
-								}
-							})	
-			    }
-				})
+			resetView (ind) {
+				this.$nextTick(() => {
+          this.$refs.scrollerBottom[0].reset()
+        })
 			},
+			btnClick (val, status) {
+				let _this = this;
+				if(status == "download") {
+					_this.download.list.map(function(item, index) {
+						if(item.code == val.query.code) {
+							item.download++;
+							item.isBuy = 1;
+						}
+					});
+				}
+			},
+			loadMore () {
+				if(this.download.onFetching || this.download.loadAll) {
+
+				} else {
+					this.download.onFetching = true;
+					this.getMore();		
+				}
+			}
 		}
 	}
 </script>
@@ -169,6 +215,11 @@
 
 	.type {
 		@extend %clearfix;
+	}
+
+
+	.list {
+		padding-bottom: 60px;
 	}
 
 	.type-entrance {

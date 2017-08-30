@@ -3,7 +3,7 @@
  -->
 
 <template>
-	<div class="msg-add">
+	<div class="msg-add" v-cloak>
 		<group>
 			<cell title="收信人" :value="toUser"></cell>
       <x-textarea title="内容" :rows="8" placeholder="请填写消息内容" :max="200" v-model="value"></x-textarea>
@@ -33,10 +33,11 @@
 		methods: {
 			submit () {
 				let _this = this;
+				console.log(this.$store.state.msg)
 				this.$http.post('/wechat/message/reply',
 						{
-							"receviceCode": _this.$store.state.msg.userCode,
-					   	"sendCode": _this.$store.state.user.userCode,
+							"receviceOpenId": _this.$store.state.msg.openId,
+					   	"sendOpenId": _this.$store.state.user.openId,
 					   	"content": _this.value
 						}
 					).then(function(e) {

@@ -2,7 +2,7 @@
 	主题详情卡片
  -->
 <template>
-	<div class="card">
+	<div class="card" v-cloak>
 		<div class="card-header">
 			<img :src="cardData.header.img">
 			<div class="title">

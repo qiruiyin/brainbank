@@ -3,7 +3,7 @@
  -->
 
 <template>
-	<div class="info-add">
+	<div class="info-add" v-cloak>
 		<group title="个人信息" label-width="4em" label-margin-right="2em" label-align="right">
       <x-input :title="name.title" v-model="name.value" :placeholder="name.placeholder"></x-input>
       <x-input :title="tel.title" v-model="tel.value" :placeholder="tel.placeholder"></x-input>

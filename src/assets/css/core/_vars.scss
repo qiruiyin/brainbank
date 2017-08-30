@@ -1,3 +1,5 @@
+// 公共变量只具备参考价值（具体页面请咨询设计师）
+
 
 // 页面大小
 // 最大宽度
@@ -5,7 +7,7 @@ $maxW: 414px;
 // 最小宽度
 $minW: 320px;
 // 左右间距
-$padding: 12px;
+$padding: 15px;
 $paddingTop: 12px;
 
 // 头部高度
@@ -37,7 +39,7 @@ $colorGray: #eee;
 
 $fontColorBlack: #333;
 $fontColor: #666;
-$fontColorGray: #888;
+$fontColorGray: #999;
 $colorRed: #f03939;
 // end
 
@@ -55,8 +57,12 @@ $tuijianImgW: 60px;
 
 //购物车模块
 $cartH: 50px;
-$cartColorYellow: #FF9500;
+// $cartColorYellow: #FF9500; // 淘宝
+$cartColorYellow: #ff8501;
 $cartColorRed: #DD2727;
+$cartBg: #393939;
+$cartColor: #fff;
+$cartBtnFontSize: 16px;
 
 $disabledPay: rgba(0, 0, 0, .2);
 
@@ -74,3 +80,28 @@ $headerPaddingTop: $padding;
 $headerContentH: $headerH - $headerPaddingTop*2;
 $headerLinkH: 30px;
 $headerPaddingLeft: $padding/2;
+
+// 经典语录
+$quotationColorTitle: #8596aa; // 标题颜色高亮
+$quotationColorMan: $quotationColorTitle; // 人物颜色高亮
+$quotationColor: $fontColorBlack; // 正文颜色
+$quotationBtnBg: #3a393e; // 按钮颜色
+$quotationCommentBg: #eee; // 评论区背景
+$quotationSendBtnBorderTop: #ccc; // 发送按钮上边框
+$quotationSendBtnBorderBottom: #1aad19; // 发送按钮上边框
+$quotationSendBtnBackground: #ececec; // 发送按钮背景
+$quotationUserImgW: $headerContentH; // 左侧头像大小
+
+// 左右图文混排图片高度和宽度
+$imgTextImgW: 50px; 
+$imgTextImgH: 42px; 
+
+
+// 设计做的间距信息
+$uiMarginH: $paddingTop;
+$uiMarginBg: #f3f3f3;
+
+// 消息提示圆点
+$msgCircleColor: #f3472f;
+$msgCircleW: 11px;
+

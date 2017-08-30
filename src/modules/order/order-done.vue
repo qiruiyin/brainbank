@@ -1,9 +1,9 @@
 <!-- 
-	支付成功
+	课程支付完成
  -->
 
 <template>
-	<div class="order-done order-course">
+	<div class="order-done order-course" v-cloak>
 		<div class="order-done-content">
 			<div class="order-done-succcess">
 				<img src="~assets/img/tips/success.png">
@@ -20,7 +20,7 @@
 			<div class="order-done-block order-done-kefu">
 				<div class="img">
 					<img :src="kefuInfo.img" alt="">
-	        <rater v-model="kefuInfo.rater" slot="value"></rater>
+	        <rater v-model="kefuInfo.rater" slot="value" disabled></rater>
 				</div>
 				<div class="order-done-kefu-info">
 					<p>学习顾问：{{ kefuInfo.name }}</p>

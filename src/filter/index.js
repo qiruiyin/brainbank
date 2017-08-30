@@ -39,6 +39,16 @@ Vue.filter('numToCash', function (value) {
 	}
 });
 
+// Vue.filter('numToNull', function (data) {
+// 	console.log(data)
+// 	if(data) {
+// 		return data.replace(/[0-9]*/g, "");
+// 	} else {
+// 		return data;
+// 	}
+// })
+
+
 const myFilter = Vue.filter('numToCash')
 
 export default myFilter

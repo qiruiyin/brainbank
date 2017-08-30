@@ -3,7 +3,7 @@
  -->
 
 <template>
-	<div class="dn-form enlist">
+	<div class="dn-form enlist" v-cloak>
 
 		<group>
       <x-input :title='course.title' v-model="course.value" readonly></x-input>
@@ -66,7 +66,7 @@
 </template>
 
 <script type="text/babel">
-	import { Group, Selector, XInput, XButton, FormPreview, Popup, Toast, TransferDomDirective as TransferDom } from 'vux'
+	import { Group, Selector, XInput, XButton, FormPreview, Popup, TransferDom } from 'vux'
   import { mapState } from 'vuex'
 	import elVerificationCode from 'components/verification-code/verification-code'
 

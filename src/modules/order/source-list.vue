@@ -3,19 +3,31 @@
  -->
 
 <template>
-	<div class="order-list">
+	<div class="order-list" v-cloak>
 		<tab :line-width=2 v-model="tabSelected">
       <tab-item class="vux-center" v-for="(item, index) in tabData" :key="index">{{ item.name }}</tab-item>
     </tab>
-    <swiper v-model="tabSelected" height="100%" :show-dots="false">
+    <swiper v-model="tabSelected" height="100%" :show-dots="false" :threshold="tabChangeW">
       <swiper-item v-for="(tabDataItem, tabDataIndex) in tabData" :key="tabDataIndex">
     		<!-- <el-card-order @on-load-more="loadMore" :card-data="item.list" :card-count="count" :card-index="index"></el-card-order> -->
     		<template v-if="tabDataItem.value != 'file'">
-  				<el-img-text-rank @on-btn-click="btnClick" v-for="(item, ind) in tabDataItem.list" :img-text-data="item" img-text-btn="0" :key="ind"></el-img-text-rank>
+	  			<scroller class="scroller" lock-x height="-scrollerInfo.offsetBottom + 'px'" @on-scroll-bottom="loadMore" ref="scrollerBottom" :scroll-bottom-offst="200">
+						<div>
+  						<el-img-text-rank @on-btn-click="btnClick" v-for="(item, ind) in tabDataItem.list" :img-text-data="item" img-text-btn="0" :key="ind"></el-img-text-rank>
+
+							<el-load-more :load-all="tabDataItem.loadAll"></el-load-more>
+  					</div>
+  				</scroller>
     		</template>
 
     		<template v-else>
-  				<el-img-text-rank @on-btn-click="btnFileClick" v-for="(item, ind) in tabDataItem.list" :is-download=true :img-text-data="item" img-text-btn="1" :key="ind"></el-img-text-rank>
+	  			<scroller class="scroller" lock-x height="-scrollerInfo.offsetBottom + 'px'" @on-scroll-bottom="loadMore" ref="scrollerBottom" :scroll-bottom-offst="200">
+  					<div>
+  						<el-img-text-rank @on-data-change="btnFileClick" v-for="(item, ind) in tabDataItem.list" :is-download=true :img-text-data="item" img-text-btn="1" :key="ind"></el-img-text-rank>
+							
+							<el-load-more :load-all="tabDataItem.loadAll"></el-load-more>
+    				</div>
+    			</scroller>
     		</template>
       </swiper-item>
     </swiper>
@@ -23,35 +35,48 @@
 </template>
 
 <script type="type/babel">
-	import { Tab, TabItem, Swiper, SwiperItem } from 'vux'
+	import { Scroller, Tab, TabItem, Swiper, SwiperItem } from 'vux'
 
 	import elImgTextRank from 'components/img-text/img-text-rank'
+	import elLoadMore from 'components/load-more/load-more'
 
 	export default {
 		name: 'orderList',
-		components: { Tab, TabItem, Swiper, SwiperItem, elImgTextRank },
+		components: { Scroller, Tab, TabItem, Swiper, SwiperItem, elImgTextRank, elLoadMore },
 		data () {
 			return {
 				title: '订单列表页面',
 				count: this.wordBook.pageCount,
+				tabChangeW: this.wordBook.tabChangeW,
+				scrollerInfo: {
+					offsetBottom: 70,
+					onfetching: false,
+					loadAll: false, // 是否加载完
+				},
 				tabData: [
 					{
 						value: 'video',
 						name: '视频',
 						productStatus: "0",
 						pageSize: 1,
+						onfetching: false,
+						loadAll: false,
 						list: []
 					},{
 						value: 'audio',
 						name: '音频',
 						productStatus: "1",
 						pageSize: 1,
+						onfetching: false,
+						loadAll: false,
 						list: []
 					},{
 						value: 'file',
 						name: '课件',
 						productStatus: "2",
 					  pageSize: 1,
+						onfetching: false,
+						loadAll: false,
 						list: []
 					}
 				],
@@ -64,8 +89,9 @@
 			}
 		},
 		mounted () {
-			// 取全部数据
-			this.fetchData(this.tabData[0], 0);
+			// 取全部数据(当前数据)
+			this.fetchData(this.tabData[this.tabSelected], this.tabSelected);
+			// this.fetchData(this.tabData[0], 0);
 		},
 		methods: {
 			fetchData (obj, ind = 0) {
@@ -80,57 +106,76 @@
 					).then(function(e) {
 						let responseData = e.data.data,
 								customerShopOrderList = [];
+						_this.tabData[ind].onFetching = false;					
 
-						if(ind < 2) {
+						if(e.data.errcode == 1) {
 							if(e.data.data && e.data.data.customerDataList && e.data.data.customerDataList.length > 0) {
 								customerShopOrderList = e.data.data.customerDataList.map(function(item, index) {
-									return {
-										img: _this.resolveImg(item.thumbnail),
-										id: item.id,
-										title: item.name,
-										type: item.DESCRIPTION,
-										pay: 0,
-										isBuy: 1,
-										like: {
-											num: item.commentAmount,
-											percent: item.rank | 3.2
-										},
-										url: 'courseTypeDetail',
-										params: {
-											code: item.code,
-											type: obj.value
+									if(ind == 3) {
+										return {
+											img: _this.resolveImg(item.thumbnail),
+											id: item.id,
+											title: item.name,
+											type: item.DESCRIPTION,
+											pay: 0,
+											isBuy: 1,
+											like: {
+												num: item.commentAmount,
+												percent: item.rank
+											},
+											url: '',
+											query: {
+												code: item.code,
+												type: obj.value
+											}
 										}
+									} else {
+										return {
+				  						id: item.id,
+				  						code: item.code,
+											title: item.name,
+											type: item.memo,
+											pay: item.requiredpoints,
+											isBuy: 1,
+											download: item.downloads,
+											downloadUrl: _this.resolveImg(item.file_url),
+											price: item.requiredpoints,
+											url: 'courseTypeDetail',
+											img: _this.resolveImg(item.thumbnail),
+											query: {
+												code: item.code,
+												type: obj.value
+											}
+				  					}
 									}
 								})
 							}
-						} else {
-							if(e.data.data && e.data.data.customerDataList && e.data.data.customerDataList.length > 0) {
-								customerShopOrderList = e.data.data.customerDataList.map(function(item, index){
-									return {
-										id: item.id,
-										code: item.code,
-										title: item.name,
-										type: item.memo,
-										pay: item.requiredpoints,
-										isBuy: 1,
-										download: item.downloads,
-										downloadUrl: _this.resolveImg(item.file_url),
-										price: item.requiredpoints,
-										url: "",
-										params: {
-											code: item.code
-										}
-									}
-								});
+
+							if(customerShopOrderList.length < _this.count) {
+								_this.tabData[ind].loadAll = true;
 							}
+
+							if(obj.pageSize == 1) {
+								_this.tabData[ind].list = customerShopOrderList;
+							} else {
+								_this.tabData[ind].list = _this.tabData[ind].list.concat(customerShopOrderList);
+								// _this.tabData[ind].list.push.apply(_this.tabData[ind].list, customerShopOrderList);
+							}
+							_this.tabData[ind].pageSize++;
+						} else {
+							_this.$vux.alert.show({
+								content: e.data.errmsg
+							})
 						}
 
-						if(obj.pageSize == 1) {
-							_this.tabData[ind].list = customerShopOrderList;
-						} else {
-							_this.tabData[ind].list.push.apply(_this.tabData[ind].list, customerShopOrderList);
-						}
+						_this.resetView(ind);
 				})
+			},
+			resetView (ind) {
+				let _this = this;
+				this.$nextTick(() => {
+          this.$refs.scrollerBottom[ind].reset()
+        })
 			},
 			onTabClick (val) {
 				if(this.tabData[val].list.length == 0){
@@ -172,36 +217,25 @@
 						}
 					})	
 			},
-			btnFileClick (val) {
-				if(!this.isLogin()) return false;
-				
+			btnFileClick (val, status) {
 				let _this = this;
-				_this.payCode = val.params.code;
-				
-				_this.$vux.confirm.show({
-					content: "需要积分：" + val.pay,
-			    onConfirm () {
-			      _this.$http.post('/wechat/coursewaremobile/buy',
-							{
-								"customerCode": _this.$store.state.user.userCode,
-								"productCode": val.params.code
-							}).then(function(e) {
-								let responseData = e.data.data;
-								if(responseData.result.tag == 1) {
-									_this.download.map(function(item, index) {
-										if(item.code == val.params.code) {
-											item.isBuy = 1;
-										}
-									})
-								} else {
-									_this.$vux.alert.show({
-										content: responseData.result.msg
-									});
-								}
-							})	
-			    }
-				})
+				if(status == "download") {
+					_this.tabData[2].list.map(function(item, index) {
+						if(item.code == val.query.code) {
+							item.download++;
+							item.isBuy = 1;
+						}
+					});
+				}
 			},
+			loadMore () {
+				if(this.tabData[this.tabSelected].onFetching || this.tabData[this.tabSelected].loadAll) {
+
+				} else {
+					this.tabData[this.tabSelected].onFetching = true;					
+					this.fetchData(this.tabData[this.tabSelected], this.tabSelected);
+				}
+			}
 		}
 	}
 </script>

@@ -3,31 +3,57 @@
  -->
 
 <template>
-	<div class="integral">
+	<div class="integral" v-cloak>
 		<el-header-index></el-header-index>
 
 		<div class="container">
 			<div class="integral-header">
 				<img src="~assets/img/user-center/integral.png" alt="">
-				<p>{{ integral }}分</p>
+				<p>我的积分{{ integral }}分</p>
+				<div class="link" @click="goPage('share')">分享给好友</div>	
 			</div>
 
 			<div class="tab">
 	      <tab v-model="tabSelected">
-	        <tab-item :selected="tabSelected == index" v-for="(item, index) in tabDatas" @click="tabSelected = index" :key="index">{{ item.title }}</tab-item>
+	        <tab-item :selected="tabSelected == index" v-for="(item, index) in tabDatas" @click="tabSelected = index" :key="index">
+	        	<p class="dn-tab-p">{{ item.num }}位</p>
+	        	<p class="dn-tab-p">{{ item.title }}</p>
+	        </tab-item>
 	      </tab>
-	      <swiper class="list" height="500px" v-model="tabSelected" :show-dots="false">
+	      
+	      <template v-if="tabSelected == 0">
+          <div @click="goMsg(item.openId, item.name)" class="integral-man" v-for="(item, ind) in tabContentDatas.type1" :key="ind">
+						<img :src="item.img">
+						<div class="title">
+							<p>{{ item.name }}</p>
+							<span>{{ tabDatas[0].tip }}：{{ item.date }}</span>
+						</div>
+						<div class="info fa fa-envelope-o"></div>
+					</div>
+	      </template>
+
+	      <template v-else>
+          <div @click="goMsg(item.openId, item.name)" class="integral-man" v-for="(item, ind) in tabContentDatas.type2" :key="ind">
+						<img :src="item.img">
+						<div class="title">
+							<p>{{ item.name }}</p>
+							<span>{{ tabDatas[1].tip }}：{{ item.date }}</span>
+						</div>
+						<div class="info fa fa-envelope-o"></div>
+					</div>
+	      </template>
+	      <!-- <swiper class="list" height="500px" v-model="tabSelected" :show-dots="false" :threshold="tabChangeW">
 	        <swiper-item v-for="(tabContentDatasData, index) in tabDatas" :key="index">
-	          <div @click="goMsg(item.code, item.name)" class="integral-man" v-for="(item, ind) in tabContentDatas[tabContentDatasData.value]" :key="ind">
+	          <div @click="goMsg(item.openId, item.name)" class="integral-man" v-for="(item, ind) in tabContentDatas[tabContentDatasData.value]" :key="ind">
 							<img :src="item.img">
 							<div class="title">
 								<p>{{ item.name }}</p>
-								<span>到期时间：{{ item.date }}</span>
+								<span>{{ tabContentDatasData.tip }}：{{ item.date }}</span>
 							</div>
 							<div class="info fa fa-envelope-o"></div>
 						</div>
 	        </swiper-item>
-	      </swiper>
+	      </swiper> -->
 	    </div>
 		</div>
 	</div>
@@ -45,14 +71,21 @@
 		data () {
 			return {
 				title: '我的积分',
+				tabChangeW: this.wordBook.tabChangeW,
 				integral: 0,
 				tabDatas: [
 					{
 						value: 'type1',
-						title: '',
+						title: '已邀请普通学员',
+						num: '',
+						tip: "关注时间",
+						list: []
 					},{
 						value: 'type2',
-						title: '',
+						title: '已报名总裁商业思维',
+						num: '',
+						tip: "报名时间",
+						list: []
 					}
 				],
 				tabSelected: 0,
@@ -71,13 +104,14 @@
 				this.$http.post('/wechat/usercenter/getIntegralInfo',
 						{
 							"userCode": _this.$store.state.user.userCode,
+							"openId": _this.$store.state.user.openId,
 						}
 					).then(function(e) {
 						let responseData = e.data.data.result;
 
 						_this.integral = responseData.integralInfo;
-						_this.tabDatas[0].title = "已邀请普通学员" + responseData.type1 + "位";
-						_this.tabDatas[1].title = responseData.type2 + "位报名总裁商业思维";
+						_this.tabDatas[0].num = responseData.type1;
+						_this.tabDatas[1].num = responseData.type2;
 
 						_this.transData(responseData.list1, 'type1');
 						_this.transData(responseData.list2, 'type2');
@@ -94,17 +128,18 @@
 							code: item.code,
 							name: item.name,
 							img: _this.resolveImg(item.header),
-							date: item.create_time
+							date: item.create_time,
+							openId: item.openid
 						}
 					});
 				}
 				_this.tabContentDatas[name] = arr;
 			},
-			goMsg (userCode, name) {
-				this.$store.commit("updateMsgName", { name: name });
-				this.$store.commit("updateMsgUserCode", { userCode: userCode });
-				this.$store.commit("updateMsgUrl", { url: 'integral' });
-				this.$router.push({ name: 'msgAdd' })
+			goMsg (sendOpenId, name) {
+				this.$router.push({ name: 'msgDetail', query: { sendUser: sendOpenId, msgType: '3' }})
+			},
+			goPage (url) {
+				this.$router.push({ name: url })
 			}
 		}
 	}
@@ -124,8 +159,10 @@
 		padding: 40px $padding $padding;
 		text-align: center;
 		line-height: 1.75;
+		color: #ff4545;
 
 		img {
+			max-width: 130px;
 			margin: 0 auto;
 			margin-bottom: $padding;
 		}
@@ -161,4 +198,21 @@
 		margin-top: -10px;
   }
 	
+	.link {
+		margin-top: 10px;
+		line-height: 30px;
+		background: #ff4545;
+		color: #fff;
+		padding: 0 1em;
+		display: inline-block;
+		border-radius: 100px;
+	}
+	
+	.vux-tab-item {
+		padding: 6px 0;
+	}
+
+	.dn-tab-p {
+		line-height: 1;
+	}
 </style>

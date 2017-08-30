@@ -3,7 +3,7 @@
  -->
 
 <template>
-	<div v-transfer-dom>
+	<div v-transfer-dom v-cloak>
 		<div class="cart">
 			<div @click="goShopCart" class="balance fa fa-shopping-cart"><span>购物车</span><i>{{ cartNum }}</i></div>
 			<div @click="addCart" class="add-cart">加入购物车</div>
@@ -41,8 +41,7 @@
 	    }
 	  },
 		mounted () {
-			// 如果还没有取过购物车信息
-			if(!this.$store.state.cart.hasAjax && this.$store.state.user.userCode) this.fetchData();
+			if(this.$store.state.user.userCode) this.fetchData();
 		},
 		methods: {
 			fetchData () {
@@ -54,7 +53,7 @@
 					).then(function(e) {
 						if(e.data.errcode == 1) {
 							_this.$store.commit("updateCartNum", { num: e.data.data.number });
-							_this.$store.commit("updateCartHasAjax", { hasAjax: true });
+							// _this.$store.commit("updateCartHasAjax", { hasAjax: true });
 						}
 					});
 			},
@@ -119,10 +118,11 @@
 		right: 0;
 		width: 100%;
 		height: $cartH;
-		background: #fff;
+		background: $cartBg;
 		z-index: 10;
 		display: flex;
-		font-size: 15px;
+		color: $cartColor;
+		font-size: $cartBtnFontSize;
 
 		div {
 			width: 50%;
@@ -167,8 +167,7 @@
 			margin-left: 1em;
 			line-height: 1;
 			font-size: 14px;
-			color: red;
-
+			color: #fff;
 		}
 	}
 

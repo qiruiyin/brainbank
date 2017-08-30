@@ -2,16 +2,17 @@
 	图文混排 
  -->
 <template>
-	<div class="img-text" @click="setCheck">
-		<check-icon @click.native="setCheck" v-if="imgTextData.hasCheck" :value.sync="imgTextData.check"></check-icon>
-		<img :src="imgTextData.imgPath" alt="图片">
+	<div class="img-text" @click="setCheck(2)" v-cloak>
+		<check-icon @click.native.stop="setCheck(1)" :value.sync="imgTextData.check"></check-icon>
+		<div class="img">
+			<img :src="imgTextData.imgPath" alt="图片">
+		</div>
 		<div class="img-text-content">
 			<div class="title">{{ imgTextData.title }}</div>
-			<div class="price" v-if="imgTextData.price">价格：<span>￥{{ imgTextData.price }}</span></div>
-			<div class="num" v-if="imgTextData.num">数量：
-				<x-number v-if="imgTextData.hasCheck" @click.native.stop="numClick" :min="1" class="num-data" v-model="imgTextData.num"></x-number>
-				<span v-else>{{ imgTextData.num }}</span>
+			<div class="num">
+				<x-number @click.native.stop="numClick" :min="1" class="num-data" v-model="cartNum"></x-number>
 			</div>
+			<div class="price" v-if="imgTextData.price">￥{{ imgTextData.price }} <span>x1</span></div>
 		</div>
 	</div>
 </template>
@@ -24,61 +25,140 @@
 		components: { XNumber, CheckIcon },
 		data () {
 			return {
+				cartNum: this.imgTextData.num
 			}
 		},
+		watch: {
+			cartNum (newValue, oldValue) {
+				let _this = this,
+						num = newValue - oldValue;
+				_this.$store.commit("updateCartNum", { num: _this.$store.state.cart.num + num });
+
+				_this.$http.post('/wechat/shop/updateCart',
+					{
+						userCode: _this.$store.state.user.userCode,
+						productCode: _this.imgTextData.code,
+						shopCount: num
+					}).then(function(e) {
+				});
+			}
+		},
+		mounted () {
+			this.fetchData();
+		},
 		methods: {
-			setCheck () {
-				this.imgTextData.check = !this.imgTextData.check
+			fetchData() {
+				let _this = this;
+				_this.$http.post('/wechat/shop/queryCart',
+					{
+						userCode: _this.$store.state.user.userCode,
+					}).then(function(e) {
+						_this.$store.commit("updateCartNum", { num: e.data.data.number });	
+				});
+			},
+			setCheck (ind) {
+				if(ind != 1) {
+					this.imgTextData.check = !this.imgTextData.check
+				}
 				this.$emit('on-check', this.imgTextData.check)
 			},
 			numClick () {
 				let _this = this;
-				
-				_this.$http.post('/wechat/shop/addCart',
-					{
-						userCode: _this.$store.state.user.userCode,
-						productCode: _this.imgTextData.code,
-						shopCount: _this.imgTextData.num
-					}).then(function(e) {
-				});
+
+				// _this.$http.post('/wechat/shop/updateCart',
+				// 	{
+				// 		userCode: _this.$store.state.user.userCode,
+				// 		productCode: _this.imgTextData.code,
+				// 		shopCount: _this.productInfo.num
+				// 	}).then(function(e) {
+				// 		if(e.data.errcode == 1) {
+				// 			_this.$vux.toast.show({
+				// 				text: "加入购物车成功"
+				// 			});
+				// 			let num = _this.productInfo.num + _this.$store.state.cart.num;
+
+				// 			_this.$store.commit("updateCartNum", { num: num});
+				// 		}
+				// });
+
+				// _this.$http.post('/wechat/shop/addCart',
+				// 	{
+				// 		userCode: _this.$store.state.user.userCode,
+				// 		productCode: _this.imgTextData.code,
+				// 		shopCount: _this.imgTextData.num
+				// 	}).then(function(e) {
+				// });
 			}
 		}
 	}
 </script>
 
+<style lang="scss">
+	@import '~lib/sandal/core';
+	@import '~assets/css/core/vars', '~assets/css/core/functions';
+	
+	$imgTextCartNumColor: $colorOrange;
+
+	.img-text {
+		.vux-check-icon {
+			display: flex;
+			justify-content: center;
+    	align-items: center;
+		}
+	}
+</style>
+
 <style lang="scss" scoped>
 	@import '~lib/sandal/core';
 	@import '~assets/css/core/vars', '~assets/css/core/functions';
 	
-	$imgTextPadding: 20px;
 
 	.img-text {
 		position: relative;
-		padding: $imgTextPadding $padding $imgTextPadding;
+		min-height: $imgTextImgH;
+		padding: $paddingTop/2 $padding;
 		background-color: #fff;
-		border-bottom: 1px solid $borderColor;
 		display: flex;
 
-		img {
-			width: 100px;
-			height: 100%;
-			display: block;
+		&:first-child {
+			// border-top: 0;
+		}
+
+		.img {
+			height: $imgTextImgH;
+			text-align: center;
+			background: #efefef;
+
+			img {
+				margin: 0 auto;
+				height: 100%;
+			}
 		}
 	}
 
 	.img-text-content {
+	  position: relative;
 	  flex: 1;
 		padding-left: $padding;
 		line-height: 2;
+		@extend %clearfix;
 
 		.title {
 			color: $fontColorBlack;
 		}
 
 		.price {
+			color: $colorOrange;
 
 			span {
+				float: right;
+				font-size: 12px;
+				color: $fontColor;
 			}
+		}
+
+		.num {
+			@extend %clearfix;
 		}
 	}
 	
@@ -89,7 +169,9 @@
 	}
 
 	.num-data {
+		// float: right;
 		float: right;
+		width: 130px;
 		padding: 0;
 	}
 </style>

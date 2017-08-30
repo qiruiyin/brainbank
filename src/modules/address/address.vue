@@ -3,7 +3,7 @@
  -->
 
 <template>
-	<div class="address">
+	<div class="address" v-cloak>
 		<swipeout class="swiper">
       <swipeout-item transition-mode="follow" v-for="(item, index) in addressDatas" :key="index">
         <div slot="right-menu">
@@ -14,7 +14,7 @@
        		<div class="block-address">{{ item.address }}</div>
 					<div class="block-msg">{{ item.name }}{{ item.phone }}</div>
 
-					<div v-if="index == addressState" class="fa fa-check checked"></div>
+					<div v-if="index == addressState" class="checked"></div>
        	</div>
       </swipeout-item>
     </swipeout>
@@ -117,9 +117,9 @@
 			addAddress () {
 				let _this = this;
 				if(_this.orderCode) {
-  				_this.$router.push({ name: "addressAdd", query: { orderCode: _this.orderCode } });
+  				_this.$router.push({ name: "addressAdd", query: { orderCode: _this.orderCode, url: 'address' } });
 				} else {
-					this.$router.push({name: "addressAdd"})
+					this.$router.push({name: "addressAdd", query: { url: 'address' }});
 				}
 			}
 		}
@@ -137,26 +137,25 @@
 	.swiper {
 		@include halfpxline(0, $borderColor, 1px, 0, 0, 0);
 	}
+	
 	.block {
 		@include halfpxline(0, $borderColor, 0 , 0, 1px, 0);
 		padding: $padding;
-		// margin: $padding;
-		// border-radius: $borderRadius;
-
-		&.active {
-			// background: $fontColorBlue;
-			// color: #fff;
-		}
 	}
 
 	.checked {
 		position: absolute;
 		right: $padding;
 		top: 50%;
-		line-height: 1;
-		margin-top: -12px;
-		font-size: 24px;
-		color: $colorGreen
+		width: 20px;
+		height: 20px;
+		margin-top: -10px;
+		background: url("~assets/img/user-center/address-check.png") no-repeat;
+		background-size: 100%;
+		// line-height: 1;
+		// margin-top: -12px;
+		// font-size: 24px;
+		// color: $colorGreen;
 	}
 	
 	.btns {

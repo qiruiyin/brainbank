@@ -3,28 +3,50 @@
  -->
 
 <template>
-	<div class="reward">
+	<div class="reward" v-cloak>
 		<div @click="btnClick" class="reward-btn">打赏</div>
+
 		<div v-transfer-dom>
-	    <popup v-model="reward.status" position="bottom" :hide-on-blur=false>
+	    <popup class="reward-popup" v-model="reward.status" position="bottom">
 	      <checker class="check"
 		    	v-model="reward.value"
 		    	default-item-class="check-item"
 		    	selected-item-class="check-item-selected"
 		    >
-		      <checker-item v-for="(item, index) in reward.list" :key="index" :value="item">￥{{ item }}</checker-item>
+		    	<div>
+		      	<checker-item v-for="(item, index) in reward.list[0]" :key="index" :value="item">￥{{ item }}</checker-item>
+		      </div>
+		      <div>
+		      	<checker-item v-for="(item, index) in reward.list[1]" :key="index" :value="item">￥{{ item }}</checker-item>
+		      </div>
 		    </checker>
+		    <div class="reward-set" @click="rewardSet">自定义金额</div>
 	      <!-- <group>
 	      	<selector title="打赏金额" :options="reward.list" v-model="reward.value"></selector>
 	      </group> -->
+	      <div class="btns reward-pay-btn">
+	        <x-button v-if="btnSubmitStatus" @click.native="btnSubmit" type="primary">确认</x-button>
+	        <x-button v-else @click.native="btnSubmit" type="primary" show-loading>确认</x-button>
+	      </div>
+	    </popup>
+	 	</div>
+
+	 	<div v-transfer-dom>
+	    <popup class="reward-popup" v-model="rewardInput.status" position="bottom">
+	    	<div class="reward-title">
+	    		<div @click="rewardSet" class="reward-back"></div>
+	    		自定义金额
+	    	</div>
+				<div class="reward-input">
+					<x-input type="tel" v-model="rewardInput.value"></x-input>
+				</div>	    	
 	      <div class="btns">
-	        <x-button @click.native="btnSubmit" type="primary">确定</x-button>
-	        <x-button @click.native="btnCancel('reward')" type="default">取消</x-button>
+	        <x-button v-if="btnSubmitStatus" @click.native="btnSubmit" type="primary">确认</x-button>
+	        <x-button v-else @click.native="btnSubmit" type="primary" show-loading>确认</x-button>
 	      </div>
 	    </popup>
 	 	</div>
 	</div> 
-	
 </template>
 
 <script type="text/babel">
@@ -47,7 +69,14 @@
 				reward: {
 					status: false,
 					value: 5,
-					list: [ 5, 10, 20, 30, 50, 100 ],
+					list: [
+						[5, 10, 20],
+						[30, 50, 100]
+					],
+				},
+				rewardInput: {
+					status: false,
+					value: ""
 				},
 				pay: {
 					status: false,
@@ -61,7 +90,8 @@
 			        value: ''
 			      }
 			    ]
-				}
+				},
+				btnSubmitStatus: true
 			}
 		},
 		computed: {
@@ -73,31 +103,44 @@
 			btnClick () {
 				this.reward.status = true;
 			},
+			rewardSet () {
+				this.rewardInput.status = !this.rewardInput.status;
+				this.rewardInput.value = "";
+			},
 			btnSubmit () {
-				let _this = this;
+				let _this = this,
+						money;
 
-				if(!_this.reward.value) {
+				if(this.rewardInput.status) {
+					money = _this.rewardInput.value
+				} else {
+					money = _this.reward.value;
+				}
+
+				if (!money) {
 					this.$vux.alert.show({
 						content: "请选择金额"
 					})
 					return false;
 				}
 
+				_this.btnSubmitStatus = false;
+
 				this.$http.post('/wechat/orderSpare/create',
 						{
 							"openId": _this.$store.state.user.openId,
 							"productCode": _this.rewardData.code,
-							"money": _this.reward.value
+							"money": money
 						}
 					).then(function(e) {
 						let responseData = e.data;
+						_this.btnSubmitStatus = true;
 
 						if(responseData.errcode != 1) {
 							_this.$vux.toast.show({
 			          text: responseData.errmsg
 			        })
 						} else {
-							_this.pay.status = true;
 							_this.payReward(responseData.data.orderCode)
 						}
 					})
@@ -144,39 +187,151 @@
 			       })
 					})
 			}
-
 		}
 	}
 </script>
+
+<style lang="scss">
+	@import '~lib/sandal/core';
+  @import '~assets/css/core/functions', '~assets/css/core/mixins', '~assets/css/core/vars';
+	
+	.btns {
+		padding: $padding;
+
+		&.reward-pay-btn {
+			padding-left: 0;
+			padding-right: 0;
+			padding-bottom: 0;
+
+			.weui-btn {
+				line-height: 50px;
+				border-radius: 0;
+			}
+		}
+
+		.disabled {
+			background: $disabledPay;
+		}
+	}
+</style>
 
 <style lang="scss" scoped>
 	@import '~lib/sandal/core';
   @import '~assets/css/core/functions', '~assets/css/core/mixins', '~assets/css/core/vars';
 	
+	.reward {
+		// margin-bottom: $paddingTop;
+	}
+
+	.reward-popup {
+		background: #fff;
+	}
+
 	.check {
 		padding: $padding 0;
 		text-align: center;
+
+		& > div {
+			width: 100%;
+			padding: 0 40px;
+			text-align: center;
+			display: flex;
+		}
 	}
 
 	// check
 	.check-item {
-	  width: 25%;
-	  height: 40px;
-	  margin: $padding;
-	  line-height: 40px;
+	  width: 67px;
+	  height: 30px;
+	  margin: $padding/2 auto;
+	  line-height: 30px;
 	  text-align: center;
 	  border-radius: 3px;
-	  border: 1px solid #ccc;
-	  background-color: #fff;
+	  // border: 1px solid #ccc;
+	  color: $fontColorBlack;
+	  background-color: #efefef;
 	  // margin: $padding;
 	}
 	.check-item-selected {
-	  background: #ffffff url(~assets/img/icon/active.png) no-repeat right bottom;
-	  border-color: #ff4a00;
+		position: relative;
+		color: #fff;
+	  background: $colorOrange;
+
+	  &:before {
+	  	content: "";
+	  	position: absolute;
+	  	right: 3px;
+	  	bottom: 3px;
+	  	width: 12px;
+	  	height: 12px;
+	  	background: url(~assets/img/icon/active.png) no-repeat;
+	  	background-size: 100%;
+	  }
+	  // border-color: #ff4a00;
+	}
+
+	.reward-set, .reward-title {
+		font-size: 18px;
+		color: #59748f;
+	}
+
+	.reward-title, .reward-set {
+		position: relative;
+		line-height: $inputH;
+		margin-bottom: 50px;
+		text-align: center;
+
+		.reward-back {
+			position: absolute;
+			top: 0;
+			left: $padding;
+			width: $inputH;
+			height: $inputH;
+			// background: red;
+
+			&:before {
+				content: "";
+				position: absolute;
+				top: 50%;
+				left: 0;
+				width: 12px;
+				height: 12px;
+				margin-top: -8px;
+				// margin-left: -4px;
+				border: 1px solid #59748f;
+				border-right: 0;
+				border-top: 0;
+				transform: rotate(45deg);
+			}
+		}
+	}
+
+	.reward-set {
+		margin-bottom: 0;
+	}
+
+	.reward-input {
+		position: relative;
+		margin: 0 $padding;
+		margin-bottom: $padding;
+		padding-left: 20px;
+		color: $fontColorBlack;
+		@include halfpxline(0, #ccc, 0 , 0, 1px, 0);
+
+		&:before {
+			content: "￥";
+			position: absolute;
+			left: 0;
+			right: 0;
+			width: 40px;
+			text-align: center;
+			line-height: 42px;
+			font-size: 18px;
+		}
 	}
 
 	.reward-btn {
-		width: 5em;
+		width: 4em;
 		margin: 0  auto;
 		margin-top: $padding;
 		line-height: $inputH;
@@ -188,11 +343,5 @@
 		border-radius: $borderRadius;
 	}
 
-	.btns {
-		padding: $padding;
-
-		.disabled {
-			background: $disabledPay;
-		}
-	}
+	
 </style>

@@ -29,10 +29,10 @@ module.exports = {
     assetsPublicPath: '/',
     proxyTable: {
         '/wechat': {
-            // target: 'http://192.168.1.153:8080/csm/wechat/',
-            target: 'http://glyh.qibeisoft.com/wechat',
-            // target: 'http://test.yoao.com/wechat',
-            // target: 'http://192.168.1.158:8080/csm/wechat/',
+            // target: 'http://192.168.1.151:8080/wechat/',
+            // target: 'http://glyh.qibeisoft.com/wechat',
+            target: 'http://m.yoao.com/wechat',
+            // target: 'http://192.168.1.154:8080/wechat/',
             // target: 'http://192.168.1.174:8080/csm/wechat/',
             // target: 'http://192.168.1.199:81/wechat/',
             changeOrigin: true,
@@ -41,17 +41,30 @@ module.exports = {
               '^/wechat': ''
             }
         },
-        '/weixin': {
-            // target: 'http://192.168.1.151:8080/csm/wechat/',
-            target: 'http://test.yoao.com',
-            // target: 'http://192.168.1.154:8080/csm/wechat/',
-            // target: 'http://192.168.1.199:81/wechat/',
-            changeOrigin: true,
-            secure: false, // 接受 运行在 https 上的服务
-            pathRewrite: {
-              '^/weixin': ''
-            }  
-        }
+        // '/system': {
+        //     // target: 'http://192.168.1.151:8080/wechat/',
+        //     // target: 'http://glyh.qibeisoft.com/wechat',
+        //     target: 'http://m.yoao.com/system',
+        //     // target: 'http://192.168.1.158:8080/csm/wechat/',
+        //     // target: 'http://192.168.1.174:8080/csm/wechat/',
+        //     // target: 'http://192.168.1.199:81/wechat/',
+        //     changeOrigin: true,
+        //     secure: false, // 接受 运行在 https 上的服务
+        //     pathRewrite: {
+        //       '^/system': ''
+        //     }
+        // },
+        // '/weixin': {
+        //     // target: 'http://192.168.1.151:8080/csm/wechat/',
+        //     target: 'http://test.yoao.com',
+        //     // target: 'http://192.168.1.154:8080/csm/wechat/',
+        //     // target: 'http://192.168.1.199:81/wechat/',
+        //     changeOrigin: true,
+        //     secure: false, // 接受 运行在 https 上的服务
+        //     pathRewrite: {
+        //       '^/weixin': ''
+        //     }  
+        // }
     },
     // CSS Sourcemaps off by default because relative paths are "buggy"
     // with this option, according to the CSS-Loader README

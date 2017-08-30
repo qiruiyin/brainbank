@@ -3,18 +3,32 @@
  -->
 
 <template>
-	<div class="personal-edit">
+	<div class="dn-form personal-edit" v-cloak>
 		<group>
 			<template v-for="item in formDatas">
     		<template v-if="item.key == 'phone' || item.key == 'qrcode'">
     			<x-input v-if="item.key == 'phone'" :title="item.title" :placeholder="item.placeholder" v-model="item.value">
-    				<el-verification-code :tel="item.value" slot="right"></el-verification-code>
+      			<label slot="label" class="label icon icon-tel">{{ item.title }}</label>
+    				<el-verification-code :tel="item.value" code-type="xiugai" slot="right"></el-verification-code>
     			</x-input>
-	    		<x-input v-else type="tel" :title="item.title" :placeholder="item.placeholder" v-model="item.value"></x-input>
+	    		<x-input v-else type="tel" :title="item.title" :placeholder="item.placeholder" v-model="item.value">
+      			<label slot="label" class="label icon icon-tel">{{ item.title }}</label>
+	    		</x-input>
     		</template>
     		<template v-else>
-	    		<x-input v-if="item.isReadonly" :title="item.title" :placeholder="item.placeholder" v-model="item.value" readonly></x-input>
-	    		<x-input v-else :title="item.title" :placeholder="item.placeholder" v-model="item.value"></x-input>
+	    		<x-input v-if="item.isReadonly" :title="item.title" :placeholder="item.placeholder" v-model="item.value" readonly>
+      			<label slot="label" class="label icon icon-tel">{{ item.title }}</label>
+	    		</x-input>
+
+	    		<template v-else>
+		    		<x-input v-if="item.key == 'name'" @on-change="nameTestNum" :title="item.title" :placeholder="item.placeholder" v-model="item.value">
+	      			<label slot="label" class="label icon icon-tel">{{ item.title }}</label>
+		    		</x-input>
+
+	    			<x-input v-else :title="item.title" :placeholder="item.placeholder" v-model="item.value">
+	      			<label slot="label" class="label icon icon-tel">{{ item.title }}</label>
+		    		</x-input>	
+	    		</template>	    		
     		</template>
 			</template>
 		</group>
@@ -36,6 +50,7 @@
 		data () {
 			return {
 				title: "修改个人资料",
+				btnStatus: false,
 				formDatas: [
 					{
 						value: '',
@@ -46,7 +61,7 @@
 					},{
 						value: '',
 						key: 'idcard',
-						title: '身份证',
+						title: '证件号码',
 						placeholder: '请输入您的身份证号码', 
 						isReadonly: true
 					},{
@@ -71,6 +86,9 @@
 				]
 			}
 		},
+		computed: {
+
+		},
 		mounted () {
 			this.fetchData();
 		},
@@ -85,7 +103,7 @@
 						let responseData = e.data.data,
 								arr = [],
 								data;
-						if(responseData) {
+						if(e.data.errcode == 1) {
 							data = responseData.customerInfoList[0];
 
 							_this.formDatas.map(function(item, index) {
@@ -102,6 +120,10 @@
 								} else if (item.key == "address") {
 									item.value = data.address;
 								}
+							})
+						} else {
+							_this.$vux.alert.show({
+								content: e.data.errmsg
 							})
 						}
 					}
@@ -121,7 +143,12 @@
 					this.$vux.toast.show({
 	          text: '验证码不能为空',
 	        })
+				} else if (_this.btnStatus) {
+					return false;
+				} else if (_this.nameTestNum(_this.formDatas[0].value)) {
+
 				} else {
+					_this.btnStatus = true;
 					this.$http.post('/wechat/usercenter/updateCustomerInfo',
 							{
 								"code": _this.$store.state.user.userCode,
@@ -132,12 +159,26 @@
 								"weixinAccount": _this.formDatas[4].value
 							}
 						).then(function(e) {
-							if(e.data.data) {
-
+							if(e.data.errcode == 1) {
+								_this.$vux.alert.show({
+									content: e.data.errmsg
+								})
+							} else {
+								_this.$vux.alert.show({
+									content: e.data.errmsg
+								})
 							}
+							_this.btnStatus = false;
 					})
 				}
-			}
+			},
+	    // nameTestNum (data) {
+	    // 	if(/[0-9]/.test(data) || /^.*[~!@#\$%\^&\*\(\)_+\-=\[\]\{\}\\\|\'\";:,\<\.\>\/\?\s+].*$/.test(data)) {
+	    // 		this.$vux.toast.text(this.nameTip);
+	    // 		return true;
+	    // 	}
+	    // 	return false;
+	    // }
 		}
 	}
 </script>
@@ -146,6 +187,8 @@
 	@import '~lib/sandal/core';
 	@import '~assets/css/core/functions', '~assets/css/core/mixins', '~assets/css/core/vars';
 	
+	@import '~assets/css/icon';
+
 	.btn {
 		padding: 30px $padding;
 	}

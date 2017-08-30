@@ -3,14 +3,17 @@
  -->
 
 <template>
-	<div class="order">
+	<div class="order" v-cloak>
 		<div class="order-body">
 			<template v-if="orderInfo.type == '2'">
 				<el-order-mall :order-mall-data="orderMallDatas" @update-address="setCartPayStatus"></el-order-mall>
 			</template>
 
 			<template v-if="orderInfo.type == '1'">
-				<el-order-course :order-course-data="orderCourseData"></el-order-course>
+				<div class="order-course">
+					<!-- <el-card-course :card-course-data="orderCourseData"></el-card-course> -->
+					<el-order-course :order-course-data="orderCourseData"></el-order-course>
+				</div>
 			</template>
 
 			<template v-if="orderInfo.type == '3'">
@@ -43,6 +46,7 @@
 				payClick: false, 
 				orderInfo: {
 					code: this.$route.query.orderCode,
+					productCode: "",
 					type: "", // 1:课程 2:商城 3:视频或音频
 					num: 0,
 					money: "",
@@ -89,12 +93,25 @@
 						let responseData = e.data,
 								num = 0;
 						if(responseData.errcode == 1) {
+							let dataList = responseData.data.list[0];
 							_this.orderInfo.address = responseData.data.address;
 							_this.orderInfo.money = responseData.data.money;
 							_this.orderInfo.type = responseData.data.type;
 
 							if(responseData.data.type == 1) {
-								_this.orderCourseData = responseData.data.list[0];
+								_this.orderInfo.productCode = dataList.productCode;
+								
+								_this.orderCourseData = {
+									manName: dataList.customerName,
+									manTel: dataList.mobile,
+									courseName: dataList.name,
+									img: _this.resolveImg(dataList.thumbnail),
+									title: dataList.lessonName,
+									amount: dataList.amount,
+									num: dataList.count,
+									customerName: "",
+									time: dataList.time
+								};
 							}
 
 							if(responseData.data.type == 2) {
@@ -102,7 +119,14 @@
 							}
 
 							if(responseData.data.type == 3) {
-								_this.orderAudioData = responseData.data.list[0];
+								_this.orderAudioData = {
+									description: "",
+									productCode: dataList.code,
+									productCount: dataList.count,
+									productName: dataList.name,
+									productPrice: dataList.amount,
+									img: _this.resolveImg(dataList.thumbnail)
+								};
 							}
 
 							if(_this.orderInfo.type != 2) {
@@ -130,6 +154,12 @@
 	@import '~lib/sandal/core';
 	@import '~assets/css/core/functions', '~assets/css/core/mixins', '~assets/css/core/vars';
 	@import '~assets/css/icon';
+
+	.order {
+		width: 100%;
+		height: 100%;
+		background-color: $bgGray;
+	}
 	
 	.address {
 		.block {

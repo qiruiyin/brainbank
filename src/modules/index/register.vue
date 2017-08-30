@@ -3,7 +3,7 @@
  -->
 
 <template>
-	<div class="register">
+	<div class="register" v-cloak>
 		<group label-width="4em" label-margin-right="2em" label-align="right">
       <x-input :title="name.title" v-model="name.value" :placeholder="name.placeholder"></x-input>
       <x-input :title="nickname.title" v-model="nickname.value" :placeholder="nickname.placeholder"></x-input>

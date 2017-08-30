@@ -3,46 +3,64 @@
  -->
 
 <template>
-	<div class="quotation-list">
-		<img class="user-img" src="~assets/img/user.png" alt="">
-		<div class="block">
-			<div class="block-header">
-				<div class="block-title">{{ quotationData.title }}</div>
-				<div class="block-header-content">{{ quotationData.content }}</div>
-				<div :class="['block-img', {'block-img-2': quotationData.img.length == 2 || quotationData.img.length == 4, 'block-img-3': quotationData.img.length == 3 || quotationData.img.length > 4}]">
-					<img v-for="(imgItem, imgIndex) in quotationData.img" :src="imgItem.src" alt="" :key="imgItem"  @click="show(imgIndex)">
-					<div v-transfer-dom>
-			      <previewer :list="quotationData.img" ref="previewer"></previewer>
-			    </div>
-				</div>
-				<div class="block-header-footer">
-					<div class="block-time">{{ quotationData.time }}</div>
-					<div :class="['block-btns', {'active': btnStatus}]" @click="showBtns">
-						<div class="show-btn fa fa-commenting-o"></div>
-						<div class="block-btns-content">
-							<div @click="btnZan" v-if="quotationData.qulikes != 1" class="fa fa-heart-o">赞</div>
-							<div @click="btnZan" v-else class="fa fa-heart">取消</div>
-							<div @click="btnComment(quotationData.code)" class="fa fa-commenting-o">评论</div>
+	<div class="quotation-list" v-cloak>
+		<div class="quotation-list-content">
+			<img class="user-img" src="~assets/img/user.png" alt="">
+			<div class="block">
+				<div class="block-header">
+					<div class="block-title">{{ quotationData.title }}</div>
+					<div class="block-header-content" v-html="quotationTransContent(quotationData.content)"></div>
+						<div v-if="quotationData.img.length > 0" :class="['block-img', {'block-img-2': quotationData.img.length == 2 || quotationData.img.length == 4, 'block-img-3': quotationData.img.length == 3 || quotationData.img.length > 4}]">
+							<template v-if="quotationData.img.length == 1">
+								<div class="img" v-for="(imgItem, imgIndex) in quotationData.img" @click="show(imgIndex)" :key="imgItem">
+									<img :src="imgItem.src" alt="">
+								</div>
+							</template>
+							<template v-else>
+								<div class="img" v-for="(imgItem, imgIndex) in quotationData.img" :style="imgItem.style" @click="show(imgIndex)" :key="imgItem">
+								</div>
+							</template>
+							<div v-transfer-dom>
+					      <previewer :list="quotationData.img" ref="previewer"></previewer>
+					    </div>
 						</div>
 					</div>
-				</div>
-			</div>
-			<div class="block-content" v-if="quotationData.zans.length > 0 || quotationData.comments.length > 0">
-				<div class="zan-list fa fa-heart-o" v-if="quotationData.zans.length > 0">
-					<span v-for="(zanItem, zanIndex) in quotationData.zans" :key="zanIndex">
-						<template v-if="zanIndex == 0">{{ zanItem.name }}</template>
-						<template v-else>，{{ zanItem.name }}</template>
-					</span>	
-				</div>
 
-				<div class="comment-list" v-if="quotationData.comments.length > 0">
-					<div @click="btnComment(quotationData.code, commentItem)" class="comment-card" v-for="(commentItem, commentIndex) in quotationData.comments" :key="commentIndex">
-						<div class="comment-card-header">
-							<i>{{ commentItem.sendName }}</i>
-							<template v-if="commentItem.receiveCode">
-								<span>回复</span>
-								<i>{{ commentItem.receiveName }}</i>
-							</template>：{{ commentItem.content }}
+					<div class="block-header-footer">
+						<div class="block-time">{{ quotationData.time }}</div>
+						<div :class="['block-btns', {'active': btnStatus}]" @click.stop="showBtns">
+							<div class="show-btn"></div>
+							<div class="block-btns-content">
+								<div @click="btnZan" v-if="quotationData.qulikes != 1" class="fa fa-heart-o">赞</div>
+								<div @click="btnZan" v-else class="fa fa-heart">取消</div>
+								<div @click="btnComment(quotationData.code)" class="fa fa-commenting-o">评论</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="block-content" v-if="quotationData.zans.length > 0 || quotationData.comments.length > 0">
+						
+						<div :class="['zan-list', 'fa', 'fa-heart-o', {'active': showMoreZanBtnNum < quotationData.zans.length}]" v-if="quotationData.zans.length > 0">
+							<span v-for="(zanItem, zanIndex) in quotationData.zans" :key="zanIndex" :class="[{'demo': showMoreZanBtnNum == zanIndex && !showMoreZan }, { 'active': showMoreZanBtnNum < zanIndex && !showMoreZan }]">
+								<template v-if="zanIndex == 0">{{ zanItem.name }}</template>
+								<template v-else>、{{ zanItem.name }}</template>
+							</span>
+						</div>
+						<div @click="showZanAll" v-if="showMoreZanBtnNum < quotationData.zans.length" :class="['zan-show-more', 'fa', showMoreZan ? 'fa-angle-up' : 'fa-angle-down']"></div>
+						<!-- <div v-if="showMoreZanBtn" class="zan-show-more fa fa-angle-down">{{ num }}\\ {{ num2 }}</div> -->
+
+						<div class="comment-list" v-if="quotationData.comments.length > 0">
+							<div @click="btnComment(quotationData.code, commentItem)" :class="['comment-card', {'show': commentShowNums > commentIndex || commentShowNumsStatus }]" v-for="(commentItem, commentIndex) in quotationData.comments" :key="commentIndex">
+								<div class="comment-card-header">
+									<i>{{ commentItem.sendName }}</i>
+									<template v-if="commentItem.receiveCode">
+										<span>回复</span>
+										<i>{{ commentItem.receiveName }}</i>
+									</template>：{{ commentItem.content }}
+								</div>
+							</div>
+
+							<div @click="showCommentAll" v-if="quotationData.comments.length > commentShowNums" :class="['comment-show-more', 'fa', commentShowNumsStatus ? 'fa-angle-up' : 'fa-angle-down']">查看更多评论</div>
 						</div>
 					</div>
 				</div>
@@ -65,40 +83,69 @@
 		data () {
 			return {
 				title: "经典语录",
+				num: -1,
+				num2: -1,
 				btnStatus: false,
+				showMoreZanBtnNum: 10,
+				showMoreZan: false,
+				commentShowNums: 3,
+				commentShowNumsStatus: false, // 是否展开
 				quotationList: {
 					code: "",
-					title: '苏引华',
-					content: '以帮助学员实现梦想，突破发展瓶颈为己任，直指核心？',
+					title: '',
+					content: '',
 					img: [],
-					time: '4小时前',
+					time: '',
 					qulikes: 0,
 					comments: [
 						{
-							receiveCode: "qeqw",
-							receiveName: "赵龙",
-							sendCode: "111",
-							sendName: "张飞",
-							content: "汉武帝偶尔玩哈佛我佛好好玩覅偶和服务我购房户我哦和我"
+							receiveCode: "",
+							receiveName: "",
+							sendCode: "",
+							sendName: "",
+							content: ""
 						},{
-							receiveCode: "qeqw",
-							receiveName: "赵龙",
-							sendCode: "111",
-							sendName: "张飞",
-							content: "汉武帝偶尔玩哈佛我佛好好玩覅偶和服务我购房户我哦和我"
+							receiveCode: "",
+							receiveName: "",
+							sendCode: "",
+							sendName: "",
+							content: ""
 						},{
-							receiveCode: "qeqw",
-							receiveName: "赵龙",
-							sendCode: "111",
-							sendName: "张飞",
-							content: "汉武帝偶尔玩哈佛我佛好好玩覅偶和服务我购房户我哦和我"
+							receiveCode: "",
+							receiveName: "",
+							sendCode: "",
+							sendName: "",
+							content: ""
 						}
 					],
-					zans: ["球球", "找零", "神奇的人", "找零", "神奇的人", "找零", "神奇的人", "找零", "神奇的人"]
+					zans: []
 				},
 			}
 		},
+		mounted () {
+			let _this = this;
+			document.querySelector("body").addEventListener("touchstart", function (argument) {
+				_this.btnStatus = false;
+			})
+		},
+		updated () {
+			// this.updateView();
+		},
 		methods: {
+			updateView () {
+				this.$nextTick( () => {
+					if(this.$refs.zanList) {
+						let h = document.querySelector(".zan-list").offsetHeight;
+						let h2 = this.$refs.zanList.getBoundingClientRect().height;
+						this.num = h;
+						this.num2 = this.$refs.zanList.getBoundingClientRect().height;
+
+						if(h2 > h) {	
+							this.showMoreZanBtn = true;
+						}
+					}
+				});
+			},
 			show (index) {
 	      this.$refs.previewer.show(index)
 	    },
@@ -130,7 +177,6 @@
 							ind = index;
 						}
 					})
-					// let index = this.quotationData.zans.indexOf(this.$store.state.user.name);
 					if (ind > -1) {
 						this.quotationData.zans.splice(ind, 1);
 					}
@@ -143,6 +189,12 @@
 						})
 				}
 			},
+			showZanAll () {
+				this.showMoreZan = !this.showMoreZan;
+			},
+			showCommentAll () {
+				this.commentShowNumsStatus = !this.commentShowNumsStatus;
+			},
 			btnComment (code, commentInfo = "") {
 				if(!this.isLogin()) return false;
 				this.$emit("on-comment-click", {code: code, commentInfo: commentInfo});
@@ -154,19 +206,20 @@
 <style lang="scss" scoped>
 	@import '~lib/sandal/core';
 	@import '~assets/css/core/functions', '~assets/css/core/mixins', '~assets/css/core/vars';
-	
-	$userImgW: $headerContentH;
 
 	.quotation-list {
 		padding: $padding;
 		padding-right: $padding*2;
+	}
+
+	.quotation-list-content {
 		display: flex;
 	}
 
 	.user-img {
-		width: $userImgW;
-		height: $userImgW;
-		border-radius: $userImgW;
+		width: $quotationUserImgW;
+		height: $quotationUserImgW;
+		border-radius: $quotationUserImgW;
 	}
 
 	.block {
@@ -180,40 +233,49 @@
 
 	.block-title {
 		font-size: 18px;
-		color: $fontColorBlack;
+		color: $quotationColorTitle;
 	}
 
 	.block-header-content {
-		padding: $padding 0;
+    line-height: 1.75;
+		padding: $padding/2 0;
 	}
 	
 	.block-img {
-		padding-right: 20%;
+		padding-right: 10%;
 		@extend %clearfix;
-		padding-bottom: $padding;
+		padding-bottom: $padding/2;
+
+		.img {
+			float: left;
+			width: 50%;
+			background: no-repeat;
+			background-size: cover;
+		}
 
 		img {
-			float: left;
-			// width: 50%;
-			// padding-right: 10px;
-
-			// img {
-			width: 33.3%;
-			border-right: 10px solid #fff;
-			// }	
+			width: 100%;
 		}
 	}
 
-	// .block-img-2 {
-	// 	img {
-	// 		width: 50%;
-	// 	}
-	// }
+	.block-img-2 {
+		.img {
+			width: 50%;
+		  height: 100px;
+			border-right: $padding/2 solid #fff;
+			border-bottom: $padding/2 solid #fff;
+			overflow: hidden;
+		}
+	}
 
 	.block-img-3 {
-		img {
+		.img {
 			width: 33.3%;
-		}	
+		  height: 100px;
+			border-right: $padding/2 solid #fff;
+			border-bottom: $padding/2 solid #fff;
+			overflow: hidden;
+		}
 	}
 
 	.block-header-footer {
@@ -243,12 +305,16 @@
 		.show-btn {
 			position: absolute;
 			top: 0;
-			right: 0;
-			width: 30px;
+			right: -10px;
+			width: 40px;
 			height: 100%;
+			background: url("~assets/img/icon/comment.png") no-repeat;
+			// background-size: 100%;
+			// background-position: center;
+		  background-size: 40%;
+    	background-position: center;
 	    line-height: 25px;
 			text-align: center;
-			text-indent: 6px;
 		}
 
 		.block-btns-content {
@@ -259,7 +325,7 @@
 			height: 100%;
 			line-height: 30px;
 			margin-top: -15px;
-			background: #999;
+			background: $quotationBtnBg;
 			color: #fff;
 			border-radius: $borderRadius;
 			text-align: center;
@@ -274,30 +340,111 @@
 			}
 		}
 	}
+
+	$blockTriggleW: 10px;
 	
 	.block-content {
+		position: relative;
 		padding: $padding;
-		border-radius: $borderRadius;
-		background-color: #f1f1f1;
-		color: $fontColorBlack;
+		background-color: $quotationCommentBg;
+		
+		&:before {
+			content: "";
+			position: absolute;
+			top: - $blockTriggleW/2 + 1px;
+			width: 0;
+	    height: 0;
+	    border-top: $blockTriggleW solid $quotationCommentBg;
+    	border-left: $blockTriggleW solid transparent;
+    	transform: rotate(-45deg);
+		}
 
 		i {
 			font-style: normal;
-			color: $colorGreen;
+			color: $quotationColorMan;
+		}
+	}
+	
+	$quotationCommentIconW: 20px;
+
+	.comment-list, .zan-list {
+		position: relative;
+		padding-top: $paddingTop/2;
+		
+		& > i {
+			position: absolute;
+			left: - 25px;
+			top: 0;
+			width: $quotationCommentIconW;
+			height: $quotationCommentIconW;
+			border-radius: $quotationCommentIconW;
+			font-size: 12px;
+			color: #fff;
+			text-align: center;
+			line-height: $quotationCommentIconW;
+			background-color: $quotationColorMan;
 		}
 	}
 
 	.zan-list {
 		position: relative;
-		// padding-bottom: $padding;
+		padding-top: 0;
+		color: $quotationColorMan;
+		text-align: justify;
+
+		&.active {
+			padding-bottom: 0;
+		}
+
+		&:before {
+			margin-right: .5em;
+			@include ellipsisOne();
+			display: inline-block;
+			line-height: $quotationCommentIconW;
+		}
+
 
 		span {
-			line-height: 1.35;
-			padding-left: 5px;
+			@include ellipsisOne();
+			display: inline-block;
+			line-height: $quotationCommentIconW;
+
+			&.demo {
+				width: 1.5em;
+			}
+
+			&.active {
+				font-size: 0;
+			}
 		}
 	}
 
+	.zan-show-more {
+    width: 100%;
+    text-align: center;
+	}
+
+	.comment-list {
+		text-align: center;
+	}
+
+	.comment-show-more {
+		@include halfpxline(30px, $colorOrange, 1px, 1px, 1px, 1px);
+		padding: 0 1em;
+		line-height: 1.75;
+		color: $colorOrange;
+		font-size: 12px;
+		margin: 0 auto;
+		margin-top: .5em;
+	}
+
 	.comment-card {
-		padding: 3px 0;
+		text-align: left;
+		display: none;
+		// padding: 3px 0;
+
+		&.show {
+			display: block;
+		}
 	}
 </style>

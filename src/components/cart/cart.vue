@@ -61,22 +61,26 @@
 				if(!this.isLogin()) return false;
 				// this.$emit("on-addCart-click");
 				let _this = this;
-				
-				_this.$http.post('/wechat/shop/updateCart',
-					{
-						userCode: _this.$store.state.user.userCode,
-						productCode: _this.productInfo.code,
-						shopCount: _this.productInfo.num
-					}).then(function(e) {
-						if(e.data.errcode == 1) {
-							_this.$vux.toast.show({
-								text: "加入购物车成功"
-							});
-							let num = _this.productInfo.num + _this.$store.state.cart.num;
 
-							_this.$store.commit("updateCartNum", { num: num});
-						}
-				});
+				if(!_this.$store.state.loadbar.isLoading) {
+					_this.$store.commit('updateLoadingStatus', {isLoading: true});	
+					_this.$http.post('/wechat/shop/updateCart',
+						{
+							userCode: _this.$store.state.user.userCode,
+							productCode: _this.productInfo.code,
+							shopCount: _this.productInfo.num
+						}).then(function(e) {
+							_this.$store.commit('updateLoadingStatus', {isLoading: false});	
+							if(e.data.errcode == 1) {
+								_this.$vux.toast.show({
+									text: "加入购物车成功"
+								});
+								let num = _this.productInfo.num + _this.$store.state.cart.num;
+
+								_this.$store.commit("updateCartNum", { num: num});
+							}
+					});	
+				}
 			},
 			goShopCart () {
 				if(!this.isLogin()) return false;
@@ -86,8 +90,10 @@
 				if(!this.isLogin()) return false;
 				let _this = this,
 						allMoney = (_this.productInfo.price * _this.productInfo.num).toFixed(2);
-
-				this.$http.post('/wechat/order/create',
+				return 
+				if(!_this.$store.state.loadbar.isLoading) {
+					_this.$store.commit('updateLoadingStatus', {isLoading: true});	
+					this.$http.post('/wechat/order/create',
 							{
 								"userCode": _this.$store.state.user.userCode,
 								"productCode": _this.productInfo.code,
@@ -99,9 +105,16 @@
 								"address": ""
 							}
 						).then(function(e) {
-							if(e.data.errcode == 1)
-							_this.$router.push({ name: "confirmOrder", query: { orderCode: e.data.data.order.code } })
+							_this.$store.commit('updateLoadingStatus', {isLoading: false});	
+							if(e.data.errcode == 1) {
+								_this.$router.push({ name: "confirmOrder", query: { orderCode: e.data.data.order.code } })
+							} else {
+								_this.$vux.alert.show({
+									content: e.data.errmsg
+								})
+							}
 						});
+				}
 			}
 		}
 	}

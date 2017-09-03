@@ -19,7 +19,7 @@
 		<div v-transfer-dom>
 			<popup class="quotation-send" v-model="commentShow" position="bottom">
 	      <group label-width="4em" label-margin-right="2em" label-align="right">
-		      <x-input placeholder="评论" v-model="commentValue">
+		      <x-input @on-focus="sendFocus" @on-blur="sendBlur" placeholder="评论" v-model="commentValue">
 		      	<x-button v-if="sendBtn.status" @click.native="submitComment" type="primary" class="send" slot="right" mini>{{ sendBtn.sendStatus ? '发送中' : '发送' }}</x-button>
 		      	<x-button v-else type="primary" class="send" slot="right" mini disabled>{{ sendBtn.sendStatus ? '发送中' : '发送' }}</x-button>
 		      </x-input>
@@ -34,6 +34,8 @@
 	import elHeaderIndex from 'components/header/header-index'
 	import elQuotation from 'components/quotation/quotation'
 	import elLoadMore from 'components/load-more/load-more'
+
+	let bfscrolltop = document.body.scrollTop;//获取软键盘唤起前浏览器滚动部分的高度
 
 	export default {
 		directives: {
@@ -78,7 +80,8 @@
 					status: false,
 					value: "default",
 					sendStatus: false // 是否在调用接口
-				}
+				},
+				intervalInput: '' // 定时器处理
 			}
 		},
 		watch: {
@@ -96,6 +99,15 @@
 			this.fetchData();
 		},
 		methods: {
+			sendFocus () {
+				this.interval = setInterval(function(){//设置一个计时器，时间设置与软键盘弹出所需时间相近
+	        document.body.scrollTop = document.body.scrollHeight;//获取焦点后将浏览器内所有内容高度赋给浏览器滚动部分高度
+	      },100)
+			},
+			sendBlur () {
+				clearInterval(this.interval);//清除计时器
+	      document.body.scrollTop = bfscrolltop;将软键盘唤起前的浏览器滚动部分高度重新赋给改变后的高度
+			},
 			fetchData () {
 				let _this = this;
 

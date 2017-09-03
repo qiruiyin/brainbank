@@ -21,7 +21,7 @@
 	import { XNumber, CheckIcon } from 'vux'
 
 	export default {
-		props: ['imgTextData'],
+		props: ['imgTextData', 'imgTextIndex'],
 		components: { XNumber, CheckIcon },
 		data () {
 			return {
@@ -60,10 +60,11 @@
 				if(ind != 1) {
 					this.imgTextData.check = !this.imgTextData.check
 				}
-				this.$emit('on-check', this.imgTextData.check)
+				this.$emit('on-check', this.imgTextData.check);
 			},
 			numClick () {
 				let _this = this;
+				this.$emit('on-number-change', {ind: this.imgTextIndex, num: this.cartNum});
 
 				// _this.$http.post('/wechat/shop/updateCart',
 				// 	{

@@ -64,7 +64,6 @@
 				filesArr.forEach(function (file, index) {
           if (!/\/(?:jpeg|png|gif)/i.test(file.type)) return;
 
-					_this.imgPreview(file);						
           let reader = new FileReader();
 
           reader.onload = function () {
@@ -75,7 +74,7 @@
             //如果图片大小小于200kb，则直接上传
             if (result.length <= _this.maxsize) {
               img = null;
-              _this.uploadImg(result, file.type);
+              _this.uploadImg(result, file);
 
               return;
             }
@@ -89,7 +88,7 @@
 
             function callback() {
               let data = _this.compress(img);
-              _this.uploadImg(data, file.type);
+              _this.uploadImg(data, file);
               img = null;
             }
           };
@@ -107,7 +106,7 @@
         _this.imageFilePriviwer.splice(ind, 1);
         _this.imageFile.splice(ind, 1);
       },
-			uploadImg (data, type) {
+			uploadImg (data, file) {
 				let _this = this,
 						formData = new FormData(),
 						text = window.atob(data.split(",")[1]),
@@ -120,7 +119,7 @@
             ubuffer[i] = text.charCodeAt(i);
         }
 
-        let blob = getBlob([buffer], type);
+        let blob = getBlob([buffer], file.type);
 
         formData.append('file', blob);
 
@@ -136,8 +135,9 @@
 	        		// _this.onUploading = false;
 							_this.imageFile.push({
 								src: _this.resolveImg(e.data.data.result[0]),
-                name: data.name
+                name: e.data.data.result[0]
 							});
+              _this.imgPreview(file);           
 							// _this.uploadImg(ind+1);
 						} else {
 							_this.$vux.alert.show({
@@ -155,9 +155,10 @@
 						if(index > 0) {
 							imageFile += ";";
 						}
-						imageFile += item.data;
+						imageFile += item.name;
 					})
 				}
+
         if(!_this.content) {
           _this.$vux.alert.show({
             content: "内容不能为空"

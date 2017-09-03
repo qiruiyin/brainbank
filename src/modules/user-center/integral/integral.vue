@@ -28,7 +28,8 @@
 							<p>{{ item.name }}</p>
 							<span>{{ tabDatas[0].tip }}：{{ item.date }}</span>
 						</div>
-						<div class="info fa fa-envelope-o"></div>
+						<div class="info"></div>
+						<!-- <div class="info fa fa-envelope-o"></div> -->
 					</div>
 	      </template>
 
@@ -39,7 +40,8 @@
 							<p>{{ item.name }}</p>
 							<span>{{ tabDatas[1].tip }}：{{ item.date }}</span>
 						</div>
-						<div class="info fa fa-envelope-o"></div>
+						<div class="info"></div>
+						<!-- <div class="info fa fa-envelope-o"></div> -->
 					</div>
 	      </template>
 	      <!-- <swiper class="list" height="500px" v-model="tabSelected" :show-dots="false" :threshold="tabChangeW">
@@ -62,8 +64,6 @@
 <script type="text/babel">
 	import { Tab, TabItem, Swiper, SwiperItem } from 'vux'
 	import elHeaderIndex from 'components/header/header-index'
-
-	import imgHeader from 'assets/img/header.png'
 
 	export default {
 		name: 'integral',
@@ -193,6 +193,10 @@
   	position: absolute;
   	right: $padding;
 		top: 50%;
+		width: 22px;
+		height: 22px;
+		background: url("~assets/img/icon/integral-msg.png") no-repeat;
+		background-size: 100%;
 		font-size: 20px;
 		line-height: 1;
 		margin-top: -10px;

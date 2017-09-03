@@ -111,7 +111,25 @@
 						if(e.data.errcode == 1) {
 							if(e.data.data && e.data.data.customerDataList && e.data.data.customerDataList.length > 0) {
 								customerShopOrderList = e.data.data.customerDataList.map(function(item, index) {
-									if(ind == 3) {
+									if(ind == 2) {
+										return {
+				  						id: item.id,
+				  						code: item.code,
+											title: item.name,
+											type: item.memo,
+											pay: item.requiredpoints,
+											isBuy: 1,
+											download: item.downloads,
+											downloadUrl: _this.resolveImg(item.file_url),
+											price: item.requiredpoints,
+											url: '',
+											img: _this.resolveImg(item.thumbnail),
+											query: {
+												code: item.code,
+												type: obj.value
+											}
+				  					}
+									} else {
 										return {
 											img: _this.resolveImg(item.thumbnail),
 											id: item.id,
@@ -123,30 +141,12 @@
 												num: item.commentAmount,
 												percent: item.rank
 											},
-											url: '',
+											url: 'courseTypeDetail',
 											query: {
 												code: item.code,
 												type: obj.value
 											}
 										}
-									} else {
-										return {
-				  						id: item.id,
-				  						code: item.code,
-											title: item.name,
-											type: item.memo,
-											pay: item.requiredpoints,
-											isBuy: 1,
-											download: item.downloads,
-											downloadUrl: _this.resolveImg(item.file_url),
-											price: item.requiredpoints,
-											url: 'courseTypeDetail',
-											img: _this.resolveImg(item.thumbnail),
-											query: {
-												code: item.code,
-												type: obj.value
-											}
-				  					}
 									}
 								})
 							}

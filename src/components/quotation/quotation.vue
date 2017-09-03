@@ -31,9 +31,9 @@
 						<div :class="['block-btns', {'active': btnStatus}]" @click.stop="showBtns">
 							<div class="show-btn"></div>
 							<div class="block-btns-content">
-								<div @click="btnZan" v-if="quotationData.qulikes != 1" class="fa fa-heart-o">赞</div>
-								<div @click="btnZan" v-else class="fa fa-heart">取消</div>
-								<div @click="btnComment(quotationData.code)" class="fa fa-commenting-o">评论</div>
+								<div @click.stop="btnZan" v-if="quotationData.qulikes != 1" class="fa fa-heart-o">赞</div>
+								<div @click.stop="btnZan" v-else class="fa fa-heart">取消</div>
+								<div @click.stop="btnComment(quotationData.code)" class="fa fa-commenting-o">评论</div>
 							</div>
 						</div>
 					</div>
@@ -125,7 +125,11 @@
 		mounted () {
 			let _this = this;
 			document.querySelector("body").addEventListener("touchstart", function (argument) {
-				_this.btnStatus = false;
+				if(_this.btnStatus) {
+					setTimeout(function(argument) {
+						_this.btnStatus = false;
+					}, 500)
+				}
 			})
 		},
 		updated () {
@@ -224,7 +228,7 @@
 
 	.block {
 		flex: 1;
-		padding-left: $padding;
+		padding-left: $padding/2;
 	}
 
 	.block-header {
@@ -296,7 +300,7 @@
 		height: 30px;
 		line-height: 30px;
 		overflow: hidden;
-		transition: 1s;
+		transition: .5s;
 
 		&.active {
 			width: 180px;

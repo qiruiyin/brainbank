@@ -156,8 +156,18 @@
 
 	.tuijian-img {
 		display: flex;
-		padding: $padding;
+		padding: 10px 10px;
 		background: #fff;
+		
+		a {
+			width: 100%;
+			padding-right: 5px;
+			display: block;
+		}
+
+		img {
+			border-radius: 5px;
+		}
 	}
 
 	.tuijian-img-left, .tuijian-img-right {
@@ -165,19 +175,18 @@
 
 		img {
 			width: 100%;
-			padding-right: $tuijianPadding;
 		}
 	}
 
 	.tuijian-img-right {
-		img {
+		a {
 			padding-right: 0;
-			padding-left: $tuijianPadding;
+			padding-left: 5px;
 		}
 
 		a:last-child {
 			img {
-				padding-top: $tuijianPadding;
+				margin-top: 5px;
 			}
 		}
 	}

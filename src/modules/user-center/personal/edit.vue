@@ -5,32 +5,26 @@
 <template>
 	<div class="dn-form personal-edit" v-cloak>
 		<group>
-			<template v-for="item in formDatas">
-    		<template v-if="item.key == 'phone' || item.key == 'qrcode'">
-    			<x-input v-if="item.key == 'phone'" :title="item.title" :placeholder="item.placeholder" v-model="item.value">
-      			<label slot="label" class="label icon icon-tel">{{ item.title }}</label>
-    				<el-verification-code :tel="item.value" code-type="xiugai" slot="right"></el-verification-code>
-    			</x-input>
-	    		<x-input v-else type="tel" :title="item.title" :placeholder="item.placeholder" v-model="item.value">
-      			<label slot="label" class="label icon icon-tel">{{ item.title }}</label>
-	    		</x-input>
-    		</template>
-    		<template v-else>
-	    		<x-input v-if="item.isReadonly" :title="item.title" :placeholder="item.placeholder" v-model="item.value" readonly>
-      			<label slot="label" class="label icon icon-tel">{{ item.title }}</label>
-	    		</x-input>
+			<x-input @on-change="nameTestNum" :title="name.title" :placeholder="name.placeholder" v-model="name.value">
+  			<label slot="label" class="label icon icon-user">{{ name.title }}</label>
+  		</x-input>
 
-	    		<template v-else>
-		    		<x-input v-if="item.key == 'name'" @on-change="nameTestNum" :title="item.title" :placeholder="item.placeholder" v-model="item.value">
-	      			<label slot="label" class="label icon icon-tel">{{ item.title }}</label>
-		    		</x-input>
-
-	    			<x-input v-else :title="item.title" :placeholder="item.placeholder" v-model="item.value">
-	      			<label slot="label" class="label icon icon-tel">{{ item.title }}</label>
-		    		</x-input>	
-	    		</template>	    		
-    		</template>
-			</template>
+  		<x-input :title="idCard.title" :placeholder="idCard.placeholder" v-model="idCard.value" readonly>
+				<label slot="label" class="label icon icon-idCard">{{ idCard.title }}</label>
+			</x-input>
+			
+			<x-input :title="phone.title" :placeholder="phone.placeholder" v-model="phone.value">
+  			<label slot="label" class="label icon icon-tel">{{ phone.title }}</label>
+				<el-verification-code :tel="phone.value" code-type="xiugai" slot="right"></el-verification-code>
+			</x-input>
+			
+			<x-input type="tel" :title="qrcode.title" :placeholder="qrcode.placeholder" v-model="qrcode.value">
+  			<label slot="label" class="label icon icon-qrcode">{{ qrcode.title }}</label>
+  		</x-input>
+			
+			<x-input :title="weixin.title" :placeholder="weixin.placeholder" v-model="weixin.value">
+  			<label slot="label" class="label icon icon-weixin">{{ weixin.title }}</label>
+  		</x-input>
 		</group>
 
 		<div class="btn">
@@ -51,39 +45,41 @@
 			return {
 				title: "修改个人资料",
 				btnStatus: false,
-				formDatas: [
-					{
-						value: '',
-						key: 'name',
-						title: '姓名',
-						placeholder: '请输入您真实姓名',
-						isReadonly: false
-					},{
-						value: '',
-						key: 'idcard',
-						title: '证件号码',
-						placeholder: '请输入您的身份证号码', 
-						isReadonly: true
-					},{
-						value: '',
-						key: 'phone',
-						title: '手机号',
-						placeholder: '请输入您的手机号',
-						isReadonly: false
-					},{
-						value: '',
-						key: 'qrcode',
-						title: '验证码',
-						placeholder: '请输入手机验证码', 
-						isReadonly: false
-					},{
-						value: '',
-						key: 'weixin',
-						title: '微信',
-						placeholder: '请输入微信号码（选填）',
-						isReadonly: false
-					}
-				]
+				name: {
+					value: '',
+					key: 'name',
+					title: '姓名',
+					placeholder: '请输入您真实姓名',
+					isReadonly: false
+				},
+				idCard: {
+					value: '',
+					key: 'idcard',
+					title: '证件号码',
+					placeholder: '请输入您的身份证号码', 
+					isReadonly: true
+				},
+				phone: {
+					value: '',
+					key: 'phone',
+					title: '手机号',
+					placeholder: '请输入您的手机号',
+					isReadonly: false
+				},
+				qrcode: {
+					value: '',
+					key: 'qrcode',
+					title: '验证码',
+					placeholder: '请输入手机验证码', 
+					isReadonly: false
+				},
+				weixin: {
+					value: '',
+					key: 'weixin',
+					title: '微信',
+					placeholder: '请输入微信号码（选填）',
+					isReadonly: false
+				}
 			}
 		},
 		computed: {
@@ -105,22 +101,10 @@
 								data;
 						if(e.data.errcode == 1) {
 							data = responseData.customerInfoList[0];
-
-							_this.formDatas.map(function(item, index) {
-								if(item.key == "name") {
-									item.value = data.NAME;
-								} else if (item.key == "phone") {
-									item.value = data.mobile;
-								} else if (item.key == "idcard") {
-									item.value = data.idcard;
-								} else if (item.key == "qq") {
-									item.value = data.qq;
-								} else if (item.key == "weixin") {
-									item.value = data.weixinAccount;
-								} else if (item.key == "address") {
-									item.value = data.address;
-								}
-							})
+							_this.name.value = data.NAME;
+							_this.idCard.value = data.idcard;
+							_this.phone.value = data.mobile;
+							_this.weixin.value = data.weixinAccount;
 						} else {
 							_this.$vux.alert.show({
 								content: e.data.errmsg
@@ -131,32 +115,30 @@
 			},
 			submit () {
 				let _this = this;
-				if(_this.formDatas[0].value == "") {
+				if(_this.name.value == "") {
 					this.$vux.toast.show({
 	          text: '姓名不能为空',
 	        })
-				} else if (_this.formDatas[2].value == "") {
+				} else if (_this.phone.value == "") {
 					this.$vux.toast.show({
 	          text: '手机号码不能为空',
 	        })
-				} else if (_this.formDatas[3].value == "") {
+				} else if (_this.qrcode.value == "") {
 					this.$vux.toast.show({
 	          text: '验证码不能为空',
 	        })
 				} else if (_this.btnStatus) {
 					return false;
-				} else if (_this.nameTestNum(_this.formDatas[0].value)) {
-
 				} else {
 					_this.btnStatus = true;
 					this.$http.post('/wechat/usercenter/updateCustomerInfo',
 							{
 								"code": _this.$store.state.user.userCode,
-								"name": _this.formDatas[0].value,
-								"mobile": _this.formDatas[2].value,
-								"idcard": _this.formDatas[1].value,
-								"smsCode": _this.formDatas[3].value,
-								"weixinAccount": _this.formDatas[4].value
+								"name": _this.name.value,
+								"mobile": _this.phone.value,
+								"idcard": _this.idCard.value,
+								"smsCode": _this.qrcode.value,
+								"weixinAccount": _this.weixin.value
 							}
 						).then(function(e) {
 							if(e.data.errcode == 1) {

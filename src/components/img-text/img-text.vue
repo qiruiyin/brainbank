@@ -6,7 +6,6 @@
 		<div class="img-text-img">
 
 			<img class="img" v-if="imgTextData.img" :src="imgTextData.img" alt="">
-			<img class="img" v-else src="~assets/img/index/video-course.png" alt="">
 			
 			<div v-if="imgTextData.status" class="status">{{ imgTextData.status }}</div>
 			<div v-if="imgTextData.date" class="date">{{ imgTextData.date }}</div>

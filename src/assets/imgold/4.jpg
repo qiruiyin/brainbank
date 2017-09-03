@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<Error>
-  <Code>AccessDenied</Code>
-  <Message>You are denied by bucket referer policy.</Message>
-  <RequestId>5953F0E32FADF32E3CE9978E</RequestId>
-  <HostId>pximg1.weilingxiu.cn</HostId>
-  <BucketName>tkpximg</BucketName>
-</Error>

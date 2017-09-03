@@ -85,7 +85,7 @@ Vue.prototype.getUserInfo = (openId, userCode = "", url = "") => {
 // 经典语录内容转换
 Vue.prototype.quotationTransContent = (value) => {
 	if(!value) return value;
-	return value.replace(/\r\n/g, "<br />");
+	return value.replace(/\n/g, "<br />");
 }
 
 // 图片链接拼接

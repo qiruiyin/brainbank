@@ -12,6 +12,7 @@ const nav = [
 	"signCode", // 签到二维码
 	"quotationSend", // 发送朋友圈
 	"quotationAdd", // 发布朋友圈
+	"retrain", // 须知
 ]
 
 export default nav;

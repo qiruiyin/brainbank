@@ -43,6 +43,9 @@ Vue.http.defaults.headers.post['Content-Type'] = 'application/raw';           //
 // window.localStorage.setItem("openId", "oOVVes5satnTP4JW2Wsb_iJwMv6Q");
 // window.localStorage.setItem("openId", "oOVVes2YmKf-O6ChTa5CrOAELfnU");
 // window.localStorage.setItem("openId", "oOVVes7rzHEB4HOXruZiNOkaXNRg");
+
+// 雷鹏
+// window.localStorage.setItem("openId", "oOVVes8K8waFWvMybnMv2muUfCwg");
 // 苏老师
 // 思维导图
 // window.localStorage.setItem("openId", "oOVVesyAwayTie9oX2qAh0wbz9ss");
@@ -55,7 +58,7 @@ Vue.http.defaults.headers.post['Content-Type'] = 'application/raw';           //
 // window.localStorage.setItem("userCode", "20170717204242642342479420527950");
 
 // 赵陵
-// window.localStorage.setItem("openId", "oOVVesxGmkmuqC8MU3XKR19I3m0g");
+window.localStorage.setItem("openId", "oOVVesxGmkmuqC8MU3XKR19I3m0g");
 // window.localStorage.setItem("userCode", "20170718220214960433651736252496");
 // james 
 // window.localStorage.setItem("userCode", "201707281605164831276233257855888");

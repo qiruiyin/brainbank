@@ -65,7 +65,7 @@ const routes = [
 			require(['../modules/index/header/retrain.vue'], loaded)
 		}),
 		meta: {
-			title: '复训须知'
+			title: '学员须知'
 		}
 	},{
 		// 废弃
@@ -389,6 +389,15 @@ const routes = [
 			title: '问题反馈'
 		}
 	},{
+		path: '/tuisong',
+		name: 'tuisong',
+		component:  loadView(loaded => {
+			require(['../modules/user-center/tuisong/tuisong.vue'], loaded)
+		}),
+		meta: {
+			title: '推送设置'
+		}
+	},{
 		// 商城
 		path: '/mall',
 		name: 'mall',
@@ -512,9 +521,6 @@ const routes = [
 		// 地址编辑
 		path: '/address-edit',
 		name: 'addressEdit',
-		query: {
-			orderCode: "" // 订单code
-		},
 		query: {
 			orderCode: "" // 订单code,用来判定是不是来自订单
 		},

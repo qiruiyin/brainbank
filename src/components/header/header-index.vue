@@ -21,7 +21,6 @@
 <script type="text/babel">
 	import { Sticky } from 'vux'
 	import { mapState } from 'vuex'
-	import imgHeader from 'assets/img/header.png'
 	import hold from 'src/commons/hold'
 
 	export default {

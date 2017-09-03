@@ -6,8 +6,9 @@
 	<div class="tuijian" v-cloak>
 		<div class="tuijian-left">
 			<div :class="{ 'tuijian-img': item.src, 'active': tuijianStatus == index }"  v-for="(item, index) in tuijianData" :key="index">
-				<div v-if="item.src" @click="play(index)" >{{ item.name }}</div>
-				<div v-else @click="goPage('quotation')" >{{ item.name }}</div>
+				<div @click="play(index)" >{{ item.name }}</div>
+				<!-- <div v-if="item.src" @click="play(index)" >{{ item.name }}</div> -->
+				<!-- <div v-else @click="goPage('quotation')" >{{ item.name }}</div> -->
 			</div>
 		</div>
 

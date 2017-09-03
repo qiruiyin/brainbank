@@ -1,34 +1,34 @@
-import imgBanner from 'assets/img/banner.jpg'
-import imgAd from 'assets/img/index/ad.png'
+// import imgBanner from 'assets/img/banner.jpg'
+// import imgAd from 'assets/img/index/ad.png'
 import imgTuijianHeader from 'assets/img/index/header.png'
-import imgCourseOther from 'assets/img/index/course.png'
+// import imgCourseOther from 'assets/img/index/course.png'
 // import imgPlay from 'assets/img/index/header.png'
 
 export const getterIndex = {
-	bannerDatas: [
-		{
-		  // url: 'banner/1',
-		  img: imgBanner,
-		},{
-		  // url: 'banner/1',
-		  img: imgBanner,
-		},{
-		  // url: 'banner/1',
-		  img: imgBanner,
-		}
-	],
-	adDatas: [
-		{
-		  url: 'banner/1',
-		  img: imgAd,
-		},{
-		  url: 'banner/1',
-		  img: imgAd,
-		},{
-		  url: 'banner/1',
-		  img: imgAd,
-		}
-	],
+	// bannerDatas: [
+	// 	{
+	// 	  // url: 'banner/1',
+	// 	  img: imgBanner,
+	// 	},{
+	// 	  // url: 'banner/1',
+	// 	  img: imgBanner,
+	// 	},{
+	// 	  // url: 'banner/1',
+	// 	  img: imgBanner,
+	// 	}
+	// ],
+	// adDatas: [
+	// 	{
+	// 	  url: 'banner/1',
+	// 	  img: imgAd,
+	// 	},{
+	// 	  url: 'banner/1',
+	// 	  img: imgAd,
+	// 	},{
+	// 	  url: 'banner/1',
+	// 	  img: imgAd,
+	// 	}
+	// ],
 	entryDatas: [
 		{
 			value: 'video',
@@ -158,16 +158,11 @@ export const getterIndex = {
 		}
 	],
 	courseOthers: [
-		{
-			value: '',
-			name: '',
-			url: '',
-			img: imgCourseOther
-		},{
-			value: '',
-			name: '',
-			url: '',
-			img: imgCourseOther
-		}
+		// {
+		// 	value: '',
+		// 	name: '',
+		// 	url: '',
+		// 	img: ''
+		// }
 	]
 }

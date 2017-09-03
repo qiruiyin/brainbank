@@ -33,7 +33,7 @@
 								<div :class="['audio-detail-desc', {'active': audioDetailDescShow}]">
 									<div class="audio-detail-desc-header" @click="toggleContent">更多简介<span class="fa fa-angle-down"></span></div>
 									<div class="audio-detail-desc-content">
-										<p>{{ courseInfo.desc }}</p>
+										<p v-html="courseInfo.desc"></p>
 										<div class="audio-detail-desc-footer" @click="toggleContent(false)">收起<span class="fa fa-angle-up"></span></div>
 									</div>
 								</div>
@@ -197,62 +197,65 @@
 								"productCode": _this.courseInfo.code,
 							};
 				}
-					this.$http.post(url,
-							params
-						).then(function(e) {
-							let responseData = e.data.data.product;
+				
+				this.$http.post(url,
+						params
+					).then(function(e) {
+						let responseData = e.data.data.product;
 
-							if(e.data.errcode == 1) {
-								_this.hasBuy = responseData.PRICE == 0 || responseData.isBuy > 0 ? '1' : '0';
-								if(_this.courseInfo.type == "course") {
-									_this.list.btn = '-1';
-									_this.relateDataBtn = '-1';
-								} else {
-									_this.list.btn = responseData.PRICE == 0 || responseData.isBuy > 0 ? '-1' : '0';
-									_this.relateDataBtn = '0';
-								}
-								_this.list.title = responseData.name;
-								_this.list.pay = responseData.PRICE;
-								_this.list.isBuy = responseData.isBuy;
-								_this.list.type = responseData.DESCRIPTION;
-								_this.list.img = _this.resolveImg(responseData.thumbnail);
-								_this.list.like = {
-									num: responseData.commentAmount,
-									percent: responseData.rank ? responseData.rank : 0,
-								};
-
-								_this.course.fileUrl = _this.resolveImg(responseData.file_url);
-								_this.course.fileThumb = _this.resolveImg(responseData.file_thumb);
-								_this.courseInfo.desc = responseData.CONTENT;
-								_this.courseInfo.name = responseData.name;
-
-								relateData = e.data.data.recommend.map(function(item, index) {
-									return {
-										img: _this.resolveImg(item.thumbnail),
-										id: item.id,
-										title: item.name,
-										type: item.DESCRIPTION,
-										pay: item.PRICE,
-										isBuy: _this.courseInfo.type == 'course' ? 1 : item.isBuy,
-										like: {
-											num: item.commentAmount,
-											percent: item.rank
-										},
-										url: 'courseTypeDetail',
-										query: {
-											code: item.code,
-											type: _this.$route.query.type
-										}
-									}
-								});
-								_this.relateData = relateData;
+						if(e.data.errcode == 1) {
+							_this.hasBuy = responseData.PRICE == 0 || responseData.isBuy > 0 ? '1' : '0';
+							
+							if(_this.courseInfo.type == "course") {
+								_this.list.btn = '-1';
+								_this.relateDataBtn = '-1';
+								_this.hasBuy = '1';
 							} else {
-								_this.$vux.alert.show({
-									content: e.data.errmsg
-								})
+								_this.list.btn = responseData.PRICE == 0 || responseData.isBuy > 0 ? '-1' : '0';
+								_this.relateDataBtn = '0';
 							}
+							_this.list.title = responseData.name;
+							_this.list.pay = responseData.PRICE;
+							_this.list.isBuy = responseData.isBuy;
+							_this.list.type = responseData.DESCRIPTION;
+							_this.list.img = _this.resolveImg(responseData.thumbnail);
+							_this.list.like = {
+								num: responseData.commentAmount,
+								percent: responseData.rank ? responseData.rank : 0,
+							};
+
+							_this.course.fileUrl = _this.resolveImg(responseData.file_url);
+							_this.course.fileThumb = _this.resolveImg(responseData.file_thumb);
+							_this.courseInfo.desc = _this.resolveRichTextImg(responseData.CONTENT);
+							_this.courseInfo.name = responseData.name;
+
+							relateData = e.data.data.recommend.map(function(item, index) {
+								return {
+									img: _this.resolveImg(item.thumbnail),
+									id: item.id,
+									title: item.name,
+									type: item.DESCRIPTION,
+									pay: item.PRICE,
+									isBuy: _this.courseInfo.type == 'course' ? 1 : item.isBuy,
+									like: {
+										num: item.commentAmount,
+										percent: item.rank
+									},
+									url: 'courseTypeDetail',
+									query: {
+										code: item.code,
+										type: _this.$route.query.type
+									}
+								}
+							});
+							_this.relateData = relateData;
+						} else {
+							_this.$vux.alert.show({
+								content: e.data.errmsg
+							})
 						}
-					);
+					}
+				);
 			},
 
 			playBtnClick () {
@@ -394,7 +397,7 @@
 	
 		&.active {
 			.audio-detail-desc-content {
-				max-height: 400px;
+				max-height: 11111400px;
 			}
 		}
 

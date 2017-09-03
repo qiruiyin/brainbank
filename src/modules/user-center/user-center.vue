@@ -30,13 +30,6 @@
 	import { mapState } from 'vuex'
 	import { Group, Cell } from 'vux'
 	
-	import imgUser from 'assets/img/user-center/user.png'
-	import imgIcon01 from 'assets/img/user-center/icon01.png'
-	import imgIcon02 from 'assets/img/user-center/icon02.png'
-	import imgIcon03 from 'assets/img/user-center/icon03.png'
-	import imgIcon04 from 'assets/img/user-center/icon04.png'
-	import imgIcon05 from 'assets/img/user-center/icon05.png'
-
 	export default {
 		components: {
 			Group, Cell
@@ -52,7 +45,6 @@
 								value: '',
 								name: '我的客服',
 								url: 'kefu',
-								img: imgIcon01,
 								icon: 'kefu',
 								click: false, // 不绑定是否可点击
 								show: true
@@ -60,7 +52,6 @@
 								value: '',
 								name: '分享给好友',
 								url: 'share',
-								img: imgIcon01,
 								icon: 'share',
 								click: true, // 不绑定是否可点击
 								show: true,
@@ -72,7 +63,6 @@
 								value: '',
 								name: '个人资料',
 								url: 'personalEdit',
-								img: imgIcon01,
 								icon: 'person',
 								click: false,  // 不绑定是否可点击
 								show: true
@@ -80,7 +70,6 @@
 								value: '',
 								name: '我的好友',
 								url: 'integral',
-								img: imgIcon02,
 								icon: 'haoyou',
 								click: false,
 								show: true
@@ -92,7 +81,6 @@
 								value: '',
 								name: '商城订单',
 								url: 'orderMallList',
-								img: imgIcon04,
 								icon: 'mall',
 								click: false,
 								show: true
@@ -100,7 +88,6 @@
 								value: '',
 								name: '课程订单',
 								url: 'orderCourseList',
-								img: imgIcon04,
 								icon: 'course',
 								click: false,
 								show: true
@@ -108,7 +95,6 @@
 								value: '',
 								name: '我的学习',
 								url: 'orderSourceList',
-								img: imgIcon04,
 								icon: 'study',
 								click: false,
 								show: true
@@ -120,7 +106,6 @@
 								value: '',
 								name: '地址管理',
 								url: 'address',
-								img: imgIcon04,
 								icon: 'address',
 								click: false,
 								show: true
@@ -132,7 +117,6 @@
 								value: '',
 								name: '编辑语录',
 								url: 'quotationSend',
-								img: imgIcon05,
 								icon: 'quotation',
 								click: true,
 								show: false
@@ -140,15 +124,20 @@
 								value: '',
 								name: '意见反馈',
 								url: 'feedback',
-								img: imgIcon05,
 								icon: 'feedback',
+								click: true,
+								show: true
+							},{
+								value: '',
+								name: '推送设置',
+								url: 'tuisong',
+								icon: 'tuisong',
 								click: true,
 								show: true
 							},{
 								value: 'clear',
 								name: '清空缓存',
 								url: '',
-								img: imgIcon05,
 								icon: 'clear',
 								click: true,
 								show: true

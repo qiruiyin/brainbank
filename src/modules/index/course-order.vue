@@ -27,7 +27,7 @@
 	    	<x-input v-model="userInfo.name.value" :placeholder="userInfo.name.placeholder" readonly required>
 	      	<label slot="label" class="label icon icon-user">{{ userInfo.name.title }}</label>
 	      </x-input>
-	      <div class="el-selector icon icon-tel">
+	      <div class="el-selector icon icon-idCardType">
 		      <selector :title="userInfo.idCardType.title" direction="left" :options="userInfo.idCardType.list" readonly v-model="userInfo.idCardType.value"></selector>	    	
 	      </div>
 	    	<x-input type="tel" v-model="userInfo.idCard.value" :placeholder="userInfo.idCard.placeholder" readonly required>
@@ -41,7 +41,7 @@
 	    	<x-input v-model="userInfo.name.value" @on-change="nameTestNum(userInfo.name.value)" :placeholder="userInfo.name.placeholder" required>
 	      	<label slot="label" class="label icon icon-user">{{ userInfo.name.title }}</label>
 	      </x-input>
-	      <div class="el-selector icon icon-tel">
+	      <div class="el-selector icon icon-idCardType">
 		      <selector :title="userInfo.idCardType.title" direction="left" :options="userInfo.idCardType.list" v-model="userInfo.idCardType.value"></selector>	    	
 	      </div>
 	    	<x-input type="tel" v-model="userInfo.idCard.value" :placeholder="userInfo.idCard.placeholder" required>
@@ -57,7 +57,7 @@
     	<x-input v-model="userInfo.name.value" :placeholder="userInfo.name.placeholder" readonly required>
       	<label slot="label" class="label icon icon-user">{{ userInfo.name.title }}</label>
       </x-input>
-      <div class="el-selector icon icon-tel">
+      <div class="el-selector icon icon-idCardType">
 	      <selector :title="userInfo.idCardType.title" direction="left" :options="userInfo.idCardType.list" readonly v-model="userInfo.idCardType.value"></selector>	    	
       </div>
     	<x-input type="tel" v-model="userInfo.idCard.value" :placeholder="userInfo.idCard.placeholder" readonly required>
@@ -76,7 +76,7 @@
       	<label slot="label" class="label icon icon-user">{{ item.name.title }}</label>
 				<div slot="right" @click="remove(index)" class="add-btn-click fa fa-minus delete"></div>
       </x-input>
-      <div class="el-selector icon icon-tel">
+      <div class="el-selector icon icon-idCardType">
 	      <selector :title="item.idCardType.title" direction="left" :options="item.idCardType.list" v-model="item.idCardType.value"></selector>	    	
       </div>
     	<x-input type="tel" v-model="item.idCard.value" :placeholder="item.idCard.placeholder" required>

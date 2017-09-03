@@ -10,7 +10,7 @@
           <swipeout-button @click.native="deleteCart(item, index)" type="warn">删除</swipeout-button>
         </div>
 
-        <imgTextCart slot="content" :ref="'imgText'+index" :img-text-data="item"  @on-check="onCheck"></imgTextCart>
+        <imgTextCart slot="content" :ref="'imgText'+index" v-show="item.show" @on-number-change="onNumberChange" :img-text-data="item" :img-text-index="index" @on-check="onCheck"></imgTextCart>
       </swipeout-item>
     </swipeout>
 		
@@ -86,7 +86,8 @@
 									num: item.shop_count,
 									code: item.code,
 									check: true,
-									hasCheck: true
+									hasCheck: true,
+									show: true
 								}
 							})
 
@@ -96,17 +97,25 @@
 			},
 			deleteCart (obj, ind = -1) {
 				let _this = this;
-				if(ind > -1) {
-					_this.cartDatas.splice(ind, 1);;
+				if(ind > -1 && !_this.$store.state.loadbar.isLoading) {
+					_this.$store.commit('updateLoadingStatus', {isLoading: true});
+					_this.$http.post('/wechat/shop/delCart',
+						{
+							userCode: _this.$store.state.user.userCode,
+							productCode: obj.code
+						}).then(function(e) {
+							_this.$store.commit('updateLoadingStatus', {isLoading: false});	
+							if(e.data.errcode == 1) {
+								_this.cartDatas[ind].show = false;
+								_this.$store.commit("updateCartNum", { num: _this.$store.state.cart.num - obj.num });
+								_this.onNumberChange();
+							} else {
+								_this.$vux.alert.show({
+									content: e.data.errmsg
+								})
+							}
+					});
 				}
-				_this.$store.commit("updateCartNum", { num: _this.$store.state.cart.num - obj.num });
-	
-				_this.$http.post('/wechat/shop/delCart',
-					{
-						userCode: _this.$store.state.user.userCode,
-						productCode: obj.code
-					}).then(function(e) {
-				});
 			},
 			deleteAll () {
 				let _this = this;
@@ -119,6 +128,7 @@
 			  			_this.$store.commit("updateCartNum", { num: 0 });
 					});
 				}
+				_this.onNumberChange();
 			},
 			selectAll (ind) {
 				let _this = this;
@@ -126,6 +136,7 @@
 				_this.cartDatas.map(function(item, index){
 					item.check = _this.checkedAll;
 				})
+				_this.onNumberChange();
 			},
 			submitOrder () {
 				let _this = this,
@@ -177,7 +188,8 @@
 	    	}
 			},
 			onCheck (val) {
-				let data;
+				let _this = this,
+						data;
 				if (val) {
 					data = this.cartDatas.every(function(elem) {
 						return elem.check == !elem.check
@@ -186,6 +198,22 @@
 				} else {
 					this.checkAll = false
 				}
+				_this.onNumberChange();
+			},
+			onNumberChange (imgCart) {
+				let _this = this,
+						num = 0;
+				if(imgCart) {
+					_this.cartDatas[imgCart.ind].num = imgCart.num;				
+				}
+				_this.cartDatas.map(function(item, index){
+					let obj = _this.$refs['imgText' + index][0];
+					if(obj.imgTextData.check && item.show) {
+						num += obj.cartNum * obj.imgTextData.price;
+					}
+					// num += item.
+				})
+				_this.allMoney = num;
 			}
 		}
 	}

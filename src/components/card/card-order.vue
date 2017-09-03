@@ -36,7 +36,7 @@
 								</template> -->
 
 								<!-- 改签状态 -->
-								<template v-if="item.ticketType == '' || item.ticketType == 0">
+								<template v-if="(item.ticketType == '' || item.ticketType == 0) && item.num == 1">
 									<x-button class="btn" @click.native="ticketChange(item.commodityCode, item.lessonCode)" mini>改签</x-button>
 								</template>
 
@@ -172,21 +172,26 @@
 			},
 			deleteOrder (code, ind) {
 				let _this = this;
-				_this.$http.post('/wechat/usercenter/deleteOrder',
-		  			{
-	  					"orderCode": code
-		  			}).then(function(e) {
-		  				if(e.data.errcode == 1) {
-								_this.cardData.splice(ind, 1);
-								_this.$vux.toast.show({
-									text: "删除成功"
-								})
-		  				} else {
-		  					_this.$vux.alert.show({
-		  						content: e.data.errmsg
-		  					})
-		  				}
-		  		});
+				_this.$vux.confirm.show({
+					content: "确认取消订单？",
+					onConfirm () {
+						_this.$http.post('/wechat/usercenter/deleteOrder',
+			  			{
+		  					"orderCode": code
+			  			}).then(function(e) {
+			  				if(e.data.errcode == 1) {
+									_this.cardData.splice(ind, 1);
+									_this.$vux.toast.show({
+										text: "删除成功"
+									})
+			  				} else {
+			  					_this.$vux.alert.show({
+			  						content: e.data.errmsg
+			  					})
+			  				}
+			  		});		
+					}
+				})
 			},
 			ticketChange (commodityCode, lessonCode) {
 				// 改签

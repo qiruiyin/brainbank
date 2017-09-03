@@ -3,20 +3,20 @@
 		<group>
       <!-- <x-input :title="name.title" v-model="name.value" :placeholder="name.placeholder"></x-input> -->
       <x-input v-model="bangding.name.value" @on-change="nameTestNum" :placeholder="bangding.name.placeholder">
-      	<label slot="label" class="label icon icon-tel">{{ bangding.name.title }}</label>
+      	<label slot="label" class="label icon icon-user">{{ bangding.name.title }}</label>
       </x-input>
-      <div class="el-selector icon icon-tel">
+      <div class="el-selector icon icon-idCardType">
 	      <selector :title="bangding.idCardType.title" :options="bangding.idCardType.list" v-model="bangding.idCardType.value"></selector>	    	
       </div>
       <x-input v-model="bangding.idCard.value" :placeholder="bangding.idCard.placeholder">
-      	<label slot="label" class="label icon icon-tel">{{ bangding.idCard.title }}</label>
+      	<label slot="label" class="label icon icon-idCard">{{ bangding.idCard.title }}</label>
       </x-input>
       <x-input type="tel" :title="bangding.tel.title" v-model="bangding.tel.value" :placeholder="bangding.tel.placeholder" class="weui-vcode">
       	<label slot="label" class="label icon icon-tel">{{ bangding.tel.title }}</label>
         <el-verification-code :tel="bangding.tel.value" code-type="bangding" slot="right"></el-verification-code>
       </x-input>
       <x-input type="tel" :title="bangding.code.title" v-model="bangding.code.value" :placeholder="bangding.code.placeholder">
-      	<label slot="label" class="label icon icon-tel">{{ bangding.code.title }}</label>
+      	<label slot="label" class="label icon icon-qrcode">{{ bangding.code.title }}</label>
       </x-input>
     </group>
 		

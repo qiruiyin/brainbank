@@ -7,12 +7,14 @@
 		<scroller class="scroller" lock-x :height="-offsetBottom + 'px'" @done-pulldown="donePulldown" @on-pulldown-loading="onPulldownLoading" @on-pullup-loading="onPullupLoading" ref="scrollerBottom" :scroll-bottom-offst="200" :use-pulldown="true" :use-pullup="true" :pulldown-config="pulldownConfig" :pullup-config="pullupConfig">
 			<div id="msg-box">		
 				<el-msg-info-block :info-data="item" v-for="(item, index) in list" :key="index"></el-msg-info-block>
+				<div v-if="list.length == 0" class="none-data">暂无数据</div>
 			</div>
 		</scroller>
 
-		<div class="msg-send" v-if="msgInfo.msgType == 3">
+		<!-- <div class="msg-send" v-if="msgInfo.msgType == 3"> -->
+		<div class="msg-send">
       <group label-width="4em" label-margin-right="2em" label-align="right">
-	      <x-input placeholder="发送消息" v-model="msgSendValue">
+	      <x-input @on-focus="sendFocus" @on-blur="sendBlur" placeholder="发送消息" v-model="msgSendValue">
 	      	<x-button v-if="sendBtn.status" @click.native="submitMsg" type="primary" class="send" slot="right" mini>{{ sendBtn.sendStatus ? '发送中' : '发送' }}</x-button>
 	      	<x-button v-else type="primary" class="send" slot="right" mini disabled>{{ sendBtn.sendStatus ? '发送中' : '发送' }}</x-button>
 	      </x-input>
@@ -24,6 +26,8 @@
 <script type="text/babel">
 	import { Scroller, LoadMore, TransferDom, Popup, XInput, XButton, Group } from 'vux'
 	import elMsgInfoBlock from "components/msg/msg-info-block"
+	
+	let bfscrolltop = document.body.scrollTop;//获取软键盘唤起前浏览器滚动部分的高度
 
 	export default {
 		name: "msgDetail",
@@ -67,7 +71,8 @@
 					value: "default",
 					sendStatus: false // 是否在调用接口
 				},
-				list: []
+				list: [],
+				intervalInput: '' // 定时器处理
 			}
 		},
 		watch: {
@@ -85,6 +90,15 @@
 			this.fetchData();
 		},
 		methods: {
+			sendFocus () {
+				this.intervalInput = setInterval(function(){//设置一个计时器，时间设置与软键盘弹出所需时间相近
+	        document.body.scrollTop = document.body.scrollHeight;//获取焦点后将浏览器内所有内容高度赋给浏览器滚动部分高度
+	      },100)
+			},
+			sendBlur () {
+				clearInterval(this.intervalInput);//清除计时器
+	      document.body.scrollTop = bfscrolltop;将软键盘唤起前的浏览器滚动部分高度重新赋给改变后的高度
+			},
 			fetchData () {
 				let _this = this;
 						// _this.resetView();
@@ -302,11 +316,18 @@
 	@import '~lib/sandal/core';
 	@import '~assets/css/core/functions', '~assets/css/core/mixins', '~assets/css/core/vars';
 
+	$elMsgInfoBlockImgW: 50px;
+	$elMsgInfoBlockAngleW: 10px;
+	$elMsgInfoBlockColor: #a2e759;
+
+	$elMsgPaddingTop: 15px;
+
 	.msg-detail {
 		position: absolute;
 		width: 100%;
 		height: 100%;
 		background: $bgGray;
+		text-align: center;
 	}
 
 	.msg-send {
@@ -314,5 +335,17 @@
 		bottom: 0;
 		left: 0;
 		width: 100%;
+	}
+
+	.none-data {
+		line-height: 20px;
+		padding: 0 .5em;
+		margin: 0 auto;
+		margin-top: $elMsgPaddingTop;
+		font-size: 12px;
+		color: #fff;
+		background: $colorGrayDisabled;
+		border-radius: $borderRadius;
+		display: inline-block;
 	}
 </style>

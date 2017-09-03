@@ -5,7 +5,7 @@
 <template>
 	<x-button class="verification-code" slot="right" type="primary" @click.native="getCode" :disabled="status" mini v-cloak>
 		<template v-if="status">
-			<countdown v-model="num" @on-finish="finish"></countdown>s后可再次发送
+			<countdown v-model="num" @on-finish="finish"></countdown>s
 		</template>
 		<template v-else>{{ msg }}</template>
 	</x-button>
@@ -42,12 +42,12 @@
 					_this.$http.post(url, {
 							"mobile": _this.tel
 						}).then(function(e) {
-							if(e.data.data.tag == 0) {
-								_this.$vux.toast.show({
-				          text: e.data.data.msg,
-				          type: "warn",
-				        })
-							}
+							// if(e.data.data.tag == 0) {
+							// 	_this.$vux.toast.show({
+				   //        text: e.data.data.msg,
+				   //        type: "warn",
+				   //      })
+							// }
 					});
 				} else {
 					_this.$vux.toast.show({

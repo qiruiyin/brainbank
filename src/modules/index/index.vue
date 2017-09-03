@@ -29,8 +29,13 @@
 				<el-tuijian @play-change="playChange" :tuijian-status="playAudioInfo.index" tuijian-link="audio" :tuijian-data="tuijianAudioDatas.list">
 					<div class="play">
 						<div class="play-audio">
-							<audio :src="item.src" @ended="audioEnded" controls="controls" preload hidden :class="'play-audio-' + index" class="play-audio-btn" v-for="(item, index) in tuijianAudioDatas.list" :key="index">
-							</audio>	
+							<!-- <audio :src="item.src" @ended="audioEnded" controls="controls" preload hidden :class="'play-audio-' + index" class="play-audio-btn" v-for="(item, index) in tuijianAudioDatas.list" :key="index">
+							</audio> -->
+							<audio @ended="audioEnded" controls="controls" preload="auto" hidden :class="'play-audio-' + index" class="play-audio-btn" v-for="(item, index) in tuijianAudioDatas.list" :key="index">
+							  <source :src="item.src" type="audio/mpeg" />
+							  <source :src="item.src" type="audio/mp3" />
+							  <embed :src="item.src" type="audio/mp3" />
+							</audio>
 						</div>
 						<div :class="['play-img', {'active': playStatus}]" @click="play('start')"></div>
 						<p>苏引华</p>

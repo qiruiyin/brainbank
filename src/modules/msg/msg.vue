@@ -159,7 +159,8 @@
 							}
 
 							if(pageSize == 1) {
-								_this.pengyou.oldTime = list[0].createTime;
+								if(list && list[0])
+									_this.pengyou.oldTime = list[0].createTime;
 								_this.pengyou.list = list;
 								_this.pengyou.pageSize = 2;
 								_this.pengyou.loadAll = false;
@@ -190,7 +191,7 @@
 				// status: true 到底部，false：保持当前
 				let _this = this;
 				_this.$nextTick(() => {
-				  _this.$refs.scrollerBottom.reset()
+				  _this.$refs.scrollerBottom && _this.$refs.scrollerBottom.reset()
 				})
 			},
 			onPulldownLoading () {

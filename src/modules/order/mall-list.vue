@@ -176,6 +176,8 @@
 				this.tabData[data.oldInd].pageSize = 1;
 				this.tabData[data.oldInd].onFetching = false;
 				this.tabData[data.oldInd].loadAll = false;
+				this.tabData[data.oldInd].list = [];
+				this.tabData[data.newInd].list = [];
 			}
 		}
 	}

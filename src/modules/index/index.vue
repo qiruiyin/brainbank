@@ -13,13 +13,14 @@
 			</div>
 			
 			<div class="entry">
-				<div v-for="item in entryDatas" :key="item.value" :class="['entry-' + item.value]" @click="entry(item.url, item.type)">
+				<div v-for="(item, index) in entryDatas" :key="index" :class="['entry-' + item.value]" @click="entry(item.url, item.type)">
 					<p>{{ item.name }}</p>
 				</div>
 			</div>
 
 			<div class="entry-videos uiBorderTop">
-				<div v-for="(item, index) in entryVideosDatas" :key="index" @click="goPage('courseTypeDetail', {type: 'video', code: item.code})">
+				<div v-for="(item, index) in entryVideosDatas" :style="{ backgroundImage: 'url(' + item.img + ')'
+				}" :key="index" @click="goPage('courseTypeDetail', {type: 'video', code: item.code})">
 					<img :src="item.img" alt="">
 					<p>{{ item.name }}</p>
 				</div>
@@ -212,7 +213,7 @@
 										price: item.price,
 										// priceUnit: '年',
 										// priceCurrency: '￥',
-										desc: item.description || '介绍',
+										desc: item.description,
 										label: '主讲', 
 										speaker: item.author || '苏引华',
 										subscribe: item.subCount,

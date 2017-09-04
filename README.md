@@ -143,3 +143,8 @@ For detailed explanation on how things work, checkout the [guide](http://vuejs-t
 	ios 键盘遮挡输入框
 
 		http://blog.csdn.net/github_37533433/article/details/66471962
+
+# vue bug
+
+	1、渲染出来的图片第一次点击会无效，第二次才可以
+		在暂时解决方案：将图片放到background上去

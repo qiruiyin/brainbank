@@ -56,6 +56,9 @@ $entry: 'video', 'audio', 'quotation', 'download';
 
 		& > div {
 			flex: 1;
+			background: no-repeat;
+			background-size: 90%;
+			background-position: center top;
 
 			p {
 				margin-top: 6px;
@@ -68,5 +71,6 @@ $entry: 'video', 'audio', 'quotation', 'download';
 		  width: 90%;
     	margin: 0 auto;
     	border-radius: 10px;
+    	visibility: hidden;
 		}
 	}

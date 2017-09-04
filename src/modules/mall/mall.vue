@@ -16,12 +16,14 @@
 			<!-- 经典推荐(图片) -->
 			<div class="tuijian-img">
 				<div class="tuijian-img-left">
-					<a v-for="(item, index) in tuijianImgLeft" :href="item.url" :key="index">
+					<a v-for="(item, index) in tuijianImgLeft" :style="{ backgroundImage: 'url(' + item.img + ')'
+				}" :href="item.url" :key="index">
 						<img :src="item.img" alt="">
 					</a>
 				</div>
 				<div class="tuijian-img-right">
-					<a v-for="(item, index) in tuijianImgRight" :href="item.url" :key="index">
+					<a v-for="(item, index) in tuijianImgRight" :style="{ backgroundImage: 'url(' + item.img + ')'
+				}" :href="item.url" :key="index">
 						<img :src="item.img" alt="">
 					</a>
 				</div>
@@ -43,7 +45,7 @@
 	import elCartFrame from 'components/cart/cart-frame'
 	import elSearch from 'components/search/search'
 	
-	import { getterIndex } from 'services/index';
+	// import { getterIndex } from 'services/index';
 
 	// import imgGoods from 'assets/img/book01.png'
 	// import imgBig from 'assets/img/mall/big.jpg'
@@ -161,8 +163,9 @@
 		
 		a {
 			width: 100%;
-			padding-right: 5px;
 			display: block;
+			background-size: 100%;
+			border-radius: 5px;
 		}
 
 		img {
@@ -172,17 +175,17 @@
 
 	.tuijian-img-left, .tuijian-img-right {
 		flex: 1;
+		padding-right: 5px;
 
 		img {
 			width: 100%;
+			visibility: hidden;
 		}
 	}
 
 	.tuijian-img-right {
-		a {
-			padding-right: 0;
-			padding-left: 5px;
-		}
+		padding-right: 0;
+		padding-left: 5px;
 
 		a:last-child {
 			img {

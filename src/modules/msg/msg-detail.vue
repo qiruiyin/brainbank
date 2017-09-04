@@ -267,7 +267,8 @@
 
 							_this.resetView(true);
 							_this.$vux.toast.show({
-								text: "发送成功"
+								text: "发送成功",
+								time: 1000
 							});
 						} else {
 							_this.$vux.toast.show({

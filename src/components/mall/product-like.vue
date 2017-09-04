@@ -3,8 +3,8 @@
  -->
 
 <template>
-	<div @click="goPage(mallProductData.code)" class="mall-product" v-cloak>
-		<img :src="mallProductData.img" alt="">
+	<div @click="goPage(mallProductData.code)" class="mall-product" :style="styleObject" v-cloak>
+		<!-- <img :src="mallProductData.img" alt=""> -->
 		<h5>{{ mallProductData.name }}</h5>
 		<!-- <p>{{ mallProductData.desc }}</p> -->
 		<div class="price">￥{{ mallProductData.price }}</div>
@@ -27,8 +27,16 @@
 				}
 			}
 		},
+		computed: {
+			styleObject () {
+				return {
+					backgroundImage: 'url(' + this.mallProductData.img + ')'
+				}
+			}
+		},
 		methods: {
 			goPage(code) {
+				// this.$store.commit('updateLoadingStatus', {isLoading: true});
 				this.$router.push({name: 'mallDetail', query: { goodsCode: code }})
 			}
 		}
@@ -45,10 +53,13 @@
 	.mall-product {
 		float: left;
 		width: 50%;
+		padding-top: 188px;
 		border-bottom: $mallProductBorder solid $bgGray;
 		line-height: 1;
 		text-align: left;
-		background: #fff;
+		background: #fff no-repeat;
+		background-size: 150px 168px;
+		background-position: center 10px;
 
 		&:nth-child(odd) {
 			border-right: $mallProductBorder/2 solid $bgGray;

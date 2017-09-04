@@ -15,7 +15,7 @@
       	<label slot="label" class="label icon icon-tel">{{ bangding.tel.title }}</label>
         <el-verification-code :tel="bangding.tel.value" code-type="bangding" slot="right"></el-verification-code>
       </x-input>
-      <x-input type="tel" :title="bangding.code.title" v-model="bangding.code.value" :placeholder="bangding.code.placeholder">
+      <x-input type="tel" :max="6" :title="bangding.code.title" v-model="bangding.code.value" :placeholder="bangding.code.placeholder">
       	<label slot="label" class="label icon icon-qrcode">{{ bangding.code.title }}</label>
       </x-input>
     </group>
@@ -124,7 +124,7 @@
 				        })
 							} else if (responseData.data.status == 1) {
 			  				_this.$store.commit('updateUserOpenId', {openId: hold.storage.get("openId")});
-								hold.storage.set("userCode", responseData.data.userCode);
+								// hold.storage.set("userCode", responseData.data.userCode);
 			  				_this.$store.commit('updateUserUserCode', {userCode: responseData.data.userCode});
 
 			  				_this.$vux.alert.show({

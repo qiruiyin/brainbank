@@ -17,7 +17,7 @@
       	<label slot="label" class="label icon icon-tel">{{ tel.title }}</label>
         <el-verification-code :tel="tel.value" code-type="baoming" slot="right"></el-verification-code>
       </x-input>
-      <x-input type="tel" :title="code.title" v-model="code.value" :placeholder="code.placeholder" required>
+      <x-input type="tel" :max="6" :title="code.title" v-model="code.value" :placeholder="code.placeholder" required>
       	<label slot="label" class="label icon icon-qrcode">{{ code.title }}</label>
       </x-input>
     </group>

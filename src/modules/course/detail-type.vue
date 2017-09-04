@@ -13,7 +13,7 @@
 	        <tab-item :selected="tabSelected == index" v-for="(item, index) in tabDatas" @click="tabSelected = index" :key="index">{{ item.title }}</tab-item>
 	      </tab>
 	      <div class="list">
-	      	<template  v-if="tabSelected == 0">
+	      	<div v-show="tabSelected == 0">
 	        	<template v-if="courseInfo.type == 'video' || courseInfo.type == 'course'">        		
 							<!-- <el-video :video-src="course.fileUrl"></el-video> -->
 							<div :class="['video', { 'hidden': !videoHidden }]">							
@@ -42,15 +42,15 @@
 							</div>
 						</div>
 						<el-reward-list :reward-code="courseInfo.code"></el-reward-list>
-	      	</template>
+	      	</div>
 	        
-	        <template v-if="tabSelected == 1">	        	
+	        <div v-show="tabSelected == 1">	        	
 						<el-comment :is-comment="hasBuy" :comment-code="courseInfo.code"></el-comment>
-	        </template>
+	        </div>
 
-	        <template v-if="tabSelected == 2">
+	        <div v-show="tabSelected == 2">
 	        	<el-img-text-rank v-for="(item, ind) in relateData" :img-text-data="item" :img-text-btn="relateDataBtn" :key="ind"></el-img-text-rank>
-	        </template>
+	        </div>
 	      </div>
 	    </div>
 		</div>

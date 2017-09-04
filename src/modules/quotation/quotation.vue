@@ -201,15 +201,12 @@
 						_this.commentShow = false;
 
 						if(responseData.tag == 1) {
-							_this.$vux.toast.show({
-								text: "评论成功",
-								onHide () {
-									// _this.$router.go(0)
-								}
+							_this.$vux.alert.show({
+								content: "评论成功，审核后可见"
 							});
 						} else {
-							_this.$vux.toast.show({
-								text: e.data.errmsg
+							_this.$vux.alert.show({
+								content: e.data.errmsg
 							});
 						}
 					})

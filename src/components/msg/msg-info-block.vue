@@ -106,6 +106,7 @@
 
 		p {
 			position: relative;
+			float: left;
 			padding: $padding;
 			margin-top: 4px;
 			background: #fff;
@@ -128,6 +129,7 @@
 		}
 		
 		& > div {
+			float: left;
 			width: 100%;
 			text-align: center;
 		}

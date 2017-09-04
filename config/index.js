@@ -32,6 +32,7 @@ module.exports = {
             // target: 'http://192.168.1.151:8080/wechat/',
             // target: 'http://glyh.qibeisoft.com/wechat',
             target: 'http://m.yoao.com/wechat',
+            // target: 'http://114.215.135.236:8090/qxpx/wechat',
             // target: 'http://192.168.1.154:8080/wechat/',
             // target: 'http://192.168.1.174:8080/csm/wechat/',
             // target: 'http://192.168.1.199:81/wechat/',
@@ -41,17 +42,17 @@ module.exports = {
               '^/wechat': ''
             }
         },
-        // '/system': {
+        // '/wechat': {
         //     // target: 'http://192.168.1.151:8080/wechat/',
         //     // target: 'http://glyh.qibeisoft.com/wechat',
-        //     target: 'http://m.yoao.com/system',
+        //     target: 'http://114.215.135.236:8090/qxpx/wechat',
         //     // target: 'http://192.168.1.158:8080/csm/wechat/',
         //     // target: 'http://192.168.1.174:8080/csm/wechat/',
         //     // target: 'http://192.168.1.199:81/wechat/',
         //     changeOrigin: true,
         //     secure: false, // 接受 运行在 https 上的服务
         //     pathRewrite: {
-        //       '^/system': ''
+        //       '^/wechat': ''
         //     }
         // },
         // '/weixin': {

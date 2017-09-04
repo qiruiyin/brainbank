@@ -8,22 +8,21 @@
 			<img class="user-img" src="~assets/img/user.png" alt="">
 			<div class="block">
 				<div class="block-header">
-					<div class="block-title">{{ quotationData.title }}</div>
-					<div class="block-header-content" v-html="quotationTransContent(quotationData.content)"></div>
-						<div v-if="quotationData.img.length > 0" :class="['block-img', {'block-img-2': quotationData.img.length == 2 || quotationData.img.length == 4, 'block-img-3': quotationData.img.length == 3 || quotationData.img.length > 4}]">
-							<template v-if="quotationData.img.length == 1">
-								<div class="img" v-for="(imgItem, imgIndex) in quotationData.img" @click="show(imgIndex)" :key="imgItem">
-									<img :src="imgItem.src" alt="">
-								</div>
-							</template>
-							<template v-else>
-								<div class="img" v-for="(imgItem, imgIndex) in quotationData.img" :style="imgItem.style" @click="show(imgIndex)" :key="imgItem">
-								</div>
-							</template>
-							<div v-transfer-dom>
-					      <previewer :list="quotationData.img" ref="previewer"></previewer>
-					    </div>
-						</div>
+					<p class="block-title">{{ quotationData.title }}</p>
+					<p class="block-header-content" v-html="quotationTransContent(quotationData.content)"></p>
+					<div v-if="quotationData.img.length > 0" :class="['block-img', {'block-img-2': quotationData.img.length == 2 || quotationData.img.length == 4, 'block-img-3': quotationData.img.length == 3 || quotationData.img.length > 4}]">
+						<template v-if="quotationData.img.length == 1">
+							<div class="img" v-for="(imgItem, imgIndex) in quotationData.img" @click="show(imgIndex)" :key="imgItem">
+								<img :src="imgItem.src" alt="">
+							</div>
+						</template>
+						<template v-else>
+							<div class="img" v-for="(imgItem, imgIndex) in quotationData.img" :style="imgItem.style" @click="show(imgIndex)" :key="imgItem">
+							</div>
+						</template>
+						<div v-transfer-dom>
+				      <previewer :list="quotationData.img" ref="previewer"></previewer>
+				    </div>
 					</div>
 
 					<div class="block-header-footer">
@@ -229,6 +228,7 @@
 	.block {
 		flex: 1;
 		padding-left: $padding/2;
+		user-select: initial;
 	}
 
 	.block-header {

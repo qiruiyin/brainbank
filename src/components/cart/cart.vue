@@ -90,7 +90,7 @@
 				if(!this.isLogin()) return false;
 				let _this = this,
 						allMoney = (_this.productInfo.price * _this.productInfo.num).toFixed(2);
-				return 
+
 				if(!_this.$store.state.loadbar.isLoading) {
 					_this.$store.commit('updateLoadingStatus', {isLoading: true});	
 					this.$http.post('/wechat/order/create',

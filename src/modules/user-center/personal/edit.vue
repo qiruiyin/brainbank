@@ -18,7 +18,7 @@
 				<el-verification-code :tel="phone.value" code-type="xiugai" slot="right"></el-verification-code>
 			</x-input>
 			
-			<x-input type="tel" :title="qrcode.title" :placeholder="qrcode.placeholder" v-model="qrcode.value">
+			<x-input type="tel" :max="6" :title="qrcode.title" :placeholder="qrcode.placeholder" v-model="qrcode.value">
   			<label slot="label" class="label icon icon-qrcode">{{ qrcode.title }}</label>
   		</x-input>
 			

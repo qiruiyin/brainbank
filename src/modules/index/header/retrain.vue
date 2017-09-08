@@ -97,9 +97,10 @@
 			getServiceUser () {
 				let _this = this;
 				if(_this.$store.state.user.userCode) {
-					_this.$http.post('/wechat/course/contactServiceUser',
+					_this.$http.post('/wechat/usercenter/customerService',
 						{
-							customerCode: _this.$store.state.user.userCode
+							"openId": _this.$store.state.user.openId,
+							"customerCode": _this.$store.state.user.userCode
 						}).then(function(e) {
 							if(e.data.errcode == 1) {
 								let responseData = e.data.data,

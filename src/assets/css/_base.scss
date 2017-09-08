@@ -90,6 +90,10 @@ input[type="button"], input[type="submit"], input[type="reset"], input[type="fil
 	height: 100% !important;
 }
 
+.xs-container {
+	user-select: initial;
+}
+
 // 设计间距
 .uiBorderTop {
 	border-top: $uiMarginH solid $uiMarginBg !important;

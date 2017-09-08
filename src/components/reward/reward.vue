@@ -173,7 +173,7 @@
 			       		if(res.err_msg == "get_brand_wcpay_request:ok" ) {
 									_this.reward.status = false;
 									_this.$vux.alert.show({
-										content: "感谢大神支持！"
+										content: "感谢您的支持！"
 									})
 			          } else if(res.err_msg == "get_brand_wcpay_request:cancel" ) {
 									this.reward.status = false;

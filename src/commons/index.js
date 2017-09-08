@@ -48,8 +48,8 @@ Vue.prototype.nameTestNum = (data) => {
 
 // 获取用户信息
 Vue.prototype.getUserInfo = (openId, userCode = "", url = "") => {
-	// hold.storage.set("openId", openId);
-	// hold.storage.set("userCode", userCode);
+	hold.storage.set("openId", openId);
+	hold.storage.set("userCode", userCode);
 	store.commit("updateUserUserCode", { userCode: userCode });
 	store.commit("updateUserOpenId", { openId: openId });
 

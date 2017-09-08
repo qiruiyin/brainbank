@@ -22,40 +22,27 @@
 	      </tab>
 	      
 	      <template v-if="tabSelected == 0">
-          <div @click="goMsg(item.openId, item.name)" class="integral-man" v-for="(item, ind) in tabContentDatas.type1" :key="ind">
+          <div @click="goMsg(item)" class="integral-man" v-for="(item, ind) in tabContentDatas.type1" :key="ind">
 						<img :src="item.img">
 						<div class="title">
 							<p>{{ item.name }}</p>
 							<span>{{ tabDatas[0].tip }}：{{ item.date }}</span>
 						</div>
-						<div class="info"></div>
+						<div v-if="item.show" class="info"></div>
 						<!-- <div class="info fa fa-envelope-o"></div> -->
 					</div>
 	      </template>
 
 	      <template v-else>
-          <div @click="goMsg(item.openId, item.name)" class="integral-man" v-for="(item, ind) in tabContentDatas.type2" :key="ind">
+          <div @click="goMsg(item)" class="integral-man" v-for="(item, ind) in tabContentDatas.type2" :key="ind">
 						<img :src="item.img">
 						<div class="title">
 							<p>{{ item.name }}</p>
 							<span>{{ tabDatas[1].tip }}：{{ item.date }}</span>
 						</div>
-						<div class="info"></div>
-						<!-- <div class="info fa fa-envelope-o"></div> -->
+						<div v-if="item.show" class="info"></div>
 					</div>
 	      </template>
-	      <!-- <swiper class="list" height="500px" v-model="tabSelected" :show-dots="false" :threshold="tabChangeW">
-	        <swiper-item v-for="(tabContentDatasData, index) in tabDatas" :key="index">
-	          <div @click="goMsg(item.openId, item.name)" class="integral-man" v-for="(item, ind) in tabContentDatas[tabContentDatasData.value]" :key="ind">
-							<img :src="item.img">
-							<div class="title">
-								<p>{{ item.name }}</p>
-								<span>{{ tabContentDatasData.tip }}：{{ item.date }}</span>
-							</div>
-							<div class="info fa fa-envelope-o"></div>
-						</div>
-	        </swiper-item>
-	      </swiper> -->
 	    </div>
 		</div>
 	</div>
@@ -77,13 +64,13 @@
 					{
 						value: 'type1',
 						title: '已邀请普通学员',
-						num: '',
+						num: 0,
 						tip: "关注时间",
 						list: []
 					},{
 						value: 'type2',
 						title: '已报名总裁商业思维',
-						num: '',
+						num: 0,
 						tip: "报名时间",
 						list: []
 					}
@@ -107,14 +94,15 @@
 							"openId": _this.$store.state.user.openId,
 						}
 					).then(function(e) {
-						let responseData = e.data.data.result;
+						if(e.data.errcode == 1) {
+							let responseData = e.data.data.result;
+							_this.integral = responseData.integralInfo;
+							_this.tabDatas[0].num = responseData.type1;
+							_this.tabDatas[1].num = responseData.type2;
 
-						_this.integral = responseData.integralInfo;
-						_this.tabDatas[0].num = responseData.type1;
-						_this.tabDatas[1].num = responseData.type2;
-
-						_this.transData(responseData.list1, 'type1');
-						_this.transData(responseData.list2, 'type2');
+							_this.transData(responseData.list1, 'type1');
+							_this.transData(responseData.list2, 'type2');		
+						}
 					}
 				);
 			},
@@ -123,20 +111,22 @@
 						arr = [];
 				if(data) {
 					data.map(function(item, index){
+					console.log(_this.$store.state.user.userCode)
 						arr[index] = {
 							id: item.id,
 							code: item.code,
 							name: item.name,
 							img: _this.resolveImg(item.header),
 							date: item.create_time,
-							openId: item.openid
+							openId: item.openid,
+							show: _this.$store.state.user.userCode == "" ? false : true
 						}
 					});
 				}
 				_this.tabContentDatas[name] = arr;
 			},
-			goMsg (sendOpenId, name) {
-				this.$router.push({ name: 'msgDetail', query: { sendUser: sendOpenId, msgType: '3' }})
+			goMsg (data) {
+				if(data.show) this.$router.push({ name: 'msgDetail', query: { sendUser: data.openId, msgType: '3' }})
 			},
 			goPage (url) {
 				this.$router.push({ name: url })

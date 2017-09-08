@@ -32,6 +32,10 @@ Vue.use(AlertPlugin)
 import { WechatPlugin } from 'vux'
 Vue.use(WechatPlugin)
 
+// touch事件
+let VueTouch = require('vue-touch')
+Vue.use(VueTouch, {name: 'v-touch'})
+
 // Vue.http.defaults.timeout = 10000;                        //响应时间
 Vue.http.defaults.headers.post['Content-Type'] = 'application/raw';           //配置请求头
 // Vue.http.defaults.baseURL = '';
@@ -39,6 +43,7 @@ Vue.http.defaults.headers.post['Content-Type'] = 'application/raw';           //
 // 清楚缓存
 // window.localStorage.clear()
 // 未绑定 oOVVes5satnTP4JW2Wsb_iJwMv6Q 
+// window.localStorage.setItem("openId", "oOVVesxggAc3RBs5XTU0Uf7jIazw");
 // window.localStorage.setItem("openId", "oOVVesysUeX_boQa7NMt5eci7OgU");
 // window.localStorage.setItem("openId", "oOVVes5satnTP4JW2Wsb_iJwMv6Q");
 // window.localStorage.setItem("openId", "oOVVes2YmKf-O6ChTa5CrOAELfnU");
@@ -62,9 +67,6 @@ Vue.http.defaults.headers.post['Content-Type'] = 'application/raw';           //
 // window.localStorage.setItem("userCode", "20170718220214960433651736252496");
 // james 
 // window.localStorage.setItem("userCode", "201707281605164831276233257855888");
-// // // 自己
-// window.localStorage.setItem("openId", "oOVVesxAHQ4C78mSV8FmQTDUpjPQ");
-// window.localStorage.setItem("userCode", "20170718161939537457373403958833");
 
 // // frank
 // window.localStorage.setItem("openId", "oOVVesy6LW3Vp5YGDRzkFi9HUzIc");

@@ -15,17 +15,19 @@
 	      <div class="list">
 	      	<div v-show="tabSelected == 0">
 	        	<template v-if="courseInfo.type == 'video' || courseInfo.type == 'course'">        		
-							<!-- <el-video :video-src="course.fileUrl"></el-video> -->
-							<div :class="['video', { 'hidden': !videoHidden }]">							
-			          <video @click="playVideo" id="video" :src="course.fileUrl" controls="controls" preload="auto" :poster="course.fileThumb"></video>
+							<div :class="['video', { 'hidden': !videoHidden }]">
+								<el-video :video-data="course"></el-video>
+			          <!-- <video @click="playVideo" id="video" :src="course.fileUrl" controls="controls" preload="auto" :poster="course.fileThumb"></video> -->
 							</div>
 	        	</template>
 	        	<template v-if="courseInfo.type == 'audio'">        		
-		          <div class="audio-msg">
-		          	<img src="~assets/img/audio.png" alt="">
-		          	<audio :src="course.fileUrl" controls="controls" preload hidden class="play-audio"></audio>	
-		          	<div @click="playBtnClick" :class="['play-btn', {'active': playBtn.status }]"></div>
-		          </div>
+								<el-audio :audio-data="course"></el-audio>
+		          <!-- <div class="audio-msg"> -->
+		          	<!-- <img src="~assets/img/audio.png" alt=""> -->
+								<!-- <el-audio :audio-data="course"></el-audio> -->
+		          	<!-- <audio :src="course.fileUrl" controls="controls" preload hidden class="play-audio"></audio>	 -->
+		          	<!-- <div @click="playBtnClick" :class="['play-btn', {'active': playBtn.status }]"></div> -->
+		          <!-- </div> -->
 	        	</template>
 	          <div class="detail-header-msg">
 	          	<el-product-ad :product-code="courseInfo.code"></el-product-ad>
@@ -37,7 +39,7 @@
 										<div class="audio-detail-desc-footer" @click="toggleContent(false)">收起<span class="fa fa-angle-up"></span></div>
 									</div>
 								</div>
-								<p>讲师备课不易，给Ta点鼓励吧</p>
+								<p>赠人玫瑰，手有余香！<br />如果你学完以上内容有收获，欢迎打赏！</p>
 								<el-reward :reward-data="courseInfo"></el-reward>
 							</div>
 						</div>
@@ -66,6 +68,7 @@
 	import elRewardList from 'components/reward/reward-list'
 	import elProductAd from 'components/product-ad/product-ad'
 	import elVideo from 'components/video/video'
+	import elAudio from 'components/video/audio'
 
 	import imgPoster from 'assets/img/audio.png'
 
@@ -73,7 +76,7 @@
 		name: 'detail',
 		components: { 
 			XButton, Flexbox, FlexboxItem, Tab, TabItem, Swiper, SwiperItem, Sticky, 
-			elHeaderIndex, elImgTextRank, elComment, elReward, elRewardList, elProductAd, elVideo
+			elHeaderIndex, elImgTextRank, elComment, elReward, elRewardList, elProductAd, elVideo, elAudio
 		},
 		data () {
 			return {
@@ -87,6 +90,13 @@
 					code: this.$route.query.code,
 					name: "",
 					desc: ""
+				},
+				courseAudioData: {
+					label: '测',
+					audioStatus: false,
+					audioProgress: 0,
+					time: 100,
+					audio: ''
 				},
 				list: {
 					btn: '-1',
@@ -125,6 +135,7 @@
 					subscribe: 0,
 					desc: '',
 					fileUrl: '',
+					playauth: '',
 					fileThumb: ''
 				},
 				relateDataBtn: "-1",
@@ -158,6 +169,12 @@
 	  },
 		mounted () {
 			this.fetchData();
+			// let player = new qcVideo.Player("id_video_container", {
+		 //    "file_id": "1465197896261041838",
+		 //    "app_id": "125132611",
+		 //    "width": 640,
+		 //    "height": 480
+			// });
 		},
 		methods: {
 			listenVideo () {
@@ -224,10 +241,14 @@
 								percent: responseData.rank ? responseData.rank : 0,
 							};
 
-							_this.course.fileUrl = _this.resolveImg(responseData.file_url);
+							_this.course.fileUrl = responseData.aliyun_file;
 							_this.course.fileThumb = _this.resolveImg(responseData.file_thumb);
 							_this.courseInfo.desc = _this.resolveRichTextImg(responseData.CONTENT);
 							_this.courseInfo.name = responseData.name;
+
+							if(_this.courseInfo.type == 'audio') {
+								_this.courseAudioData.audio = responseData.aliyun_file;
+							}
 
 							relateData = e.data.data.recommend.map(function(item, index) {
 								return {
@@ -294,6 +315,7 @@
 <style lang="scss">
 	@import '~lib/sandal/core';
 	@import '~assets/css/core/functions', '~assets/css/core/mixins', '~assets/css/core/vars';
+	
 	.detail {
 		.detail-container {
 			.text {
@@ -321,7 +343,7 @@
 
 		.video, .audio-msg {
 			width: 100%;
-			height: 200px;
+			// height: 200px;
 			background: #333;
 
 			video {
@@ -354,6 +376,10 @@
 		.detail-header-msg-desc {
 			padding: $paddingTop 0;
 			text-align: center;
+
+			& > p {
+				line-height: 1.35;
+			}
 		}
 	}
 

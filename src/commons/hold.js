@@ -1,6 +1,8 @@
 // 只是关于本地缓存的处理
 
-let storage = window.localStorage;
+let localStorage = window.localStorage;
+let storage = window.localStorage; // 加上缓存
+// let storage = window.sessionStorage;
 
 const hold = {
 	session: {
@@ -15,6 +17,20 @@ const hold = {
 		},
 		set (item, value) {
 			return storage.setItem(item, value)
+		},
+		clear () {
+			storage.clear();
+		}
+	},
+	localStorage: {
+		get (item) {
+			return localStorage.getItem(item)
+		},
+		set (item, value) {
+			return localStorage.setItem(item, value)
+		},
+		clear () {
+			localStorage.clear();
 		}
 	}
 }

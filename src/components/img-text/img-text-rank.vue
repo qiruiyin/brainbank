@@ -116,7 +116,7 @@
 					}
 				}
 				
-				return 1
+				return 5
 			},
 			isClick () {
 				if(this.imgTextData.pay == 0) {

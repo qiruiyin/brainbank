@@ -362,8 +362,20 @@ const routes = [
 			title: '分享有奖'
 		}
 	},{
+		path: '/personal',
+		name: 'personal',
+		component:  loadView(loaded => {
+			require(['../modules/user-center/personal/personal.vue'], loaded)
+		}),
+		meta: {
+			title: '个人资料'
+		}
+	},{
 		path: '/personal-edit',
 		name: 'personalEdit',
+		query: {
+			key: "" // key是要修改的属性
+		},
 		component:  loadView(loaded => {
 			require(['../modules/user-center/personal/edit.vue'], loaded)
 		}),

@@ -11,20 +11,21 @@
 			</div>
 		</scroller>
 
-		<!-- <div class="msg-send" v-if="msgInfo.msgType == 3"> -->
-		<div class="msg-send">
-      <group label-width="4em" label-margin-right="2em" label-align="right">
-	      <x-input @on-focus="sendFocus" @on-blur="sendBlur" placeholder="发送消息" v-model="msgSendValue">
-	      	<x-button v-if="sendBtn.status" @click.native="submitMsg" type="primary" class="send" slot="right" mini>{{ sendBtn.sendStatus ? '发送中' : '发送' }}</x-button>
-	      	<x-button v-else type="primary" class="send" slot="right" mini disabled>{{ sendBtn.sendStatus ? '发送中' : '发送' }}</x-button>
-	      </x-input>
+    <div class="msg-send" v-if="msgInfo.msgType == 3">
+			<group class="msg-textarea" label-width="4em" label-margin-right="2em" label-align="right">
+	    	<x-textarea @on-focus="sendFocus" @on-blur="sendBlur" placeholder="发送消息" v-model="msgSendValue"></x-textarea>
 	    </group>
-    </div>
+
+	    <div class="msg-btn">
+	    	<x-button v-if="sendBtn.status" @click.native="submitMsg" type="primary" class="send" slot="right" mini>发送</x-button>
+      	<x-button v-else type="primary" class="send" slot="right" mini disabled>发送</x-button>
+	    </div>	
+		</div>
 	</div>
 </template>
 
 <script type="text/babel">
-	import { Scroller, LoadMore, TransferDom, Popup, XInput, XButton, Group } from 'vux'
+	import { Scroller, LoadMore, TransferDom, Popup, XInput, XTextarea, XButton, Group } from 'vux'
 	import elMsgInfoBlock from "components/msg/msg-info-block"
 	
 	let bfscrolltop = document.body.scrollTop;//获取软键盘唤起前浏览器滚动部分的高度
@@ -35,14 +36,14 @@
 	    TransferDom
 	  },
 		components: {
-			Scroller, LoadMore, Popup, XInput, XButton, Group, elMsgInfoBlock
+			Scroller, LoadMore, Popup, XInput, XTextarea, XButton, Group, elMsgInfoBlock
 		},
 		data () {
 			return {
 				title: "消息详情",
 				scrollH: 0, // 初始scroll高度
 				onFetching: false, // 是否在加载数据
-				offsetBottom: this.$route.query.msgType == 3 ? 70 : 0, // 距底部高度
+				offsetBottom: this.$route.query.msgType == 3 ? 100 : 0, // 距底部高度
 				pulldownConfig: {
 					content: '',
 					downContent: '',
@@ -125,7 +126,8 @@
 										img: _this.resolveImg(item.sendHeader),
 										content: item.content,
 										status: item.sendOpenId == _this.$store.state.user.openId ? "2" : "1",
-										time: item.time
+										time: item.time,
+										msgStatus: item.msg_status
 									}
 								});
 
@@ -242,9 +244,17 @@
 				let _this = this;
 
 				if(!_this.sendBtn.status) return false;
-				if(_this.sendBtn.sendStatus) return false;
-				_this.sendBtn.sendStatus = true;
-				
+
+				if(_this.msgSendValue == "") {
+					this.$vux.toast.show({
+						text: '输入不能为空'
+					})
+					return
+				}
+
+				if(_this.$store.state.loadbar.isLoading) return;
+
+				_this.$store.commit('updateLoadingStatus', {isLoading: true});
 				_this.$http.post('/wechat/message/sendUserMsg',
 					{
 						openId: _this.$store.state.user.openId,
@@ -254,8 +264,7 @@
 						_this.commentValue = "";
 						let responseData = e.data.data;
 						
-						_this.sendBtn.sendStatus = false;
-						_this.commentShow = false;
+						_this.$store.commit('updateLoadingStatus', {isLoading: false});
 
 						if(e.data.errcode == 1) {
 							_this.list.push({
@@ -294,15 +303,15 @@
 
 		.weui-cells {
 			margin-top: 0;
-			background-color: #fff;
+			background: transparent;
 
 			&:before {
-				border-top-color: $quotationSendBtnBorderTop;
+				// border-top-color: $quotationSendBtnBorderTop;
 			}
 		}
 
 		.weui-cell__bd {
-			@include halfpxline(0, $quotationSendBtnBorderBottom, 0 , 0, 1px, 0);
+			// @include halfpxline(0, $quotationSendBtnBorderBottom, 0 , 0, 1px, 0);
 			margin-right: $padding;
 		}
 
@@ -336,6 +345,7 @@
 		bottom: 0;
 		left: 0;
 		width: 100%;
+		background: $bgGray;
 	}
 
 	.none-data {
@@ -348,5 +358,19 @@
 		background: $colorGrayDisabled;
 		border-radius: $borderRadius;
 		display: inline-block;
+	}
+
+	.msg-send {
+		padding-right: 4em;
+	}
+
+	.msg-textarea {
+	}
+
+	.msg-btn {
+		position: absolute;
+		bottom: 12px;
+		right: 0;
+		width: 5em;
 	}
 </style>

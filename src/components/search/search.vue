@@ -32,7 +32,7 @@
 
 					<el-load-more :load-all="searchData.loadAll"></el-load-more>
 	    	</div>
-    		<div v-else>没有产品</div>
+    		<div class="none-data" v-else>没有产品</div>
 	    </scroller>
 
     </popup>
@@ -241,5 +241,11 @@
     		color: $fontColorGray;
     	}
     }
+	}
+
+
+	.none-data {
+		padding-top: 20px;
+		text-align: center;
 	}
 </style>

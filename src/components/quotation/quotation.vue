@@ -21,7 +21,7 @@
 							</div>
 						</template>
 						<div v-transfer-dom>
-				      <previewer :list="quotationData.img" ref="previewer"></previewer>
+				      <previewer :list="quotationData.img" ref="previewer" :options="quotationData.options"></previewer>
 				    </div>
 					</div>
 
@@ -94,6 +94,9 @@
 					title: '',
 					content: '',
 					img: [],
+					options: {
+						loop: false
+					},
 					time: '',
 					qulikes: 0,
 					comments: [
@@ -220,14 +223,14 @@
 	}
 
 	.user-img {
-		width: $quotationUserImgW;
-		height: $quotationUserImgW;
-		border-radius: $quotationUserImgW;
+		width: $quotationUserImgW + 3px;
+		height: $quotationUserImgW + 3px;
+		border-radius: $quotationUserImgW + 3px;
 	}
 
 	.block {
 		flex: 1;
-		padding-left: $padding/2;
+		padding-left: $padding/2 - 3px;
 		user-select: initial;
 	}
 

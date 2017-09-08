@@ -37,7 +37,12 @@
 	 				window.location.href = e.data.data.accessUrl
 	  		});
 	    } else {
-	    	_this.getUserCode(openId, {name: 'index'});
+	    	let beforeLoginUrl = JSON.parse(hold.localStorage.get('beforeLoginUrl'));
+	    	if(beforeLoginUrl) {
+	    		_this.getUserCode(openId, {name: beforeLoginUrl.name, query: beforeLoginUrl.query, params: beforeLoginUrl.params});
+	    	} else {
+		    	_this.getUserCode(openId, {name: 'index'});
+	    	}
 	    }
 		},
 		methods: {

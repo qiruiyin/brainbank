@@ -6,7 +6,8 @@
 		<el-header-index></el-header-index>
 
 		<div class="container">
-			<video class="top-video" :src="course.fileUrl" controls="controls" preload="auto" :poster="course.fileThumb"></video>
+			<!-- <video class="top-video" :src="course.fileUrl" controls="controls" preload="auto" :poster="course.fileThumb"></video> -->
+			<el-video :video-data="course"></el-video>
 			
 			<div class="tab">
 	      <tab v-model="tabSelected">
@@ -42,12 +43,13 @@
 	import elComment from 'components/comment/comment'
 	import elReward from 'components/reward/reward'
 	import elWitness from 'components/witness/witness'
+	import elVideo from 'components/video/video'
 
 	export default {
 		name: 'detail',
 		components: { 
 			XButton, Flexbox, FlexboxItem, Tab, TabItem, Swiper, SwiperItem, Sticky, 
-			elHeaderIndex, elImgTextRank, elComment, elReward, elWitness
+			elHeaderIndex, elImgTextRank, elComment, elReward, elWitness, elVideo
 		},
 		data () {
 			return {
@@ -136,7 +138,7 @@
 							percent: responseData.rank ? responseData.rank : 0,
 						};
 
-						_this.course.fileUrl = _this.resolveImg(responseData.file_url);
+						_this.course.fileUrl = responseData.aliyun_file;
 						_this.course.fileThumb = _this.resolveImg(responseData.file_thumb);
 						_this.course.desc = responseData.DESCRIPTION;
 						_this.courseInfo.name = responseData.name;

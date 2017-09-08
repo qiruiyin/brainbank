@@ -10,10 +10,9 @@
 			<card :header="{title:'我的服务人员'}" class="uiBorderTop">
 				<div slot="content" class="service">
 					<div class="service-card">
-						<img :src="service.img" alt="">
+						<img v-show="service.img" :src="service.img" alt="">
 						<div class="service-card-text">
 							<div class="title">{{ service.name }}</div>
-							<p>工号：{{ service.num }}</p>
 							<p>电话：{{ service.tel }}</p>
 
 							<div class="service-btn-group">
@@ -27,11 +26,6 @@
 			<card :header="{title:'近期开课行程安排'}" class="uiBorderTop">
 				<div slot="content" class="table">
 					<el-course-recent></el-course-recent>
-					<!-- <timeline>
-						<timeline-item v-for="(item, index) in courseList" :key="index">
-							<p @click="goCourse(item.code)">{{ item.name }}</p>
-						</timeline-item>
-					</timeline> -->
 				</div>
 			</card>
 		</div>
@@ -42,8 +36,6 @@
 	import { Timeline, TimelineItem, XTable, Card } from 'vux'
 	import elHeaderIndex from 'components/header/header-index'
 	import elCourseRecent from 'components/course/recent'
-	
-	// import imgUser from 'assets/img/user-center/user.png'
 	
 	export default {
 		name: 'kefu',
@@ -89,6 +81,7 @@
 				let _this = this;
 				this.$http.post('/wechat/usercenter/customerService',
 						{
+							"openId": _this.$store.state.user.openId,
 							"customerCode": _this.$store.state.user.userCode,
 						}
 					).then(function(e) {
@@ -176,7 +169,7 @@
 		}
 
 		.title {
-			// font-size: 18px;
+	    line-height: 40px;
 		}
 	}
 

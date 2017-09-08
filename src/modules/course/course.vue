@@ -156,6 +156,9 @@
   	margin-bottom: $padding;
 	}
 	
+	.course-list {
+		padding-bottom: 30px;
+	}
 	
 
 </style>

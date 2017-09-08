@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import store from '../store'
 import wordBook from './wordBook'
+import hold from './hold'
 
 import { AjaxPlugin } from 'vux'
 Vue.use(AjaxPlugin)
@@ -131,7 +132,7 @@ Vue.prototype.signUrl = (url, status = false, obj = {}) => {
 		});
 
 		if(!status) {
-			Vue.prototype.openShare(Vue.prototype.wordBook.urlLink.share, "大脑银行商学院", '海量"企业"管理与"行业资料"任你下载，大量"培训视频"与"商业思维"随你观看！', window.localStorage.getItem("openId"), "", status);
+			Vue.prototype.openShare(Vue.prototype.wordBook.urlLink.share, "大脑银行商学院", '海量"企业"管理与"行业资料"任你下载，大量"培训视频"与"商业思维"随你观看！', hold.storage.getItem("openId"), "", status);
 		} else {
 			store.commit("updateUserShareImg", { 'shareImg': obj.url + "?time=" + Date.parse(new Date())})
 		}

@@ -48,8 +48,6 @@
             this.$router.go(0);
           }
         }
-        // console.log(to, from)
-        // this.$router.go(0)
       }
     },
     mounted () {

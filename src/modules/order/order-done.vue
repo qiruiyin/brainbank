@@ -92,9 +92,10 @@
 			getKefu () {
 				let _this = this;
 
-				_this.$http.post('/wechat/course/contactServiceUser',
+				_this.$http.post('/wechat/usercenter/customerService',
 					{
-						customerCode: _this.$store.state.user.userCode
+						"openId": _this.$store.state.user.openId,
+						"customerCode": _this.$store.state.user.userCode
 					}).then(function(e) {
 						let responseData = e.data.data,
 								service = responseData.userList;

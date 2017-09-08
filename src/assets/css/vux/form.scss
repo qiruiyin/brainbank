@@ -8,8 +8,14 @@
 		width: 7em;
 	}
 
+	.vux-selector {
+		.weui-cell__hd {
+			width: 5em;
+		}
+	}
+
 	.vux-selector.weui-cell_select-after {
-		padding-left: $padding;
+		padding-left: $padding - 3px;
 	}
 
 	.weui-input {
@@ -24,14 +30,6 @@
 
 	.weui-cells {
 		margin-top: 0;
-
-		&:before {
-			border-top: 0;
-		}
-
-		&:after {
-			border-bottom: 0;
-		}
 	}
 }
 
@@ -39,4 +37,34 @@
 	.weui-cell__ft {
 		text-align: left;
 	}
+}
+
+.weui-cell_select .weui-cell__bd:after {
+	width: 12px !important;
+	height: 12px !important;
+}
+
+.vux-check-icon > .weui-icon-success:before, .vux-check-icon > .weui-icon-success-circle:before {
+	margin-left: 0 !important;
+}
+
+.weui-btn {
+	&:after {
+		border-width: 0 !important;
+	}
+
+	&.weui-btn_default {
+		&:after {
+			border-width: 1px !important;
+		}
+	}
+}
+
+.weui-cell_select .weui-cell__bd:after {
+	border-width: 1px 1px 0 0 !important;
+	border-color: #ccc !important;
+}
+
+.weui-search-bar__label span {
+	line-height: 28px;
 }

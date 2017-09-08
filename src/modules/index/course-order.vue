@@ -5,7 +5,7 @@
 <template>
 	<div class="dn-form enlist" v-cloak>
 		<h5 class="enlist-title">{{ courseInfo.course }}
-			<span class="price" v-if="courseInfo.type == 3">￥{{ count.value == 0 ? courseInfo.price : courseInfo.price * count.value | numToCash }}</span>
+			<span class="price" v-if="courseInfo.type == 3">￥{{ count.value == 0 ? courseInfo.price : (courseInfo.price * count.value || courseInfo.price ) | numToCash }}</span>
 			<span class="price" v-else>￥{{ courseInfo.price * (1+addManInfo.length) | numToCash }}</span>
 		</h5>
 
@@ -74,7 +74,7 @@
 	  <group class="add-man" v-for="(item, index) in addManInfo" :key="index">
     	<x-input v-model="item.name.value"  @on-change="nameTestNum(item.name.value)" :placeholder="item.name.placeholder" required>
       	<label slot="label" class="label icon icon-user">{{ item.name.title }}</label>
-				<div slot="right" @click="remove(index)" class="add-btn-click fa fa-minus delete"></div>
+				<div slot="right" @click="remove(index)" class="add-btn-click delete"></div>
       </x-input>
       <div class="el-selector icon icon-idCardType">
 	      <selector :title="item.idCardType.title" direction="left" :options="item.idCardType.list" v-model="item.idCardType.value"></selector>	    	
@@ -89,7 +89,7 @@
 
 		<group v-if="courseInfo.type == 2 && payType != 1">
 			<div @click="add" class="add-btn icon icon-add">添加报名人员
-				<div class="add-btn-click fa fa-plus"></div>
+				<div class="add-btn-click"></div>
 			</div>
 		</group>
 
@@ -309,6 +309,14 @@
 
     		if(this.courseInfo.type == 3) {
     			count = this.count.value;
+    			if(!parseInt(count, 10)) {
+    				this.$vux.alert.show({
+    					content: "报名人数只能为数字"
+    				});
+
+    				return false;
+    			}
+
     			if(count < 5) {
     				this.$vux.alert.show({
     					content: "报名人数不能小于5人"
@@ -489,9 +497,11 @@
 		background: $colorOrange;
 		color: #fff;
 		font-size: $addBtnW - 8px;
+		background: url("~assets/img/icon/plus.png") no-repeat;
+		background-size: 100%;
 
 		&.delete {
-			background: $colorRed;
+			background-image: url("~assets/img/icon/minus.png");
 		}
 	}
 

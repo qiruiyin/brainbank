@@ -106,7 +106,7 @@
 				transition: 1s;
 
 				&:before {
-    			background-image: url("~assets/img/index/tuijian-active.png");
+    			background-image: url("~assets/img/index/tuijian-active.gif");
 				}
 			}
 

@@ -77,6 +77,7 @@
 					upContent: '',
 					loadingContent: '正在加载'
 				},
+				
 			}
 		},
 		mounted () {
@@ -88,6 +89,7 @@
 				this.getSys();
 				this.getPengyou(true);
 			},
+
 			getSys () {
 				let _this = this;
 

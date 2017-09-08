@@ -4,24 +4,28 @@
 
 <template>
 	<div class="user-center" v-cloak>
-		<header>
-			<img :src="user.img" alt="">
-			<!-- <p>{{ user.openId }}</p> -->
-			<div class="header-info">
-				<p>{{ user.name }}</p>
-				<p>{{ user.course }}</p>
+		<div class="user-center-header">
+			<div class="img" @click="checkLogin({name: personData.url}, personData.click)">
+				<img :src="user.img" alt="">
+				<p>{{ user.name }}
+					<span>{{ user.course }}</span>
+				</p>
 			</div>
-		</header>
+			<div class="qrcode" @click="checkLogin({name: shareData.url}, shareData.click)"></div>
+		</div>
 
 		<main>
-			<group v-for="(groupItem, groupIndex) in operations" :key="groupIndex">
-				<cell v-show="item.show" v-for="(item, index) in groupItem.list" @click.native="checkLogin({name: item.url}, item.click)" :title="item.name" :key="index" is-link>
-	        <i slot="icon" :class="['icon', 'icon-user-' + item.icon]"></i>
-	      </cell>
-			</group>
-      <!-- <cell @click.native="clearStorage" :title="clearData.name" >
-        <i slot="icon" :class="['fa', 'fa-' + clearData.icon ]"></i>
-      </cell> -->
+			<div v-show="item.show" class="user-center-block" v-for="(item, index) in operations" :key="index">
+				<div v-if="item.name" class="user-center-block-title">{{ item.name }}</div>
+				<div class="user-center-block-content">
+					<template v-for="(listItem, listInd) in item.list">
+						<div v-if="listItem.show" class="user-center-operate" @click="checkLogin({name: listItem.url}, listItem.click)">
+							<i :class="['icon', 'icon-user-' + listItem.icon]"></i>
+							{{ listItem.name }}
+						</div>
+					</template>
+				</div>
+			</div>
 		</main>	
 	</div>
 </template>
@@ -29,6 +33,7 @@
 <script type="text/babel">
 	import { mapState } from 'vuex'
 	import { Group, Cell } from 'vux'
+	import hold from 'src/commons/hold'
 	
 	export default {
 		components: {
@@ -38,15 +43,33 @@
 			return {
 				title: '用户中心',
 				kefuUrl: 'kefu',
+				personData: {
+					value: '',
+					name: '个人资料',
+					url: 'personal',
+					icon: 'person',
+					click: false,  // 不绑定是否可点击
+					show: true
+				},
+				shareData: {
+					value: '',
+					name: '分享给好友',
+					url: 'share',
+					icon: 'share',
+					click: true, // 不绑定是否可点击
+					show: true,
+				},
 				operations: [
 					{
+						name: "",
+						show: true,
 						list: [
 							{
 								value: '',
 								name: '我的客服',
 								url: 'kefu',
 								icon: 'kefu',
-								click: false, // 不绑定是否可点击
+								click: true, // 不绑定是否可点击
 								show: true
 							},{
 								value: '',
@@ -55,17 +78,6 @@
 								icon: 'share',
 								click: true, // 不绑定是否可点击
 								show: true,
-							}
-						]
-					},{
-						list: [
-							{
-								value: '',
-								name: '个人资料',
-								url: 'personalEdit',
-								icon: 'person',
-								click: false,  // 不绑定是否可点击
-								show: true
 							},{
 								value: '',
 								name: '我的好友',
@@ -76,6 +88,8 @@
 							}
 						]
 					},{
+						name: "我的交易",
+						show: true,
 						list: [
 							{
 								value: '',
@@ -101,21 +115,12 @@
 							},
 						]
 					},{
+						name: "我的设置",
+						show: true,
 						list: [
 							{
 								value: '',
-								name: '地址管理',
-								url: 'address',
-								icon: 'address',
-								click: false,
-								show: true
-							}
-						]
-					},{
-						list: [
-							{
-								value: '',
-								name: '编辑语录',
+								name: '经典语录',
 								url: 'quotationSend',
 								icon: 'quotation',
 								click: true,
@@ -143,6 +148,26 @@
 								show: true
 							}
 						]
+					},{
+						name: "我的助手",
+						show: false,
+						list: [
+							{
+								value: '',
+								name: '业务办理',
+								url: 'http://m.yoao.com/mobile/index.jsp?openId=' + this.$store.state.user.openId,
+								icon: 'yewu',
+								click: true,
+								show: true
+							},{
+								value: '',
+								name: '协同办公',
+								url: 'http://m.yoao.com/mobile/index.jsp?openId=' + this.$store.state.user.openId,
+								icon: 'xietong',
+								click: true,
+								show: true
+							}
+						]
 					}
 				]
 			}
@@ -163,60 +188,41 @@
 						openId: _this.user.openId
 					}).then(function(e) {
 						if(e.data.errcode == 1) {
-							_this.operations[_this.operations.length - 1].list[0].show = true;
+							_this.operations[2].list[0].show = true;
+						}
+					})
+				this.$http.post('/wechat/usercenter/isSysUser',
+					{
+						openId: _this.user.openId
+					}).then(function(e) {
+						if(e.data.errcode == 1) {
+							_this.operations[3].show = e.data.data.isUser;
+							// _this.operations[_this.operations.length - 1].list[0].show = true;
 						}
 					})
 			},
 			clearStorage () {
-				window.localStorage.clear();
+				hold.storage.clear();
 				this.$router.push({name: 'index'})
 			},
 			checkLogin (url, data) {
-				if(data) {
-					if(url.name) {
-						this.$router.push(url); 
+				if(!data) {
+					if(!this.isLogin()) return false
+				}
+
+				if(url.name) {
+					if(/http/.test(url.name)) {
+						location.href = url.name;
 					} else {
-						this.clearStorage(); 
+						this.$router.push(url); 
 					}
 				} else {
-					if(!this.isLogin()) return false
-
-					this.$router.push(url);
+					this.clearStorage(); 
 				}
 			}
 		}
 	}
 </script>
-
-
-<style lang="scss">
-	@import '~lib/sandal/core';
-	@import '~assets/css/core/functions', '~assets/css/core/mixins', '~assets/css/core/vars';
-	
-	.user-center {
-		
-		main {
-			border-bottom: $uiMarginH solid $uiMarginBg;
-		}
-
-		.weui-cell_access .weui-cell__ft:after {
-			width: 10px;
-			height: 10px;
-		}
-
-		.weui-cells {
-			margin-top: 0;
-			border-top: $uiMarginH solid $uiMarginBg;
-
-			&:before {
-				border-top: 0;
-			}
-			&:after {
-				border-bottom: 0;
-			}
-		}
-	}
-</style>
 
 <style lang="scss" scoped>
 	@import '~lib/sandal/core';
@@ -228,46 +234,100 @@
 	
 	$userCenterIconW: 22px;
 
-	.user-center {
-		.icon {
-			padding-left: $userCenterIconW + 6px;
+	.user-center-header {
+		position: relative;
+		padding: 15px;
+		padding-right: 80px;
+		border-top: $uiMarginH solid $uiMarginBg;
+		border-bottom: $uiMarginH solid $uiMarginBg;
+
+		.img {
+			position: relative;
+			padding-left: 60px + 15px;
+			height: 60px;
+			@extend %clearfix;
+			color: $fontColorBlack;
+			line-height: 2;
+
+			p {
+				font-size: 16px;
+				@include ellipsisMore(1);
+			}
+
+			span {
+				font-size: 14px;
+				display: block;
+			}
+		}
+
+		img {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 60px;
+			height: 60px;
+			border-radius: $borderRadius;
+		}
+
+		.qrcode {
+			position: absolute;
+			right: $padding + 20px;
+			top: 50%;
+			width: 19px;
+			height: 19px;
+			margin-top: -10px;
+			background: url("~assets/img/icon/user-qrcode.png") no-repeat;
+			background-size: 100%;
 
 			&:before {
-				width: $userCenterIconW;
-				height: $userCenterIconW;
-				margin-top: -$userCenterIconW/2;
+				content: "";
+				position: absolute;
+				top: 50%;
+				right: -20px;
+				width: 10px;
+				height: 17px;
+				margin-top: -9px;
+				background: url("~assets/img/icon/you.png") no-repeat;
+				background-size: 100%;
 			}
 		}
 	}
 
-	header {
-		padding: $paddingTop 0;
-		background-color: $colorOrange;
-		text-align: center;
-		color: #fff;
+	.user-center-block {
 
-		img {
-			width: $userCenterheaderImgW;
-			height: $userCenterheaderImgW;
-			margin: 0 auto;
-			border-radius: $userCenterheaderImgW;
+	}
+
+	.user-center-block-title {
+		line-height: 30px;
+		text-indent: $padding;
+		background: $uiMarginBg;
+	}
+
+	.user-center-block-content {
+		@extend %clearfix;
+		text-align: center;
+	}
+
+	.user-center-operate {
+		@include halfpxline(0, $uiMarginBg, 0, 2px, 2px, 0);
+		position: relative;
+		float: left;
+		width: 33.33%;
+		height: 90px;
+		padding-top: 60px;
+		padding-left: 0;
+		background-color: #fff;
+
+		&:nth-child(3n) {
+			@include halfpxline(0, $uiMarginBg, 0, 0, 2px, 0);
 		}
 		
-		.header-info {
-			width: 100%;
-			line-height: 2;
-			@extend %clearfix;
-
-			p {
-				float: left;
-				width: 50%;
-				padding: 0 .5em;
-				text-align: right;
-
-				&:last-child {
-					text-align: left;
-				}
-			}
+		i {
+			position: absolute;
+			top: 30px;
+			left: 50%;
+			margin-left: -15px;
+			display: block;
 		}
 	}
 </style>

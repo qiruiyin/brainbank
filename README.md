@@ -133,11 +133,6 @@ For detailed explanation on how things work, checkout the [guide](http://vuejs-t
 
 
 
-# 备注
-
-	由于项目方不允许使用第三方资源服务，在音视频的加载及播放上，存在问题，需要后台支持（目前的后台暂无支持），该项目的音视频播放在体验上需要优化，后台也没有做资源服务器，资源响应很慢
-
-
 # 帮助
 
 	ios 键盘遮挡输入框

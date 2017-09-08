@@ -33,6 +33,7 @@
 							<!-- <audio :src="item.src" @ended="audioEnded" controls="controls" preload hidden :class="'play-audio-' + index" class="play-audio-btn" v-for="(item, index) in tuijianAudioDatas.list" :key="index">
 							</audio> -->
 							<audio @ended="audioEnded" controls="controls" preload="auto" hidden :class="'play-audio-' + index" class="play-audio-btn" v-for="(item, index) in tuijianAudioDatas.list" :key="index">
+							  <source :src="item.src" type="audio/mp4" />
 							  <source :src="item.src" type="audio/mpeg" />
 							  <source :src="item.src" type="audio/mp3" />
 							  <embed :src="item.src" type="audio/mp3" />

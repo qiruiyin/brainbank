@@ -9,7 +9,7 @@
       <selector title="省" placeholder="请选择省份" :options="province.list" v-model="province.value" @on-change="provinceChange"></selector>
       <selector title="市" placeholder="请选择城市" :options="city.list" v-model="city.value" @on-change="cityChange"></selector>
       <selector title="区" placeholder="请选择区县" :options="county.list" v-model="county.value"></selector>
-      <x-input title="具体地址" placeholder="请输入具体地址" v-model="addressDetail"></x-input>
+      <x-textarea title="具体地址" placeholder="请输入具体地址" v-model="addressDetail"></x-textarea>
       <x-input title="姓名" placeholder="请输入姓名" v-model="name"></x-input>
       <x-input title="联系电话" placeholder="请输入联系电话" type="tel" v-model="tel"></x-input>
     	<div class="check">
@@ -24,12 +24,12 @@
 </template>
 
 <script type="text/babel">
-	import { Group, Cell, Selector, CheckIcon, XInput, XButton, XAddress, ChinaAddressV3Data  } from 'vux'
+	import { Group, Cell, Selector, CheckIcon, XInput, XTextarea, XButton, XAddress, ChinaAddressV3Data  } from 'vux'
 	
 	export default {
 		name: "address-add",
 		components: {
-			Group, Cell, Selector, CheckIcon, XInput, XButton, XAddress, ChinaAddressV3Data 
+			Group, Cell, Selector, CheckIcon, XInput, XTextarea, XButton, XAddress, ChinaAddressV3Data 
 		},
 		data () {
 			return {

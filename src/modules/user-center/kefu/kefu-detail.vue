@@ -86,7 +86,8 @@
 				this.$http.post('/wechat/usercenter/customerService/info',
 						{
 							"customerCode": _this.$store.state.user.userCode,
-							"userCode": _this.$route.query.serviceCode
+							"userCode": _this.$route.query.serviceCode,
+							"openId": _this.$store.state.user.openId
 						}
 					).then(function(e) {
 						if(e.data.errcode == 1) {

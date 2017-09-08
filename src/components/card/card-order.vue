@@ -10,7 +10,7 @@
 				<div class="card" v-for="(item, index) in cardData" :key="index">
 					<div class="card-header">
 						<p>订单号：{{ item.code }}</p>
-						<span>{{ item.status }}</span>
+						<span v-if="item.status">{{ item.status }}</span>
 					</div>
 					<div class="card-content">
 						<el-card-course v-if="!item.orderProductList" :card-course-data="item"></el-card-course>
@@ -281,9 +281,9 @@
   }
 
   .card-header {
-		height: $inputH + 8px;
-		line-height: $inputH;
-		padding: 4px $padding;
+		// height: $inputH + 8px;
+		// line-height: $inputH;
+		padding: $padding;
 		color: $fontColorBlack;
   	@include halfpxline(0, $borderColor, 0, 0, 1px, 0);
   	display: flex;
@@ -298,9 +298,7 @@
 
   	p {
   		flex: 1;
-	    overflow: hidden;
-    	text-overflow: ellipsis;
-    	white-space: nowrap;
+  		word-break: break-all;
   	}
 
   	span {

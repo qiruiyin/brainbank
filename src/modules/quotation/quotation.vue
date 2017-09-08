@@ -17,13 +17,21 @@
 		</div>
 
 		<div v-transfer-dom>
-			<popup class="quotation-send" v-model="commentShow" position="bottom">
-	      <group label-width="4em" label-margin-right="2em" label-align="right">
-		      <x-input @on-focus="sendFocus" @on-blur="sendBlur" placeholder="评论" v-model="commentValue">
-		      	<x-button v-if="sendBtn.status" @click.native="submitComment" type="primary" class="send" slot="right" mini>{{ sendBtn.sendStatus ? '发送中' : '发送' }}</x-button>
-		      	<x-button v-else type="primary" class="send" slot="right" mini disabled>{{ sendBtn.sendStatus ? '发送中' : '发送' }}</x-button>
-		      </x-input>
-		    </group>
+			<popup  v-model="commentShow" position="bottom">
+				<div class="quotation-send">
+					<group class="quotation-textarea" label-width="4em" label-margin-right="2em" label-align="right">
+		      	<x-textarea @on-focus="sendFocus" @on-blur="sendBlur" placeholder="评论" v-model="commentValue"></x-textarea>
+			      <!-- <x-input @on-focus="sendFocus" @on-blur="sendBlur" placeholder="评论" v-model="commentValue">
+			      	<x-button v-if="sendBtn.status" @click.native="submitComment" type="primary" class="send" slot="right" mini>{{ sendBtn.sendStatus ? '发送中' : '发送' }}</x-button>
+			      	<x-button v-else type="primary" class="send" slot="right" mini disabled>{{ sendBtn.sendStatus ? '发送中' : '发送' }}</x-button>
+			      </x-input> -->
+			    </group>
+
+			    <div class="quotation-btn">
+			    	<x-button v-if="sendBtn.status" @click.native="submitComment" type="primary" class="send" slot="right" mini>发送</x-button>
+		      	<x-button v-else type="primary" class="send" slot="right" mini disabled>发送</x-button>
+			    </div>	
+				</div>
 	    </popup>
 	   </div>
 	</div>
@@ -143,7 +151,10 @@
 											qulikes: item.qulikes,
 											time: item.time,
 											title: item.title,
-											zans: item.zans
+											zans: item.zans,
+											options: {
+												loop: false
+											}
 										}
 									});
 								}
@@ -184,9 +195,11 @@
 			submitComment () {
 				let _this = this;
 				if(!_this.sendBtn.status) return false;
-				if(_this.sendBtn.sendStatus) return false;
-				_this.sendBtn.sendStatus = true;
 				
+				if(_this.$store.state.loadbar.isLoading) return;
+
+				_this.$store.commit('updateLoadingStatus', {isLoading: true});
+
 				_this.$http.post('/wechat/quotationsmobile/addComment',
 					{
 						userCode: _this.$store.state.user.userCode, //用户code
@@ -197,7 +210,7 @@
 						_this.commentValue = "";
 						let responseData = e.data.data;
 						
-						_this.sendBtn.sendStatus = false;
+						_this.$store.commit('updateLoadingStatus', {isLoading: false});
 						_this.commentShow = false;
 
 						if(responseData.tag == 1) {
@@ -232,7 +245,7 @@
 	
 	.quotation-send {
 		.weui-cell {
-			padding: 24px 15px;
+			padding: 24px 0 24px 15px;
 		}
 
 		.weui-cells {
@@ -245,7 +258,7 @@
 		}
 
 		.weui-cell__bd {
-			@include halfpxline(0, $quotationSendBtnBorderBottom, 0 , 0, 1px, 0);
+			// @include halfpxline(0, $quotationSendBtnBorderBottom, 0 , 0, 1px, 0);
 			margin-right: $padding;
 		}
 
@@ -277,5 +290,19 @@
 	.btns {
 		padding: $padding;
 	}
+	
+	.quotation-send {
+		position: relative;
+		padding-right: 5em;
+	}
 
+	.quotation-textarea {
+	}
+
+	.quotation-btn {
+		position: absolute;
+		bottom: 24px;
+		right: 0;
+		width: 5em;
+	}
 </style>

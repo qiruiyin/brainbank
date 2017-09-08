@@ -124,7 +124,7 @@
 				        })
 							} else if (responseData.data.status == 1) {
 			  				_this.$store.commit('updateUserOpenId', {openId: hold.storage.get("openId")});
-								// hold.storage.set("userCode", responseData.data.userCode);
+								hold.storage.set("userCode", responseData.data.userCode);
 			  				_this.$store.commit('updateUserUserCode', {userCode: responseData.data.userCode});
 
 			  				_this.$vux.alert.show({

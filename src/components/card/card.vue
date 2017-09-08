@@ -23,8 +23,6 @@
 <script type="text/babel">
 	import { Panel, Group, Radio } from 'vux'
 	
-	import imgHeader from 'assets/img/icon/icon.png'
-
 	export default {
 		name: 'card',
 		components: { Panel },
